@@ -16,7 +16,7 @@ jobs:
           python-version: '3.12'
       - run: pip install -r requirements.txt
       - name: Compile application
-        run: python -m py_compile app.py core.py starter_data.py
+        run: python -m py_compile app.py core.py starter_data.py storage.py
       - name: Run deterministic workflow tests
         run: PYTHONPATH=. pytest -q
       - name: Streamlit smoke test
