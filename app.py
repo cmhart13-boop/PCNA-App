@@ -10,8 +10,7 @@ st.markdown("""
 [data-testid="stSidebar"] > div:first-child { padding-top:1rem; }
 .block-container { padding-top:1.25rem; max-width:1500px; }
 #MainMenu, footer, header { visibility:hidden; }
-.pcna-wordmark { font-size:3rem; font-weight:900; letter-spacing:-.12rem; color:var(--pcna); line-height:1; }
-.app-name { font-size:.92rem; font-weight:700; color:var(--ink); margin-top:.45rem; }
+.app-name { font-size:.92rem; font-weight:700; color:var(--ink); margin-top:.15rem; }
 .eyebrow { font-size:.72rem; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:var(--pcna); }
 .hero { padding:1.2rem 0 .8rem 0; border-bottom:1px solid var(--line); margin-bottom:1.1rem; }
 .hero h1 { margin:.15rem 0 .25rem; font-size:2.15rem; letter-spacing:-.03em; color:var(--ink); }
@@ -19,12 +18,12 @@ st.markdown("""
 .card { border:1px solid var(--line); border-radius:14px; padding:1.05rem; min-height:135px; background:#fff; box-shadow:0 5px 18px rgba(18,43,68,.04); }
 .card-title { font-size:1rem; font-weight:800; color:var(--ink); margin-bottom:.25rem; }
 .card-copy { font-size:.87rem; color:var(--muted); line-height:1.4; }
-.small-label { font-size:.72rem; color:var(--muted); font-weight:700; text-transform:uppercase; letter-spacing:.08em; }
 </style>
 """, unsafe_allow_html=True)
 
 with st.sidebar:
-    st.markdown('<div class="pcna-wordmark">PCNA</div><div class="app-name">PCNA Assistant</div>', unsafe_allow_html=True)
+    st.image("assets/pcna-logo.webp", width=170)
+    st.markdown('<div class="app-name">PCNA Assistant</div>', unsafe_allow_html=True)
     st.write("")
     section = st.radio(
         "Workspace",
@@ -56,7 +55,7 @@ else:
         left, right = st.columns([1.15, .85])
         with left:
             st.subheader("Start a spec sample order")
-            request = st.text_area("Tell PCNA Assistant what you need", placeholder="Example: Dade Polo, black, medium, embroidery left chest, white imprint; Stanley Quencher 30 oz, polar, laser left of handle.", height=150)
+            st.text_area("Tell PCNA Assistant what you need", placeholder="Example: Dade Polo, black, medium, embroidery left chest, white imprint; Stanley Quencher 30 oz, polar, laser left of handle.", height=150)
             st.button("Build Spec Order", type="primary", use_container_width=True)
         with right:
             st.subheader("Order defaults")
