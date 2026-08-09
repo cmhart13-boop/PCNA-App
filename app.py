@@ -33,8 +33,7 @@ from storage import (
 )
 
 st.set_page_config(
-    page_title="PCNA Assistant",
-    page_icon="💼",
+    page_title="PCNA",
     layout="centered",
     initial_sidebar_state="collapsed",
 )
@@ -57,20 +56,11 @@ html,body,[data-testid="stAppViewContainer"]{{background:#fff;color:var(--ink);}
 #MainMenu,footer,[data-testid="stToolbar"]{{visibility:hidden!important;height:0!important;}}
 .block-container{{max-width:620px!important;padding:12px 15px 104px!important;margin:0 auto!important;}}
 
-/* mobile app header */
-.app-header{{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:4px 1px 12px;border-bottom:1px solid var(--line);margin-bottom:14px;}}
-.brand-wrap{{display:flex;align-items:center;gap:9px;min-width:0;}}
-.brand-logo{{width:92px;height:auto;display:block;}}
-.brand-copy{{font-size:11px;font-weight:800;letter-spacing:.07em;color:var(--muted);text-transform:uppercase;white-space:nowrap;}}
-.status-dot{{display:inline-flex;align-items:center;gap:6px;border:1px solid #dce9e2;background:#f5fbf7;color:var(--green);border-radius:999px;padding:6px 9px;font-size:11px;font-weight:800;white-space:nowrap;}}
-.status-dot:before{{content:'';width:7px;height:7px;background:var(--green);border-radius:50%;}}
-
 .page-kicker{{font-size:11px;font-weight:900;letter-spacing:.10em;color:var(--pcna);text-transform:uppercase;margin-top:2px;}}
 .page-title{{font-size:29px;line-height:1.04;font-weight:850;letter-spacing:-.035em;color:var(--ink);margin:4px 0 7px;}}
 .page-copy{{font-size:15px;line-height:1.45;color:var(--muted);margin:0 0 18px;}}
 .section-title{{font-size:18px;font-weight:850;letter-spacing:-.015em;margin:20px 0 9px;color:var(--ink);}}
 
-/* tappable home cards */
 .action-grid{{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:4px 0 6px;}}
 .action-card{{display:block;text-decoration:none!important;border:1px solid var(--line);border-radius:17px;padding:16px 14px;background:#fff;min-height:118px;box-shadow:0 5px 17px rgba(20,55,80,.055);transition:transform .12s ease,box-shadow .12s ease;}}
 .action-card:active{{transform:scale(.985);}}
@@ -81,14 +71,12 @@ html,body,[data-testid="stAppViewContainer"]{{background:#fff;color:var(--ink);}
 .wide-card .action-icon{{margin:0;font-size:22px;}}
 .wide-card .action-title{{margin:0 0 2px;}}
 
-/* info/result cards */
 .info-card{{border:1px solid var(--line);border-radius:16px;padding:14px;background:#fff;margin:8px 0;box-shadow:0 4px 15px rgba(20,55,80,.04);}}
 .info-card-title{{font-size:15px;font-weight:850;color:var(--ink);}}
 .info-card-meta{{font-size:12px;color:var(--muted);margin-top:3px;}}
 .data-chip{{display:inline-block;padding:5px 8px;border-radius:999px;background:#eef5fa;color:var(--pcna);font-size:11px;font-weight:850;margin-right:5px;}}
 .order-box{{white-space:pre-wrap;border:1px solid var(--line);background:#fbfcfd;border-radius:15px;padding:14px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;line-height:1.5;overflow-wrap:anywhere;}}
 
-/* Streamlit controls tuned for thumbs */
 .stButton>button,.stDownloadButton>button,[data-testid="stLinkButton"] a{{min-height:48px!important;border-radius:13px!important;font-weight:800!important;font-size:15px!important;width:100%!important;}}
 .stTextInput input,.stNumberInput input,.stTextArea textarea,[data-baseweb="select"]>div{{min-height:48px!important;border-radius:12px!important;font-size:16px!important;}}
 .stTextArea textarea{{min-height:112px!important;}}
@@ -98,7 +86,6 @@ html,body,[data-testid="stAppViewContainer"]{{background:#fff;color:var(--ink);}
 hr{{margin:16px 0!important;border-color:var(--line)!important;}}
 label,[data-testid="stWidgetLabel"]{{font-weight:750!important;color:var(--ink)!important;}}
 
-/* fixed app nav */
 .bottom-nav{{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:min(620px,100%);height:76px;background:rgba(255,255,255,.96);backdrop-filter:blur(16px);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(4,1fr);z-index:9999;padding:7px 7px max(7px,env(safe-area-inset-bottom));box-sizing:border-box;}}
 .nav-item{{display:flex;flex-direction:column;align-items:center;justify-content:center;text-decoration:none!important;color:#7890a0!important;font-size:10px;font-weight:800;gap:3px;border-radius:12px;}}
 .nav-icon{{font-size:20px;line-height:1;}}
@@ -109,9 +96,6 @@ label,[data-testid="stWidgetLabel"]{{font-weight:750!important;color:var(--ink)!
  .page-title{{font-size:27px;}}
  .action-grid{{gap:9px;}}
  .action-card{{padding:15px 12px;min-height:112px;}}
- .brand-logo{{width:82px;}}
- .brand-copy{{display:none;}}
- .status-dot{{font-size:10px;padding:5px 7px;}}
 }}
 @media(max-width:350px){{.action-grid{{grid-template-columns:1fr;}}.wide-card{{grid-column:auto;}}}}
 </style>
@@ -162,25 +146,6 @@ def current_page() -> str:
 
 def nav_link(page: str) -> str:
     return f"?page={quote(page)}"
-
-
-def app_header():
-    logo_html = (
-        '<img src="app/static/pcna-logo.webp" class="brand-logo">'
-        if False
-        else '<div style="font-size:24px;font-weight:950;letter-spacing:-.06em;color:#084f86">PCNA</div>'
-    )
-    # st.image is used below for the exact uploaded logo; this HTML fallback keeps spacing stable.
-    c1, c2 = st.columns([1.8, 1])
-    with c1:
-        if Path("assets/pcna-logo.webp").exists():
-            st.image("assets/pcna-logo.webp", width=112)
-        else:
-            st.markdown(logo_html, unsafe_allow_html=True)
-        st.caption("PCNA Assistant · Mobile Sales Workspace")
-    with c2:
-        st.markdown('<div style="text-align:right;padding-top:7px"><span class="status-dot">Verified data</span></div>', unsafe_allow_html=True)
-    st.markdown('<div style="border-bottom:1px solid #e2e9ef;margin:-3px 0 14px"></div>', unsafe_allow_html=True)
 
 
 def page_header(kicker: str, title: str, copy: str):
@@ -274,10 +239,8 @@ def product_configuration(prefix: str):
 
 
 page = current_page()
-app_header()
 
 if page == "home":
-    page_header("Mobile Sales Workspace", "Everything PCNA. In your pocket.", "Fast product lookup, samples, quotes, virtual requests and saved customer work — built specifically for phone use.")
     projects = persistent_projects()
     st.markdown(
         f'<span class="data-chip">{st.session_state.data_source}</span><span class="data-chip">{len(projects)} saved</span>',
