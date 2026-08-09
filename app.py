@@ -1,8 +1,6 @@
 from __future__ import annotations
 
 import json
-import os
-from datetime import date
 from pathlib import Path
 
 import pandas as pd
@@ -24,6 +22,14 @@ from core import (
     search_products,
 )
 from starter_data import verified_starter_data
+from storage import (
+    delete_project,
+    export_projects,
+    list_project_files,
+    list_projects,
+    save_project as persist_project,
+    save_upload,
+)
 
 st.set_page_config(page_title="PCNA Assistant", page_icon="💼", layout="wide", initial_sidebar_state="expanded")
 
@@ -52,7 +58,6 @@ header[data-testid="stHeader"] {{background:transparent;}}
 .pcna-card-copy {{color:var(--muted);font-size:.88rem;line-height:1.45;}}
 .pcna-badge {{display:inline-block;padding:.25rem .6rem;border-radius:999px;background:#eaf4fb;color:var(--pcna);font-size:.72rem;font-weight:800;}}
 .pcna-order {{white-space:pre-wrap;border:1px solid var(--line);background:#fbfcfd;border-radius:12px;padding:1rem;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.88rem;line-height:1.48;}}
-.small-muted {{font-size:.8rem;color:var(--muted);}}
 div[data-testid="stMetric"] {{border:1px solid var(--line);border-radius:14px;padding:.75rem;background:#fff;}}
 .stButton > button[kind="primary"] {{background:var(--pcna);border-color:var(--pcna);}}
 </style>
@@ -66,11 +71,6 @@ def read_csv_bytes(data: bytes, name: str) -> pd.DataFrame:
     import io
     compression = "gzip" if name.lower().endswith(".gz") else "infer"
     return pd.read_csv(io.BytesIO(data), low_memory=False, compression=compression)
-
-
-@st.cache_data(show_spinner=False)
-def read_csv_path(path: str) -> pd.DataFrame:
-    return pd.read_csv(path, low_memory=False)
 
 
 def load_bundled_or_starter():
@@ -95,8 +95,6 @@ if "products" not in st.session_state:
     st.session_state.decorations = d
     st.session_state.pricing = r
     st.session_state.data_source = source
-if "projects" not in st.session_state:
-    st.session_state.projects = []
 if "spec_item_count" not in st.session_state:
     st.session_state.spec_item_count = 1
 if "chat_history" not in st.session_state:
@@ -110,17 +108,8 @@ def hero(kicker: str, title: str, copy: str):
     )
 
 
-def save_project(kind: str, customer: str, project: str, payload: dict):
-    st.session_state.projects.insert(
-        0,
-        {
-            "type": kind,
-            "customer": customer.strip() or "Unassigned",
-            "project": project.strip() or f"{kind} {date.today().isoformat()}",
-            "date": date.today().isoformat(),
-            "payload": payload,
-        },
-    )
+def save_project(kind: str, customer: str, project: str, payload: dict) -> int:
+    return persist_project(kind, customer, project, payload)
 
 
 def product_picker(prefix: str):
@@ -217,30 +206,31 @@ with st.sidebar:
 
 
 if section == "Home":
+    projects = list_projects()
     hero("PCNA Sales Workspace", "PCNA Assistant", "One place for product lookup, spec samples, quotes, virtual requests, packaging concepts and customer project history.")
     m1, m2, m3, m4 = st.columns(4)
     m1.metric("Products", f"{st.session_state.products['Item Number'].nunique():,}")
     m2.metric("Decoration rows", f"{len(st.session_state.decorations):,}")
     m3.metric("Pricing rows", f"{len(st.session_state.pricing):,}")
-    m4.metric("Saved projects", len(st.session_state.projects))
+    m4.metric("Saved projects", len(projects))
     st.write("")
     cols = st.columns(4)
     cards = [
         ("Spec Samples", "Build the PCNA spec format from verified item, color and decoration data."),
         ("Quotes", "Uses decorated pricing by default and applies the correct quantity tier."),
-        ("Virtual Requests", "Keep customer, item, artwork filename and decoration direction together."),
-        ("Perfectly Packaged", "Save kit components, creative direction and packaging concepts by customer."),
+        ("Virtual Requests", "Keep customer, item, artwork and decoration direction together."),
+        ("Perfectly Packaged", "Save kit components, reference files and creative direction by customer."),
     ]
     for col, (title, copy) in zip(cols, cards):
         with col:
             st.markdown(f'<div class="pcna-card"><div class="pcna-card-title">{title}</div><div class="pcna-card-copy">{copy}</div></div>', unsafe_allow_html=True)
     st.write("")
     st.subheader("Recent projects")
-    if not st.session_state.projects:
-        st.info("Your saved work will appear here during this session. Export projects from Saved Projects at any time.")
+    if not projects:
+        st.info("Saved work will appear here and remain available after a browser refresh.")
     else:
-        for p in st.session_state.projects[:6]:
-            st.write(f"**{p['customer']} — {p['project']}** · {p['type']} · {p['date']}")
+        for p in projects[:6]:
+            st.write(f"**{p['customer']} — {p['project']}** · {p['type']} · {p['date'][:10]}")
 
 
 elif section == "PCNA Assistant":
@@ -331,18 +321,14 @@ elif section == "Spec Sample Orders":
         st.session_state.spec_item_count -= 1
         st.rerun()
     if st.button("Build Spec Sample Order", type="primary", use_container_width=True, disabled=len(configured) != st.session_state.spec_item_count):
-        items = []
-        for cfg in configured:
-            items.append(SpecItem(
-                product=cfg["Product Name"],
-                item_number=cfg["Item Number"],
-                color=cfg["Color"],
-                size=cfg["Size"],
-                decoration_method=cfg["Decoration Method"],
-                decoration_location=cfg["Decoration Location"],
-                imprint_color="N/A" if is_no_ink_decoration(cfg["Decoration Method"]) else cfg["Imprint Color"],
-                imprint_size="Max Imprint",
-            ))
+        items = [
+            SpecItem(
+                product=cfg["Product Name"], item_number=cfg["Item Number"], color=cfg["Color"], size=cfg["Size"],
+                decoration_method=cfg["Decoration Method"], decoration_location=cfg["Decoration Location"],
+                imprint_color="N/A" if is_no_ink_decoration(cfg["Decoration Method"]) else cfg["Imprint Color"], imprint_size="Max Imprint"
+            )
+            for cfg in configured
+        ]
         order = build_spec_order(items, po=po, ship_date=ship_date, in_hands_date=in_hands, ship_to=ship_to)
         st.session_state.last_spec = order
         save_project("Spec Sample Order", customer, customer, {"order": order})
@@ -397,7 +383,7 @@ elif section == "Quotes":
                 if st.button("Save Quote", type="primary", use_container_width=True):
                     payload = {**identity, "Quantity": qty, "Color": color, **tier}
                     save_project("Quote", customer, customer, payload)
-                    st.success("Quote saved to this session's project workspace.")
+                    st.success("Quote saved to the persistent project workspace.")
 
 
 elif section == "Virtual Requests":
@@ -408,22 +394,26 @@ elif section == "Virtual Requests":
     instructions = st.text_area("Creative Instructions", placeholder="Logo centered left chest, white imprint, show on black garment...")
     if st.button("Save Virtual Request", type="primary", use_container_width=True, disabled=cfg is None):
         payload = {**cfg, "Artwork": artwork.name if artwork else "", "Instructions": instructions}
-        save_project("Virtual Request", customer, customer, payload)
-        st.success("Virtual request saved.")
+        project_id = save_project("Virtual Request", customer, customer, payload)
+        if artwork:
+            save_upload(project_id, artwork.name, artwork.getvalue())
+        st.success("Virtual request and artwork saved.")
 
 
 elif section == "Perfectly Packaged":
     hero("Kitting", "Perfectly Packaged", "Build and save multi-product kit concepts without losing product or customer context.")
     customer = st.text_input("Customer", key="package_customer")
     package_name = st.text_input("Package / Concept Name", placeholder="Ford Dealer Welcome Kit")
-    st.info("Use Product Search to verify each component before finalizing the kit. Perfectly Packaged design assets and rendered virtuals can be attached to the project as they are created.")
+    st.info("Use Product Search to verify each component before finalizing the kit. Reference art and finished virtuals can be stored with the project.")
     items = st.text_area("Verified Kit Components", height=180, placeholder="TM16398 — Men's DADE Short Sleeve Polo — Black — Embroidery Left Chest\n1603-02 — Stanley Quencher 30oz — Frost — Laser Handle Left")
     concept = st.text_area("Packaging / Design Direction", height=160, placeholder="Describe box concept, brand story, inside-lid art, card copy and arrangement...")
     refs = st.file_uploader("Reference files / artwork", accept_multiple_files=True, type=["png", "jpg", "jpeg", "pdf", "svg"])
     if st.button("Save Perfectly Packaged Project", type="primary", use_container_width=True):
         payload = {"Components": [x.strip() for x in items.splitlines() if x.strip()], "Concept": concept, "Files": [f.name for f in refs]}
-        save_project("Perfectly Packaged", customer, package_name, payload)
-        st.success("Perfectly Packaged project saved.")
+        project_id = save_project("Perfectly Packaged", customer, package_name, payload)
+        for file in refs:
+            save_upload(project_id, file.name, file.getvalue())
+        st.success("Perfectly Packaged project and files saved.")
 
 
 elif section == "Design Concepts":
@@ -433,20 +423,36 @@ elif section == "Design Concepts":
     brief = st.text_area("Creative Brief", height=220)
     files = st.file_uploader("Reference files", accept_multiple_files=True, type=["png", "jpg", "jpeg", "pdf", "svg"])
     if st.button("Save Design Concept", type="primary", use_container_width=True):
-        save_project("Design Concept", customer, concept_name, {"Brief": brief, "Files": [f.name for f in files]})
-        st.success("Design concept saved.")
+        project_id = save_project("Design Concept", customer, concept_name, {"Brief": brief, "Files": [f.name for f in files]})
+        for file in files:
+            save_upload(project_id, file.name, file.getvalue())
+        st.success("Design concept and files saved.")
 
 
 elif section == "Saved Projects":
-    hero("Workspace", "Saved Projects", "Review everything created in this session and export the full project history as JSON.")
-    if not st.session_state.projects:
+    hero("Workspace", "Saved Projects", "Reopen saved specs, quotes, virtual requests, packaging concepts and their uploaded files.")
+    projects = list_projects()
+    if not projects:
         st.info("No projects saved yet.")
     else:
-        for i, project in enumerate(st.session_state.projects):
+        for project in projects:
             with st.expander(f"{project['customer']} — {project['project']} · {project['type']}"):
+                st.caption(f"Saved {project['date']}")
                 st.json(project["payload"])
-        export = json.dumps(st.session_state.projects, indent=2, ensure_ascii=False)
-        st.download_button("Export All Projects", export, file_name="PCNA_Assistant_Projects.json", mime="application/json", use_container_width=True)
+                project_files = list_project_files(project["id"])
+                if project_files:
+                    st.markdown("**Files**")
+                    for file_path in project_files:
+                        st.download_button(
+                            f"Download {file_path.name}",
+                            data=file_path.read_bytes(),
+                            file_name=file_path.name,
+                            key=f"file_{project['id']}_{file_path.name}",
+                        )
+                if st.button("Delete Project", key=f"delete_{project['id']}"):
+                    delete_project(project["id"])
+                    st.rerun()
+        st.download_button("Export All Projects", export_projects(), file_name="PCNA_Assistant_Projects.json", mime="application/json", use_container_width=True)
 
 
 elif section == "Data Sources":
@@ -473,4 +479,4 @@ elif section == "Data Sources":
             except Exception as exc:
                 st.error(f"Data validation failed: {exc}")
     st.divider()
-    st.caption("Source precedence for production: live PCNA/PromoStandards data should override CSV conflicts when the API bridge is configured. The current app never silently invents missing data.")
+    st.caption("Source precedence for production: live PCNA/PromoStandards data should override CSV conflicts when the API bridge is configured. The app never silently invents missing data.")
