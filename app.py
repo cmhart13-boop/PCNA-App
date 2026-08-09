@@ -54,37 +54,41 @@ html,body,[data-testid="stAppViewContainer"]{{background:#fff;color:var(--ink);}
 [data-testid="stHeader"]{{background:rgba(255,255,255,.94);backdrop-filter:blur(12px);height:0;}}
 [data-testid="stSidebar"]{{display:none;}}
 #MainMenu,footer,[data-testid="stToolbar"]{{visibility:hidden!important;height:0!important;}}
-.block-container{{max-width:620px!important;padding:12px 15px 104px!important;margin:0 auto!important;}}
+.block-container{{max-width:620px!important;padding:calc(34px + env(safe-area-inset-top)) 15px 104px!important;margin:0 auto!important;}}
 
 .page-kicker{{font-size:11px;font-weight:900;letter-spacing:.10em;color:var(--pcna);text-transform:uppercase;margin-top:2px;}}
-.page-title{{font-size:29px;line-height:1.04;font-weight:850;letter-spacing:-.035em;color:var(--ink);margin:4px 0 7px;}}
-.page-copy{{font-size:15px;line-height:1.45;color:var(--muted);margin:0 0 18px;}}
-.section-title{{font-size:18px;font-weight:850;letter-spacing:-.015em;margin:20px 0 9px;color:var(--ink);}}
+.page-title{{font-size:29px;line-height:1.08;font-weight:850;letter-spacing:-.035em;color:var(--pcna);margin:4px 0 9px;}}
+.page-copy{{font-size:15px;line-height:1.48;color:var(--muted);margin:0 0 18px;}}
+.section-title{{font-size:18px;font-weight:850;letter-spacing:-.015em;margin:20px 0 9px;color:var(--pcna);}}
 
 .action-grid{{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:4px 0 6px;}}
 .action-card{{display:block;text-decoration:none!important;border:1px solid var(--line);border-radius:17px;padding:16px 14px;background:#fff;min-height:118px;box-shadow:0 5px 17px rgba(20,55,80,.055);transition:transform .12s ease,box-shadow .12s ease;}}
 .action-card:active{{transform:scale(.985);}}
-.action-icon{{font-size:24px;line-height:1;margin-bottom:14px;}}
-.action-title{{font-size:15px;font-weight:850;color:var(--ink);line-height:1.15;margin-bottom:5px;}}
+.action-icon{{font-size:24px;line-height:1;margin-bottom:14px;color:var(--pcna);}}
+.action-title{{font-size:15px;font-weight:850;color:var(--pcna);line-height:1.15;margin-bottom:5px;}}
 .action-copy{{font-size:12px;color:var(--muted);line-height:1.35;}}
 .wide-card{{grid-column:1/-1;min-height:auto;display:flex;align-items:center;gap:12px;padding:14px 15px;}}
 .wide-card .action-icon{{margin:0;font-size:22px;}}
 .wide-card .action-title{{margin:0 0 2px;}}
 
 .info-card{{border:1px solid var(--line);border-radius:16px;padding:14px;background:#fff;margin:8px 0;box-shadow:0 4px 15px rgba(20,55,80,.04);}}
-.info-card-title{{font-size:15px;font-weight:850;color:var(--ink);}}
+.info-card-title{{font-size:15px;font-weight:850;color:var(--pcna);}}
 .info-card-meta{{font-size:12px;color:var(--muted);margin-top:3px;}}
 .data-chip{{display:inline-block;padding:5px 8px;border-radius:999px;background:#eef5fa;color:var(--pcna);font-size:11px;font-weight:850;margin-right:5px;}}
 .order-box{{white-space:pre-wrap;border:1px solid var(--line);background:#fbfcfd;border-radius:15px;padding:14px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;line-height:1.5;overflow-wrap:anywhere;}}
 
 .stButton>button,.stDownloadButton>button,[data-testid="stLinkButton"] a{{min-height:48px!important;border-radius:13px!important;font-weight:800!important;font-size:15px!important;width:100%!important;}}
-.stTextInput input,.stNumberInput input,.stTextArea textarea,[data-baseweb="select"]>div{{min-height:48px!important;border-radius:12px!important;font-size:16px!important;}}
+.stTextInput input,.stNumberInput input,.stTextArea textarea,[data-baseweb="select"]>div{{min-height:50px!important;border-radius:12px!important;font-size:16px!important;background:#fff!important;border-color:#b8cad8!important;color:var(--ink)!important;}}
+.stTextInput input:focus,.stNumberInput input:focus,.stTextArea textarea:focus{{border-color:var(--pcna)!important;box-shadow:0 0 0 1px var(--pcna)!important;}}
+[data-baseweb="select"]>div:focus-within{{border-color:var(--pcna)!important;box-shadow:0 0 0 1px var(--pcna)!important;}}
+.stTextInput input::placeholder,.stTextArea textarea::placeholder{{color:#7a8d9d!important;opacity:1!important;}}
 .stTextArea textarea{{min-height:112px!important;}}
-[data-testid="stFileUploaderDropzone"]{{border-radius:14px!important;padding:14px 10px!important;}}
+[data-testid="stFileUploaderDropzone"]{{border-radius:14px!important;padding:14px 10px!important;border-color:#b8cad8!important;background:#fbfdff!important;}}
 [data-testid="stExpander"]{{border:1px solid var(--line)!important;border-radius:14px!important;overflow:hidden;margin:8px 0;}}
 [data-testid="stMetric"]{{border:1px solid var(--line);border-radius:14px;padding:12px;background:#fff;}}
 hr{{margin:16px 0!important;border-color:var(--line)!important;}}
-label,[data-testid="stWidgetLabel"]{{font-weight:750!important;color:var(--ink)!important;}}
+label,[data-testid="stWidgetLabel"]{{font-weight:800!important;color:var(--pcna)!important;}}
+[data-testid="stWidgetLabel"] p{{color:var(--pcna)!important;font-weight:800!important;}}
 
 .bottom-nav{{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:min(620px,100%);height:76px;background:rgba(255,255,255,.96);backdrop-filter:blur(16px);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(4,1fr);z-index:9999;padding:7px 7px max(7px,env(safe-area-inset-bottom));box-sizing:border-box;}}
 .nav-item{{display:flex;flex-direction:column;align-items:center;justify-content:center;text-decoration:none!important;color:#7890a0!important;font-size:10px;font-weight:800;gap:3px;border-radius:12px;}}
@@ -92,8 +96,9 @@ label,[data-testid="stWidgetLabel"]{{font-weight:750!important;color:var(--ink)!
 .nav-item.active{{color:var(--pcna)!important;background:#eff6fb;}}
 
 @media(max-width:430px){{
- .block-container{{padding-left:12px!important;padding-right:12px!important;}}
- .page-title{{font-size:27px;}}
+ .block-container{{padding-top:calc(38px + env(safe-area-inset-top))!important;padding-left:12px!important;padding-right:12px!important;}}
+ .page-title{{font-size:28px;line-height:1.1;}}
+ .page-copy{{font-size:15px;}}
  .action-grid{{gap:9px;}}
  .action-card{{padding:15px 12px;min-height:112px;}}
 }}
