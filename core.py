@@ -66,9 +66,27 @@ def search_products(products: pd.DataFrame, query: str, limit: int = 30) -> pd.D
     brand = products["Brand"].str.lower()
     exact_item = item.eq(q)
     starts_item = item.str.startswith(q, na=False)
-    name_has = name.str.contains(q, regex=False, na=False)
-    brand_has = brand.str.contains(q, regex=False, na=False)
-    score = exact_item.astype(int) * 100 + starts_item.astype(int) * 50 + name_has.astype(int) * 20 + brand_has.astype(int) * 5
+    phrase_name = name.str.contains(q, regex=False, na=False)
+    phrase_brand = brand.str.contains(q, regex=False, na=False)
+    tokens = [t for t in q.replace("-", " ").split() if t]
+    if tokens:
+        token_name = pd.Series(True, index=products.index)
+        token_any = pd.Series(True, index=products.index)
+        combined = name + " " + brand + " " + item
+        for token in tokens:
+            token_name &= name.str.contains(token, regex=False, na=False)
+            token_any &= combined.str.contains(token, regex=False, na=False)
+    else:
+        token_name = pd.Series(False, index=products.index)
+        token_any = pd.Series(False, index=products.index)
+    score = (
+        exact_item.astype(int) * 100
+        + starts_item.astype(int) * 50
+        + phrase_name.astype(int) * 30
+        + token_name.astype(int) * 24
+        + token_any.astype(int) * 12
+        + phrase_brand.astype(int) * 5
+    )
     out = products.loc[score.gt(0)].copy()
     out["_score"] = score[score.gt(0)]
     out = out.sort_values(["_score", "Product Name", "Item Number"], ascending=[False, True, True])
@@ -122,7 +140,6 @@ def pricing_schedules(pricing: pd.DataFrame, item_number: str, *, currency: str 
     schedules = [s for s in rows["Decorated or Blank"].map(_clean_text).unique().tolist() if s]
     def rank(s: str):
         sl = s.lower()
-        # Default to LIST decorated schedule first. This avoids accidentally returning blank or net pricing.
         return (0 if "list" in sl else 1, 0 if sl.endswith("_1") else 1, sl)
     return sorted(schedules, key=rank)
 
