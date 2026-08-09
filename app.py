@@ -32,11 +32,7 @@ from storage import (
     save_upload,
 )
 
-st.set_page_config(
-    page_title="PCNA",
-    layout="centered",
-    initial_sidebar_state="collapsed",
-)
+st.set_page_config(page_title="PCNA", layout="centered", initial_sidebar_state="collapsed")
 
 PCNA_BLUE = "#084f86"
 INK = "#14273a"
@@ -60,6 +56,33 @@ html,body,[data-testid="stAppViewContainer"]{{background:#fff;color:var(--ink);}
 .page-title{{font-size:29px;line-height:1.04;font-weight:850;letter-spacing:-.035em;color:var(--ink);margin:4px 0 7px;}}
 .page-copy{{font-size:15px;line-height:1.45;color:var(--muted);margin:0 0 18px;}}
 .section-title{{font-size:18px;font-weight:850;letter-spacing:-.015em;margin:20px 0 9px;color:var(--ink);}}
+
+.promo-shell{{overflow:hidden;border-radius:22px;margin:0 0 14px;box-shadow:0 10px 30px rgba(15,55,85,.12);}}
+.promo-track{{display:flex;width:max-content;animation:pcnaMarquee 24s linear infinite;}}
+.promo-shell:hover .promo-track{{animation-play-state:paused;}}
+.promo-slide{{width:min(590px,calc(100vw - 30px));height:202px;flex:0 0 auto;position:relative;overflow:hidden;text-decoration:none!important;color:#fff!important;display:block;}}
+.promo-slide:after{{content:'';position:absolute;inset:0;background:linear-gradient(90deg,rgba(6,28,48,.80),rgba(6,28,48,.22) 58%,rgba(6,28,48,.06));}}
+.promo-a{{background:linear-gradient(135deg,#005c95 0%,#00a7c8 52%,#9ae8ef 100%);}}
+.promo-b{{background:linear-gradient(135deg,#231f5f 0%,#6558d3 48%,#ff7f9c 100%);}}
+.promo-c{{background:linear-gradient(135deg,#0f5c45 0%,#2aa876 50%,#bce784 100%);}}
+.promo-art{{position:absolute;right:10px;top:8px;width:46%;height:92%;opacity:.95;z-index:1;}}
+.promo-copy{{position:absolute;left:20px;top:24px;z-index:2;width:56%;}}
+.promo-eyebrow{{font-size:11px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;opacity:.86;}}
+.promo-title{{font-size:25px;font-weight:900;line-height:1.04;letter-spacing:-.035em;margin:8px 0 7px;}}
+.promo-text{{font-size:13px;line-height:1.35;max-width:245px;opacity:.92;}}
+.promo-cta{{display:inline-flex;margin-top:14px;padding:8px 11px;border-radius:999px;background:rgba(255,255,255,.94);color:#12334c;font-size:11px;font-weight:900;}}
+@keyframes pcnaMarquee{{0%{{transform:translateX(0)}}100%{{transform:translateX(-50%)}}}}
+
+.explore-row{{display:flex;gap:10px;overflow-x:auto;padding:1px 1px 6px;scrollbar-width:none;-webkit-overflow-scrolling:touch;}}
+.explore-row::-webkit-scrollbar{{display:none;}}
+.explore-card{{min-width:145px;border-radius:17px;padding:14px;text-decoration:none!important;color:#fff!important;box-shadow:0 5px 18px rgba(20,55,80,.10);}}
+.explore-card:nth-child(1){{background:linear-gradient(145deg,#0b6fa4,#22b8cf);}}
+.explore-card:nth-child(2){{background:linear-gradient(145deg,#8146a5,#c562b0);}}
+.explore-card:nth-child(3){{background:linear-gradient(145deg,#d45f27,#f0a344);}}
+.explore-card:nth-child(4){{background:linear-gradient(145deg,#23845d,#70b878);}}
+.explore-icon{{font-size:27px;line-height:1;margin-bottom:20px;}}
+.explore-title{{font-size:14px;font-weight:900;}}
+.explore-copy{{font-size:10px;opacity:.84;margin-top:3px;}}
 
 .action-grid{{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:4px 0 6px;}}
 .action-card{{display:block;text-decoration:none!important;border:1px solid var(--line);border-radius:17px;padding:16px 14px;background:#fff;min-height:118px;box-shadow:0 5px 17px rgba(20,55,80,.055);transition:transform .12s ease,box-shadow .12s ease;}}
@@ -86,7 +109,7 @@ html,body,[data-testid="stAppViewContainer"]{{background:#fff;color:var(--ink);}
 hr{{margin:16px 0!important;border-color:var(--line)!important;}}
 label,[data-testid="stWidgetLabel"]{{font-weight:750!important;color:var(--ink)!important;}}
 
-.bottom-nav{{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:min(620px,100%);height:76px;background:rgba(255,255,255,.96);backdrop-filter:blur(16px);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(4,1fr);z-index:9999;padding:7px 7px max(7px,env(safe-area-inset-bottom));box-sizing:border-box;}}
+.bottom-nav{{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:min(620px,100%);height:76px;background:rgba(255,255,255,.94);backdrop-filter:blur(18px);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(4,1fr);z-index:9999;padding:7px 7px max(7px,env(safe-area-inset-bottom));box-sizing:border-box;}}
 .nav-item{{display:flex;flex-direction:column;align-items:center;justify-content:center;text-decoration:none!important;color:#7890a0!important;font-size:10px;font-weight:800;gap:3px;border-radius:12px;}}
 .nav-icon{{font-size:20px;line-height:1;}}
 .nav-item.active{{color:var(--pcna)!important;background:#eff6fb;}}
@@ -96,20 +119,22 @@ label,[data-testid="stWidgetLabel"]{{font-weight:750!important;color:var(--ink)!
  .page-title{{font-size:27px;}}
  .action-grid{{gap:9px;}}
  .action-card{{padding:15px 12px;min-height:112px;}}
+ .promo-slide{{width:calc(100vw - 24px);height:188px;}}
+ .promo-title{{font-size:23px;}}
+ .promo-copy{{left:17px;top:21px;}}
 }}
 @media(max-width:350px){{.action-grid{{grid-template-columns:1fr;}}.wide-card{{grid-column:auto;}}}}
+@media(prefers-reduced-motion:reduce){{.promo-track{{animation:none;overflow-x:auto;}}}}
 </style>
 """,
     unsafe_allow_html=True,
 )
-
 
 @st.cache_data(show_spinner=False)
 def read_csv_bytes(data: bytes, name: str) -> pd.DataFrame:
     import io
     compression = "gzip" if name.lower().endswith(".gz") else "infer"
     return pd.read_csv(io.BytesIO(data), low_memory=False, compression=compression)
-
 
 def load_bundled_or_starter():
     data_dir = Path("data")
@@ -126,7 +151,6 @@ def load_bundled_or_starter():
     products, decorations, pricing = verified_starter_data()
     return prepare_products(products), prepare_decorations(decorations), prepare_pricing(pricing), "Verified starter catalog"
 
-
 if "products" not in st.session_state:
     p, d, r, source = load_bundled_or_starter()
     st.session_state.products = p
@@ -138,15 +162,12 @@ if "spec_item_count" not in st.session_state:
 if "chat_history" not in st.session_state:
     st.session_state.chat_history = []
 
-
 def current_page() -> str:
     page = st.query_params.get("page", "home")
     return page if isinstance(page, str) else "home"
 
-
 def nav_link(page: str) -> str:
     return f"?page={quote(page)}"
-
 
 def page_header(kicker: str, title: str, copy: str):
     st.markdown(
@@ -154,6 +175,35 @@ def page_header(kicker: str, title: str, copy: str):
         unsafe_allow_html=True,
     )
 
+def promo_strip():
+    home = "https://www.pcna.com/en-us"
+    packaged = "https://www.pcna.com/en-us/tools-services/perfectly-packaged"
+    slides = f"""
+<a class="promo-slide promo-a" href="{home}" target="_blank" rel="noopener">
+  <div class="promo-copy"><div class="promo-eyebrow">Explore PCNA</div><div class="promo-title">Fresh ideas.<br>Ready to brand.</div><div class="promo-text">Jump from the app into PCNA.com for products, brands and inspiration.</div><span class="promo-cta">Open PCNA.com →</span></div>
+  <svg class="promo-art" viewBox="0 0 240 190" aria-hidden="true"><circle cx="148" cy="86" r="70" fill="rgba(255,255,255,.16)"/><path d="M115 31h48v18l9 13v93c0 10-8 18-18 18h-30c-10 0-18-8-18-18V62l9-13z" fill="rgba(255,255,255,.92)"/><rect x="116" y="20" width="46" height="18" rx="7" fill="rgba(255,255,255,.74)"/><path d="M117 104h43" stroke="#0d7fa5" stroke-width="8" stroke-linecap="round"/></svg>
+</a>
+<a class="promo-slide promo-b" href="{packaged}" target="_blank" rel="noopener">
+  <div class="promo-copy"><div class="promo-eyebrow">Perfectly Packaged</div><div class="promo-title">Make the unboxing<br>part of the idea.</div><div class="promo-text">Explore PCNA packaging and kitting options without leaving your workflow.</div><span class="promo-cta">Explore packaging →</span></div>
+  <svg class="promo-art" viewBox="0 0 240 190" aria-hidden="true"><path d="M58 72l62-38 67 35-64 39z" fill="rgba(255,255,255,.93)"/><path d="M58 72v65l65 38v-67z" fill="rgba(255,255,255,.70)"/><path d="M123 108v67l64-39V69z" fill="rgba(255,255,255,.84)"/><path d="M90 54l66 35" stroke="#8b5ec7" stroke-width="8" stroke-linecap="round"/></svg>
+</a>
+<a class="promo-slide promo-c" href="{home}" target="_blank" rel="noopener">
+  <div class="promo-copy"><div class="promo-eyebrow">Shop the assortment</div><div class="promo-title">Drinkware. Bags.<br>Apparel. More.</div><div class="promo-text">Use the app for the work, then tap through to PCNA.com when you want to browse.</div><span class="promo-cta">Browse PCNA →</span></div>
+  <svg class="promo-art" viewBox="0 0 240 190" aria-hidden="true"><path d="M70 61h86l14 98H55z" fill="rgba(255,255,255,.90)"/><path d="M87 65c0-31 53-31 53 0" fill="none" stroke="rgba(255,255,255,.85)" stroke-width="10" stroke-linecap="round"/><circle cx="174" cy="58" r="35" fill="rgba(255,255,255,.18)"/></svg>
+</a>
+"""
+    st.markdown(f'<div class="promo-shell"><div class="promo-track">{slides}{slides}</div></div>', unsafe_allow_html=True)
+    st.markdown(
+        f"""
+<div class="explore-row">
+<a class="explore-card" href="{home}" target="_blank" rel="noopener"><div class="explore-icon">◒</div><div class="explore-title">Drinkware</div><div class="explore-copy">Browse on PCNA.com</div></a>
+<a class="explore-card" href="{home}" target="_blank" rel="noopener"><div class="explore-icon">◇</div><div class="explore-title">Apparel</div><div class="explore-copy">Brands + styles</div></a>
+<a class="explore-card" href="{home}" target="_blank" rel="noopener"><div class="explore-icon">▰</div><div class="explore-title">Bags</div><div class="explore-copy">Totes + travel</div></a>
+<a class="explore-card" href="{packaged}" target="_blank" rel="noopener"><div class="explore-icon">▱</div><div class="explore-title">Packaging</div><div class="explore-copy">Perfectly Packaged</div></a>
+</div>
+""",
+        unsafe_allow_html=True,
+    )
 
 def bottom_nav(page: str):
     group = "create" if page in {"spec", "blank", "quote", "virtual", "package", "concept"} else page
@@ -169,10 +219,8 @@ def bottom_nav(page: str):
         unsafe_allow_html=True,
     )
 
-
 def persistent_projects():
     return list_projects()
-
 
 def save_project(kind: str, customer: str, project: str, payload: dict, uploads=None) -> int:
     project_id = persist_project(kind, customer, project, payload)
@@ -181,13 +229,8 @@ def save_project(kind: str, customer: str, project: str, payload: dict, uploads=
             save_upload(project_id, upload.name, upload.getvalue())
     return project_id
 
-
 def product_picker(prefix: str):
-    query = st.text_input(
-        "Product name or item number",
-        key=f"{prefix}_query",
-        placeholder="Try Dade Polo, Stanley 30 oz, 1603-02...",
-    )
+    query = st.text_input("Product name or item number", key=f"{prefix}_query", placeholder="Try Dade Polo, Stanley 30 oz, 1603-02...")
     if not query:
         return None
     matches = search_products(st.session_state.products, query, limit=30)
@@ -200,18 +243,13 @@ def product_picker(prefix: str):
     row = unique.iloc[labels.index(chosen)]
     return product_identity(st.session_state.products, row["Item Number"])
 
-
 def product_configuration(prefix: str):
     identity = product_picker(prefix)
     if not identity:
         return None
     item = identity["Item Number"]
-    st.markdown(
-        f'<div class="info-card"><div class="info-card-title">{identity["Product Name"]}</div><div class="info-card-meta">Item {item}</div></div>',
-        unsafe_allow_html=True,
-    )
-    colors = colors_for_item(st.session_state.products, item)
-    color = st.selectbox("Color", colors if colors else [""], key=f"{prefix}_color")
+    st.markdown(f'<div class="info-card"><div class="info-card-title">{identity["Product Name"]}</div><div class="info-card-meta">Item {item}</div></div>', unsafe_allow_html=True)
+    color = st.selectbox("Color", colors_for_item(st.session_state.products, item) or [""], key=f"{prefix}_color")
     size = st.text_input("Size (if applicable)", key=f"{prefix}_size", placeholder="Medium")
     dec = decorations_for_item(st.session_state.decorations, item)
     if dec.empty:
@@ -224,28 +262,17 @@ def product_configuration(prefix: str):
         drow = dec.iloc[labels.index(selected)]
         method = str(drow["Decoration Method"])
         location = str(drow["Decoration Location"])
-        max_size = imprint_size(drow)
-        st.caption(f"Verified max imprint: {max_size}")
+        st.caption(f"Verified max imprint: {imprint_size(drow)}")
     imprint_default = "N/A" if is_no_ink_decoration(method) else ""
     imprint_color = st.text_input("Imprint Color", value=imprint_default, key=f"{prefix}_imprint")
-    return {
-        **identity,
-        "Color": color,
-        "Size": size,
-        "Decoration Method": method,
-        "Decoration Location": location,
-        "Imprint Color": imprint_color,
-    }
-
+    return {**identity, "Color": color, "Size": size, "Decoration Method": method, "Decoration Location": location, "Imprint Color": imprint_color}
 
 page = current_page()
 
 if page == "home":
+    promo_strip()
     projects = persistent_projects()
-    st.markdown(
-        f'<span class="data-chip">{st.session_state.data_source}</span><span class="data-chip">{len(projects)} saved</span>',
-        unsafe_allow_html=True,
-    )
+    st.markdown(f'<span class="data-chip">{st.session_state.data_source}</span><span class="data-chip">{len(projects)} saved</span>', unsafe_allow_html=True)
     st.markdown('<div class="section-title">Quick actions</div>', unsafe_allow_html=True)
     st.markdown(
         f"""
@@ -306,7 +333,7 @@ elif page == "search":
                 for _, row in d.head(40).iterrows():
                     st.markdown(f"**{row['Decoration Method']}**  \n{row['Decoration Location']} · max {imprint_size(row)}")
                     st.divider()
-        st.link_button("Open this product area on PCNA.com", "https://www.pcna.com", use_container_width=True)
+        st.link_button("Open PCNA.com", "https://www.pcna.com/en-us", use_container_width=True)
 
 elif page == "spec":
     page_header("Orders", "Spec Sample", "Build the exact spec sample format using verified product, color and decoration data.")
@@ -333,8 +360,10 @@ elif page == "spec":
             SpecItem(
                 product=x["Product Name"], item_number=x["Item Number"], color=x["Color"], size=x["Size"],
                 decoration_method=x["Decoration Method"], decoration_location=x["Decoration Location"],
-                imprint_color="N/A" if is_no_ink_decoration(x["Decoration Method"]) else x["Imprint Color"], imprint_size="Max Imprint",
-            ) for x in configured
+                imprint_color="N/A" if is_no_ink_decoration(x["Decoration Method"]) else x["Imprint Color"],
+                imprint_size="Max Imprint",
+            )
+            for x in configured
         ]
         order = build_spec_order(items, po=po, ship_date=ship_date, in_hands_date=in_hands, ship_to=ship_to)
         save_project("Spec Sample Order", customer, customer, {"order": order})
@@ -354,8 +383,7 @@ elif page == "blank":
         size = st.text_input("Size (if applicable)")
         ship_to = st.text_area("Ship To")
         if st.button("Save Blank Sample", type="primary", use_container_width=True):
-            payload = {"Product": identity["Product Name"], "Item Number": item, "Color": color, "Size": size, "Ship To": ship_to}
-            save_project("Blank Sample", customer, customer, payload)
+            save_project("Blank Sample", customer, customer, {"Product": identity["Product Name"], "Item Number": item, "Color": color, "Size": size, "Ship To": ship_to})
             st.success("Blank sample saved.")
 
 elif page == "quote":
@@ -373,10 +401,7 @@ elif page == "quote":
             schedule = st.selectbox("Decorated pricing schedule", schedules, index=0)
             tier = quote_tier(st.session_state.pricing, item, qty, currency="USD", decorated=True, schedule=schedule)
             if tier:
-                st.markdown(
-                    f'<div class="info-card"><div class="info-card-title">${tier["Unit Price"]:,.2f} each</div><div class="info-card-meta">{qty:,} pieces · tier {tier["MOQ Tier"]:,} · extended ${tier["Unit Price"]*qty:,.2f}</div></div>',
-                    unsafe_allow_html=True,
-                )
+                st.markdown(f'<div class="info-card"><div class="info-card-title">${tier["Unit Price"]:,.2f} each</div><div class="info-card-meta">{qty:,} pieces · tier {tier["MOQ Tier"]:,} · extended ${tier["Unit Price"]*qty:,.2f}</div></div>', unsafe_allow_html=True)
                 if tier["Below MOQ"]:
                     st.warning(f"Quantity is below the first decorated tier ({tier['MOQ Tier']}).")
                 st.caption(f"Source: {tier['Schedule']} · {tier['Price Description']}")
@@ -391,8 +416,7 @@ elif page == "virtual":
     artwork = st.file_uploader("Artwork", type=["png", "jpg", "jpeg", "pdf", "svg", "eps", "ai"])
     instructions = st.text_area("Creative Instructions", placeholder="White logo, left chest, show on black garment...")
     if st.button("Save Virtual Request", type="primary", use_container_width=True, disabled=cfg is None):
-        payload = {**cfg, "Artwork": artwork.name if artwork else "", "Instructions": instructions}
-        save_project("Virtual Request", customer, customer, payload, [artwork] if artwork else [])
+        save_project("Virtual Request", customer, customer, {**cfg, "Artwork": artwork.name if artwork else "", "Instructions": instructions}, [artwork] if artwork else [])
         st.success("Virtual request and artwork saved.")
 
 elif page == "package":
@@ -402,9 +426,9 @@ elif page == "package":
     items = st.text_area("Verified Kit Components", placeholder="One verified component per line", height=150)
     concept = st.text_area("Packaging / Design Direction", height=150)
     refs = st.file_uploader("Reference files / artwork", accept_multiple_files=True, type=["png", "jpg", "jpeg", "pdf", "svg"])
+    st.link_button("View Perfectly Packaged on PCNA.com", "https://www.pcna.com/en-us/tools-services/perfectly-packaged", use_container_width=True)
     if st.button("Save Perfectly Packaged Project", type="primary", use_container_width=True):
-        payload = {"Components": [x.strip() for x in items.splitlines() if x.strip()], "Concept": concept, "Files": [f.name for f in refs]}
-        save_project("Perfectly Packaged", customer, package_name, payload, refs)
+        save_project("Perfectly Packaged", customer, package_name, {"Components": [x.strip() for x in items.splitlines() if x.strip()], "Concept": concept, "Files": [f.name for f in refs]}, refs)
         st.success("Package project saved.")
 
 elif page == "concept":
@@ -434,8 +458,7 @@ elif page == "saved":
                 st.markdown(f'<div class="order-box">{payload["order"]}</div>', unsafe_allow_html=True)
             else:
                 st.json(payload)
-            files = list_project_files(project["id"])
-            for f in files:
+            for f in list_project_files(project["id"]):
                 st.download_button(f"Download {f.name}", f.read_bytes(), file_name=f.name, key=f"file_{project['id']}_{f.name}", use_container_width=True)
             if st.button("Delete Project", key=f"delete_{project['id']}", use_container_width=True):
                 delete_project(project["id"])
@@ -496,7 +519,7 @@ elif page == "data":
                 st.success("Full masters validated and loaded.")
             except Exception as exc:
                 st.error(f"Data validation failed: {exc}")
-    st.link_button("Open PCNA.com", "https://www.pcna.com", use_container_width=True)
+    st.link_button("Open PCNA.com", "https://www.pcna.com/en-us", use_container_width=True)
 
 else:
     st.query_params["page"] = "home"
