@@ -170,10 +170,23 @@ def approved_pcna_header(width: int = 105):
 def live_pcna_banner():
     components.html(
         """
-<div class="pcna-live-shell"><div class="fallback"><a href="https://www.pcna.com/en-us" target="_blank" rel="noopener">Open live PCNA.com</a></div><iframe src="https://www.pcna.com/en-us" title="Live PCNA.com promotional banner" loading="eager"></iframe></div>
-<style>html,body{margin:0;padding:0;background:#fff;overflow:hidden}.pcna-live-shell{position:relative;height:100%;overflow:hidden;border-radius:14px;background:#fff}.pcna-live-shell iframe{position:absolute;left:0;top:-92px;width:100%;height:620px;border:0;background:#fff;z-index:2}.fallback{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;border:1px solid #d6e2eb;border-radius:14px;background:#fff;z-index:1}.fallback a{color:#084f86;font-size:15px;font-weight:700;text-decoration:none}</style>
+<a class="pcna-hero" href="https://www.pcna.com/en-us" target="_blank" rel="noopener noreferrer" aria-label="Open PCNA.com">
+  <div class="pcna-hero-copy">
+    <div class="pcna-hero-kicker">PCNA.COM</div>
+    <div class="pcna-hero-title">Explore products, brands &amp; tools</div>
+    <div class="pcna-hero-link">Open PCNA.com&nbsp;&nbsp;→</div>
+  </div>
+</a>
+<style>
+html,body{margin:0;padding:0;background:transparent;overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+.pcna-hero{display:flex;align-items:flex-end;box-sizing:border-box;width:100%;height:146px;padding:18px 20px;border-radius:14px;text-decoration:none;background:linear-gradient(135deg,#003b5c 0%,#084f86 68%,#0d689f 100%);box-shadow:inset 0 0 0 1px rgba(255,255,255,.10);overflow:hidden}
+.pcna-hero-copy{color:#fff}
+.pcna-hero-kicker{font-size:11px;font-weight:800;letter-spacing:.13em;opacity:.72;margin-bottom:5px}
+.pcna-hero-title{font-size:21px;line-height:1.08;font-weight:800;letter-spacing:-.02em;margin-bottom:8px}
+.pcna-hero-link{font-size:12px;font-weight:750;opacity:.88}
+</style>
 """,
-        height=152,
+        height=150,
         scrolling=False,
     )
 
@@ -380,14 +393,14 @@ if page == "home":
 <style>
 @media(max-width:430px){
   html,body,[data-testid="stAppViewContainer"],[data-testid="stAppViewContainer"]>.main{min-height:100dvh!important;}
-  [data-testid="stAppViewContainer"]>.main{overflow-y:hidden!important;}
-  .block-container{width:100%!important;max-width:none!important;height:calc(100dvh - 76px)!important;box-sizing:border-box!important;padding:calc(16px + env(safe-area-inset-top)) 10px 8px!important;margin:0!important;overflow:hidden!important;}
+  [data-testid="stAppViewContainer"]>.main{overflow-y:auto!important;}
+  .block-container{width:100%!important;max-width:none!important;min-height:calc(100dvh - 76px)!important;box-sizing:border-box!important;padding:calc(18px + env(safe-area-inset-top)) 10px 12px!important;margin:0!important;overflow:visible!important;}
   .block-container [data-testid="stVerticalBlock"]{gap:0!important;}
-  [data-testid="stImage"]{margin:0 0 2px!important;overflow:visible!important;}
+  [data-testid="stImage"]{margin:0 0 4px!important;overflow:visible!important;}
   [data-testid="stImage"] img{display:block!important;margin:0 auto!important;max-width:100%!important;height:auto!important;object-fit:contain!important;}
-  iframe[title="streamlit_component"]{display:block!important;margin:0!important;}
-  .section-title{font-size:20px!important;margin:4px 0 7px!important;line-height:1.08!important;position:relative!important;z-index:2!important;}
-  .action-grid{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;grid-template-rows:repeat(2,minmax(0,1fr))!important;gap:8px!important;margin:0!important;height:calc(100dvh - 76px - env(safe-area-inset-top) - 295px)!important;min-height:250px!important;max-height:330px!important;}
+  iframe[title="streamlit_component"]{display:block!important;margin:2px 0 0!important;width:100%!important;}
+  .section-title{font-size:20px!important;margin:7px 0 8px!important;line-height:1.08!important;position:relative!important;z-index:2!important;}
+  .action-grid{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;grid-template-rows:repeat(2,1fr)!important;gap:8px!important;margin:0!important;height:auto!important;min-height:228px!important;max-height:none!important;}
   .action-card{box-sizing:border-box!important;padding:10px 12px!important;min-height:0!important;height:100%!important;border-radius:15px!important;overflow:hidden!important;display:flex!important;flex-direction:column!important;justify-content:flex-start!important;}
   .action-icon{font-size:22px!important;line-height:1!important;margin:0 0 5px!important;flex:0 0 auto!important;}
   .action-title{font-size:17px!important;line-height:1.08!important;margin:0 0 4px!important;flex:0 0 auto!important;}
@@ -397,7 +410,7 @@ if page == "home":
 @media(max-width:390px){
   .block-container{padding-left:8px!important;padding-right:8px!important;}
   .section-title{font-size:19px!important;margin:4px 0 7px!important;}
-  .action-grid{gap:7px!important;height:calc(100dvh - 76px - env(safe-area-inset-top) - 286px)!important;min-height:238px!important;}
+  .action-grid{gap:7px!important;height:auto!important;min-height:220px!important;}
   .action-card{padding:9px 10px!important;}
   .action-title{font-size:16px!important;}
   .action-copy{font-size:11.5px!important;}
@@ -407,7 +420,7 @@ if page == "home":
         unsafe_allow_html=True,
     )
 
-approved_pcna_header(100 if page == "home" else 105)
+approved_pcna_header(98 if page == "home" else 105)
 
 if page == "home":
     live_pcna_banner()
