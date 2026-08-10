@@ -164,7 +164,7 @@ def approved_pcna_header():
     """Render the locked approved PCNA logo asset exactly as stored in GitHub."""
     left, center, right = st.columns([1.6, 1, 1.6])
     with center:
-        st.image("assets/pcna-logo.webp", width=105)
+        st.image("IMG_2337.webp", width=105)
 
 
 def live_pcna_banner():
