@@ -1,0 +1,45 @@
+name: Lift PCNA home content once
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  lift-home:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Move home content higher only
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('app.py')
+          s = p.read_text()
+          replacements = {
+              '.section-title{{font-size:18px;font-weight:850;letter-spacing:-.015em;margin:14px 0 7px;color:var(--pcna);}}': '.section-title{{font-size:18px;font-weight:850;letter-spacing:-.015em;margin:8px 0 6px;color:var(--pcna);}}',
+              '@media(max-width:430px){{.block-container{{padding-top:calc(30px + env(safe-area-inset-top))!important;padding-left:12px!important;padding-right:12px!important;}}.page-title{{font-size:28px;line-height:1.1;}}.section-title{{margin:10px 0 6px;}}.action-grid{{gap:9px;}}.action-card{{padding:10px 11px;min-height:88px;}}}}': '@media(max-width:430px){{.block-container{{padding-top:calc(30px + env(safe-area-inset-top))!important;padding-left:12px!important;padding-right:12px!important;}}.page-title{{font-size:28px;line-height:1.1;}}.section-title{{margin:3px 0 5px;}}.action-grid{{gap:9px;margin-top:2px;}}.action-card{{padding:10px 11px;min-height:88px;}}}}',
+              '.pcna-live-shell{height:188px}.pcna-live-shell iframe{top:-82px;height:590px}': '.pcna-live-shell{height:168px}.pcna-live-shell iframe{top:-82px;height:590px}',
+              '        height=228,\n        scrolling=False,': '        height=180,\n        scrolling=False,',
+          }
+          changed = False
+          for old, new in replacements.items():
+              if old in s:
+                  s = s.replace(old, new, 1)
+                  changed = True
+          if changed:
+              p.write_text(s)
+          PY
+          if git diff --quiet -- app.py; then
+            echo "No homepage changes needed"
+            exit 0
+          fi
+          git config user.name "PCNA App Automation"
+          git config user.email "actions@users.noreply.github.com"
+          git add app.py
+          git commit -m "Move What do you need and cards higher"
+          git push
