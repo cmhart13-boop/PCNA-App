@@ -1,0 +1,83 @@
+name: Fix compact PCNA header
+
+on:
+  push:
+    paths:
+      - '.github/workflows/fix-compact-pcna-header.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  fix-header:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Apply exact scoped header correction
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path('app.py')
+          text = path.read_text()
+
+          old_css = '.nav-item.active{{color:rgba(255,255,255,.92)!important;background:rgba(255,255,255,.08);}}\n@media(max-width:430px)'
+          new_css = '.nav-item.active{{color:rgba(255,255,255,.92)!important;background:rgba(255,255,255,.08);}}\n.pcna-approved-header{{display:flex;align-items:center;justify-content:center;height:38px;margin:-8px 0 6px;overflow:hidden;}}\n.pcna-approved-header img{{display:block;max-height:32px;max-width:148px;width:auto;height:auto;object-fit:contain;}}\n@media(max-width:430px)'
+          if old_css not in text:
+              raise SystemExit('Expected nav CSS anchor not found; refusing unrelated changes.')
+          text = text.replace(old_css, new_css, 1)
+
+          old_func = '''def approved_pcna_header():
+    """Render the locked approved PCNA logo asset exactly as stored in GitHub."""
+    left, center, right = st.columns([1, 1.45, 1])
+    with center:
+        st.image("assets/pcna-logo.webp", use_container_width=True)
+'''
+          new_func = '''def approved_pcna_header():
+    """Render the locked approved PCNA logo asset exactly as stored in GitHub."""
+    import base64
+
+    logo_bytes = Path("assets/pcna-logo.webp").read_bytes()
+    logo_b64 = base64.b64encode(logo_bytes).decode("ascii")
+    st.markdown(
+        f'<div class="pcna-approved-header"><img src="data:image/webp;base64,{logo_b64}" alt="PCNA"></div>',
+        unsafe_allow_html=True,
+    )
+'''
+          if old_func not in text:
+              raise SystemExit('Expected approved_pcna_header function not found; refusing unrelated changes.')
+          text = text.replace(old_func, new_func, 1)
+
+          path.write_text(text)
+          PY
+
+      - name: Verify only intended behavior
+        run: |
+          python -m py_compile app.py
+          python - <<'PY'
+          from pathlib import Path
+          t = Path('app.py').read_text()
+          assert 'background:#003b5c' in t
+          assert 'live_pcna_banner()' in t
+          assert 'What do you need?' in t
+          assert 'Spec Sample Order' in t
+          assert 'Virtual Designs' in t
+          assert 'Quote Request' in t
+          assert '>Projects<' in t
+          assert 'assets/pcna-logo.webp' in t
+          assert 'max-height:32px' in t
+          PY
+
+      - name: Commit correction
+        run: |
+          if git diff --quiet -- app.py; then
+            echo 'No changes needed.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add app.py
+          git commit -m 'Restore compact approved PCNA header'
+          git push origin HEAD:main
