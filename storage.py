@@ -14,11 +14,7 @@ def _now() -> str:
     return datetime.now(timezone.utc).isoformat()
 
 
-def _connect() -> sqlite3.Connection:
-    DB_PATH.parent.mkdir(parents=True, exist_ok=True)
-    con = sqlite3.connect(DB_PATH)
-    con.row_factory = sqlite3.Row
-    con.execute("PRAGMA foreign_keys = ON")
+def _create_schema(con: sqlite3.Connection) -> None:
     con.execute(
         """
         CREATE TABLE IF NOT EXISTS projects (
@@ -49,6 +45,67 @@ def _connect() -> sqlite3.Connection:
         )
         """
     )
+
+
+def _migrate_legacy_if_needed(con: sqlite3.Connection) -> None:
+    table = con.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='projects'").fetchone()
+    if not table:
+        return
+    columns = {row[1] for row in con.execute("PRAGMA table_info(projects)").fetchall()}
+    if "name" in columns:
+        return
+    if not {"kind", "customer", "project", "created_at", "payload_json"}.issubset(columns):
+        return
+    con.execute("ALTER TABLE projects RENAME TO legacy_projects")
+    _create_schema(con)
+    rows = con.execute("SELECT id, kind, customer, project, created_at, payload_json FROM legacy_projects ORDER BY id").fetchall()
+    kind_map = {
+        "Spec Sample Order": "spec_sample",
+        "Quote": "quote",
+        "Virtual / Design": "virtual",
+        "Virtual Request": "virtual",
+        "Perfectly Packaged": "virtual",
+        "Blank Sample": "blank_sample",
+    }
+    for row in rows:
+        customer = (row["customer"] or "Unassigned").strip() or "Unassigned"
+        project_name = (row["project"] or row["kind"] or "Untitled Project").strip() or "Untitled Project"
+        existing = con.execute(
+            "SELECT id FROM projects WHERE lower(name)=lower(?) AND lower(customer)=lower(?) ORDER BY id DESC LIMIT 1",
+            (project_name, customer),
+        ).fetchone()
+        if existing:
+            project_id = int(existing["id"])
+        else:
+            cur = con.execute(
+                "INSERT INTO projects(name, customer, status, notes, created_at, updated_at) VALUES(?,?,?,?,?,?)",
+                (project_name, customer, "Active", "", row["created_at"], row["created_at"]),
+            )
+            project_id = int(cur.lastrowid)
+        try:
+            payload = json.loads(row["payload_json"] or "{}")
+        except Exception:
+            payload = {}
+        artifact_type = kind_map.get(row["kind"], str(row["kind"] or "artifact").lower().replace(" ", "_"))
+        output = str(payload.get("order") or payload.get("quote") or "")
+        prompt = str(payload.get("request") or payload.get("Request") or "")
+        con.execute(
+            """
+            INSERT INTO artifacts(project_id, artifact_type, title, original_prompt, ai_output, structured_json, status, created_at, updated_at)
+            VALUES(?,?,?,?,?,?,?,?,?)
+            """,
+            (project_id, artifact_type, row["kind"] or "Saved Work", prompt, output, json.dumps(payload, ensure_ascii=False), "Complete", row["created_at"], row["created_at"]),
+        )
+    con.execute("DROP TABLE legacy_projects")
+
+
+def _connect() -> sqlite3.Connection:
+    DB_PATH.parent.mkdir(parents=True, exist_ok=True)
+    con = sqlite3.connect(DB_PATH)
+    con.row_factory = sqlite3.Row
+    con.execute("PRAGMA foreign_keys = ON")
+    _migrate_legacy_if_needed(con)
+    _create_schema(con)
     con.commit()
     return con
 
@@ -119,17 +176,7 @@ def save_artifact(
             INSERT INTO artifacts(project_id, artifact_type, title, original_prompt, ai_output, structured_json, status, created_at, updated_at)
             VALUES(?,?,?,?,?,?,?,?,?)
             """,
-            (
-                int(project_id),
-                artifact_type,
-                title or artifact_type,
-                original_prompt or "",
-                ai_output or "",
-                json.dumps(structured_data or {}, ensure_ascii=False),
-                status or "Complete",
-                ts,
-                ts,
-            ),
+            (int(project_id), artifact_type, title or artifact_type, original_prompt or "", ai_output or "", json.dumps(structured_data or {}, ensure_ascii=False), status or "Complete", ts, ts),
         )
         con.execute("UPDATE projects SET updated_at=? WHERE id=?", (ts, int(project_id)))
         con.commit()
@@ -138,10 +185,7 @@ def save_artifact(
 
 def list_artifacts(project_id: int) -> list[dict[str, Any]]:
     with _connect() as con:
-        rows = con.execute(
-            "SELECT * FROM artifacts WHERE project_id=? ORDER BY updated_at DESC, id DESC",
-            (int(project_id),),
-        ).fetchall()
+        rows = con.execute("SELECT * FROM artifacts WHERE project_id=? ORDER BY updated_at DESC, id DESC", (int(project_id),)).fetchall()
     return [
         {
             "id": int(r["id"]),
@@ -181,13 +225,7 @@ def list_projects(limit: int = 500) -> list[dict]:
     result = []
     for row in rows:
         item = _project_dict(row)
-        item.update(
-            {
-                "virtual_count": int(row["virtual_count"] or 0),
-                "quote_count": int(row["quote_count"] or 0),
-                "spec_count": int(row["spec_count"] or 0),
-            }
-        )
+        item.update({"virtual_count": int(row["virtual_count"] or 0), "quote_count": int(row["quote_count"] or 0), "spec_count": int(row["spec_count"] or 0)})
         result.append(item)
     return result
 
@@ -199,10 +237,6 @@ def get_project(project_id: int) -> dict[str, Any] | None:
 
 
 def save_project(kind: str, customer: str, project: str, payload: dict) -> int:
-    """Backward-compatible helper used by older app code.
-
-    Returns the logical project id. The supplied record is stored as an artifact.
-    """
     project_id = get_or_create_project(project or kind, customer)
     kind_map = {
         "Spec Sample Order": "spec_sample",
@@ -216,14 +250,7 @@ def save_project(kind: str, customer: str, project: str, payload: dict) -> int:
     output = str(payload.get("order") or payload.get("quote") or "")
     prompt = str(payload.get("request") or payload.get("Request") or "")
     title = str(payload.get("title") or kind)
-    save_artifact(
-        project_id,
-        artifact_type,
-        title,
-        original_prompt=prompt,
-        ai_output=output,
-        structured_data=payload,
-    )
+    save_artifact(project_id, artifact_type, title, original_prompt=prompt, ai_output=output, structured_data=payload)
     return project_id
 
 
