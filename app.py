@@ -53,47 +53,404 @@ INK = "#14273a"
 MUTED = "#66798a"
 LINE = "#d6e2eb"
 PANEL = "#f7fafc"
+NAV_BLUE = "#003b5c"
 
 st.markdown(
     f"""
 <style>
-:root{{--pcna:{PCNA_BLUE};--ink:{INK};--muted:{MUTED};--line:{LINE};--panel:{PANEL};}}
-html,body,[data-testid="stAppViewContainer"]{{background:#fff;color:var(--ink);}}
-[data-testid="stAppViewContainer"]>.main{{overflow-x:hidden;}}
-[data-testid="stHeader"]{{height:0!important;background:transparent!important;}}
-[data-testid="stSidebar"]{{display:none;}}
-#MainMenu,footer,[data-testid="stToolbar"]{{visibility:hidden!important;height:0!important;}}
-.block-container{{max-width:620px!important;padding:calc(24px + env(safe-area-inset-top)) 15px 104px!important;margin:0 auto!important;}}
-.page-kicker{{font-size:11px;font-weight:900;letter-spacing:.10em;color:var(--pcna);text-transform:uppercase;margin-top:2px;}}
-.page-title{{font-size:29px;line-height:1.08;font-weight:850;letter-spacing:-.035em;color:var(--pcna);margin:4px 0 9px;}}
-.page-copy{{font-size:15px;line-height:1.48;color:var(--muted);margin:0 0 18px;}}
-.section-title{{font-size:18px;font-weight:850;letter-spacing:-.015em;margin:8px 0 6px;color:var(--pcna);}}
-.action-grid{{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:5px 0 8px;}}
-.action-card{{display:block;text-decoration:none!important;border:1.5px solid rgba(8,79,134,.36);border-radius:16px;padding:12px 13px;background:#fff;min-height:96px;box-shadow:0 4px 0 rgba(8,79,134,.10),0 9px 18px rgba(8,79,134,.08);transition:transform .12s ease,box-shadow .12s ease,border-color .12s ease;}}
-.action-card:hover{{border-color:rgba(8,79,134,.58);box-shadow:0 6px 0 rgba(8,79,134,.13),0 14px 28px rgba(8,79,134,.12);}}
-.action-card:active{{transform:translateY(3px);box-shadow:0 2px 0 rgba(8,79,134,.12),0 7px 14px rgba(8,79,134,.08);}}
-.action-icon{{font-size:21px;line-height:1;margin-bottom:8px;color:var(--pcna);}}
-.action-title{{font-size:15px;font-weight:850;color:var(--pcna);line-height:1.12;margin-bottom:4px;}}
-.action-copy{{font-size:11px;color:var(--muted);line-height:1.25;}}
-.info-card{{border:1px solid var(--line);border-radius:16px;padding:14px;background:#fff;margin:8px 0;box-shadow:0 4px 14px rgba(8,79,134,.05);}}
-.info-card-title{{font-size:15px;font-weight:850;color:var(--pcna);}}
-.info-card-meta{{font-size:12px;color:var(--muted);margin-top:3px;}}
-.data-chip{{display:inline-block;padding:5px 8px;border-radius:999px;background:#eef5fa;color:var(--pcna);font-size:11px;font-weight:850;margin-right:5px;}}
-.order-box{{white-space:pre-wrap;border:1px solid var(--line);background:#fbfcfd;border-radius:15px;padding:14px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;line-height:1.5;overflow-wrap:anywhere;}}
-.stButton>button,.stDownloadButton>button,[data-testid="stLinkButton"] a{{min-height:48px!important;border-radius:13px!important;font-weight:800!important;font-size:15px!important;width:100%!important;}}
-.stTextInput input,.stNumberInput input,.stTextArea textarea,[data-baseweb="select"]>div{{min-height:50px!important;border-radius:12px!important;font-size:16px!important;background:#fff!important;border-color:#b8cad8!important;color:var(--ink)!important;}}
-.stTextInput input:focus,.stNumberInput input:focus,.stTextArea textarea:focus{{border-color:var(--pcna)!important;box-shadow:0 0 0 1px var(--pcna)!important;}}
-[data-baseweb="select"]>div:focus-within{{border-color:var(--pcna)!important;box-shadow:0 0 0 1px var(--pcna)!important;}}
-.stTextArea textarea{{min-height:120px!important;}}
-[data-testid="stFileUploaderDropzone"]{{border-radius:14px!important;padding:14px 10px!important;border-color:#b8cad8!important;background:#fbfdff!important;}}
-[data-testid="stExpander"]{{border:1px solid var(--line)!important;border-radius:14px!important;overflow:hidden;margin:8px 0;}}
-label,[data-testid="stWidgetLabel"],[data-testid="stWidgetLabel"] p{{font-weight:800!important;color:var(--pcna)!important;}}
-.bottom-nav{{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:min(620px,100%);height:76px;background:#003b5c;backdrop-filter:blur(16px);border-top:1px solid rgba(255,255,255,.10);display:grid;grid-template-columns:repeat(4,1fr);z-index:9999;padding:7px 7px max(7px,env(safe-area-inset-bottom));box-sizing:border-box;}}
-.nav-item{{display:flex;flex-direction:column;align-items:center;justify-content:center;text-decoration:none!important;color:rgba(255,255,255,.58)!important;font-size:10px;font-weight:800;gap:3px;border-radius:12px;}}
-.nav-icon{{font-size:20px;line-height:1;}}
-.nav-item.active{{color:rgba(255,255,255,.92)!important;background:rgba(255,255,255,.08);}}
-@media(max-width:430px){{.block-container{{padding-top:calc(24px + env(safe-area-inset-top))!important;padding-left:12px!important;padding-right:12px!important;}}.page-title{{font-size:28px;line-height:1.1;}}.section-title{{margin:3px 0 5px;}}.action-grid{{gap:9px;margin-top:2px;}}.action-card{{padding:10px 11px;min-height:88px;}}}}
-@media(max-width:350px){{.action-grid{{grid-template-columns:1fr;}}}}
+:root {{
+  --pcna: {PCNA_BLUE};
+  --ink: {INK};
+  --muted: {MUTED};
+  --line: {LINE};
+  --panel: {PANEL};
+  --nav-blue: {NAV_BLUE};
+  --nav-height: 76px;
+  --page-max: 620px;
+  --page-side: 12px;
+  --home-gap: 10px;
+}}
+
+html,
+body,
+[data-testid="stAppViewContainer"],
+[data-testid="stMain"] {{
+  background: #fff;
+  color: var(--ink);
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}}
+
+[data-testid="stAppViewContainer"] > .main {{
+  width: 100%;
+  overflow-x: hidden;
+}}
+
+[data-testid="stHeader"] {{
+  height: 0 !important;
+  min-height: 0 !important;
+  background: transparent !important;
+}}
+
+[data-testid="stSidebar"] {{ display: none; }}
+#MainMenu,
+footer,
+[data-testid="stToolbar"] {{
+  visibility: hidden !important;
+  height: 0 !important;
+}}
+
+.block-container,
+[data-testid="stMainBlockContainer"],
+[data-testid="stAppViewBlockContainer"] {{
+  width: 100% !important;
+  max-width: var(--page-max) !important;
+  box-sizing: border-box !important;
+  margin: 0 auto !important;
+  padding: calc(16px + env(safe-area-inset-top)) 15px calc(96px + env(safe-area-inset-bottom)) !important;
+}}
+
+.block-container > [data-testid="stVerticalBlock"] {{
+  gap: 0 !important;
+}}
+
+[data-testid="stElementContainer"] {{
+  margin: 0;
+}}
+
+.page-kicker {{
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: .10em;
+  color: var(--pcna);
+  text-transform: uppercase;
+  margin-top: 2px;
+}}
+.page-title {{
+  font-size: 29px;
+  line-height: 1.08;
+  font-weight: 850;
+  letter-spacing: -.035em;
+  color: var(--pcna);
+  margin: 4px 0 9px;
+}}
+.page-copy {{
+  font-size: 15px;
+  line-height: 1.48;
+  color: var(--muted);
+  margin: 0 0 18px;
+}}
+.section-title {{
+  font-size: 18px;
+  line-height: 1.1;
+  font-weight: 850;
+  letter-spacing: -.015em;
+  margin: 8px 0 6px;
+  color: var(--pcna);
+}}
+
+.action-grid {{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 5px 0 8px;
+}}
+.action-card {{
+  display: block;
+  text-decoration: none !important;
+  border: 1.5px solid rgba(8,79,134,.36);
+  border-radius: 16px;
+  padding: 12px 13px;
+  background: #fff;
+  min-height: 96px;
+  box-shadow: 0 4px 0 rgba(8,79,134,.10),0 9px 18px rgba(8,79,134,.08);
+  transition: transform .12s ease,box-shadow .12s ease,border-color .12s ease;
+}}
+.action-card:hover {{
+  border-color: rgba(8,79,134,.58);
+  box-shadow: 0 6px 0 rgba(8,79,134,.13),0 14px 28px rgba(8,79,134,.12);
+}}
+.action-card:active {{
+  transform: translateY(3px);
+  box-shadow: 0 2px 0 rgba(8,79,134,.12),0 7px 14px rgba(8,79,134,.08);
+}}
+.action-icon {{
+  font-size: 21px;
+  line-height: 1;
+  margin-bottom: 8px;
+  color: var(--pcna);
+}}
+.action-title {{
+  font-size: 15px;
+  font-weight: 850;
+  color: var(--pcna);
+  line-height: 1.12;
+  margin-bottom: 4px;
+}}
+.action-copy {{
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.25;
+}}
+
+.info-card {{
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 14px;
+  background: #fff;
+  margin: 8px 0;
+  box-shadow: 0 4px 14px rgba(8,79,134,.05);
+}}
+.info-card-title {{ font-size: 15px; font-weight: 850; color: var(--pcna); }}
+.info-card-meta {{ font-size: 12px; color: var(--muted); margin-top: 3px; }}
+.data-chip {{
+  display: inline-block;
+  padding: 5px 8px;
+  border-radius: 999px;
+  background: #eef5fa;
+  color: var(--pcna);
+  font-size: 11px;
+  font-weight: 850;
+  margin-right: 5px;
+}}
+.order-box {{
+  white-space: pre-wrap;
+  border: 1px solid var(--line);
+  background: #fbfcfd;
+  border-radius: 15px;
+  padding: 14px;
+  font-family: ui-monospace,SFMono-Regular,Menlo,monospace;
+  font-size: 12px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}}
+
+.stButton > button,
+.stDownloadButton > button,
+[data-testid="stLinkButton"] a {{
+  min-height: 48px !important;
+  border-radius: 13px !important;
+  font-weight: 800 !important;
+  font-size: 15px !important;
+  width: 100% !important;
+}}
+.stTextInput input,
+.stNumberInput input,
+.stTextArea textarea,
+[data-baseweb="select"] > div {{
+  min-height: 50px !important;
+  border-radius: 12px !important;
+  font-size: 16px !important;
+  background: #fff !important;
+  border-color: #b8cad8 !important;
+  color: var(--ink) !important;
+}}
+.stTextInput input:focus,
+.stNumberInput input:focus,
+.stTextArea textarea:focus {{
+  border-color: var(--pcna) !important;
+  box-shadow: 0 0 0 1px var(--pcna) !important;
+}}
+[data-baseweb="select"] > div:focus-within {{
+  border-color: var(--pcna) !important;
+  box-shadow: 0 0 0 1px var(--pcna) !important;
+}}
+.stTextArea textarea {{ min-height: 120px !important; }}
+[data-testid="stFileUploaderDropzone"] {{
+  border-radius: 14px !important;
+  padding: 14px 10px !important;
+  border-color: #b8cad8 !important;
+  background: #fbfdff !important;
+}}
+[data-testid="stExpander"] {{
+  border: 1px solid var(--line) !important;
+  border-radius: 14px !important;
+  overflow: hidden;
+  margin: 8px 0;
+}}
+label,
+[data-testid="stWidgetLabel"],
+[data-testid="stWidgetLabel"] p {{
+  font-weight: 800 !important;
+  color: var(--pcna) !important;
+}}
+
+.bottom-nav {{
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 0;
+  width: min(var(--page-max),100%);
+  height: var(--nav-height);
+  background: var(--nav-blue);
+  backdrop-filter: blur(16px);
+  border-top: 1px solid rgba(255,255,255,.10);
+  display: grid;
+  grid-template-columns: repeat(4,1fr);
+  z-index: 9999;
+  padding: 7px 7px max(7px,env(safe-area-inset-bottom));
+  box-sizing: border-box;
+}}
+.nav-item {{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none !important;
+  color: rgba(255,255,255,.58) !important;
+  font-size: 10px;
+  font-weight: 800;
+  gap: 3px;
+  border-radius: 12px;
+}}
+.nav-icon {{ font-size: 20px; line-height: 1; }}
+.nav-item.active {{
+  color: rgba(255,255,255,.92) !important;
+  background: rgba(255,255,255,.08);
+}}
+
+/* HOME: normal document flow. No viewport-height parent locks and no scroll lock. */
+.block-container:has(.home-action-grid),
+[data-testid="stMainBlockContainer"]:has(.home-action-grid),
+[data-testid="stAppViewBlockContainer"]:has(.home-action-grid) {{
+  height: auto !important;
+  min-height: 0 !important;
+  padding: calc(6px + env(safe-area-inset-top)) var(--page-side) calc(88px + env(safe-area-inset-bottom)) !important;
+  overflow: visible !important;
+}}
+
+.block-container:has(.home-action-grid) > [data-testid="stVerticalBlock"] {{
+  display: block !important;
+  height: auto !important;
+  min-height: 0 !important;
+  overflow: visible !important;
+}}
+
+.block-container:has(.home-action-grid) [data-testid="stElementContainer"] {{
+  height: auto !important;
+  min-height: 0 !important;
+}}
+
+.block-container:has(.home-action-grid) [data-testid="stImage"] {{
+  margin: 0 0 4px !important;
+  padding: 0 !important;
+}}
+.block-container:has(.home-action-grid) [data-testid="stImage"] img {{
+  display: block !important;
+  margin: 0 auto !important;
+  width: auto !important;
+  max-width: 100% !important;
+  height: auto !important;
+  object-fit: contain !important;
+}}
+
+.block-container:has(.home-action-grid) [data-testid="stElementContainer"]:has(iframe[title="streamlit_component"]) {{
+  margin: 0 !important;
+  padding: 0 !important;
+  height: auto !important;
+  min-height: 0 !important;
+}}
+.block-container:has(.home-action-grid) iframe[title="streamlit_component"] {{
+  display: block !important;
+  width: 100% !important;
+  height: clamp(120px, 16.5dvh, 148px) !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+}}
+
+.home-heading {{
+  font-size: clamp(19px, 2.4dvh, 22px);
+  line-height: 1.08;
+  font-weight: 850;
+  letter-spacing: -.015em;
+  color: var(--pcna);
+  margin: 5px 0 7px;
+}}
+
+.home-action-grid {{
+  display: grid;
+  grid-template-columns: repeat(2,minmax(0,1fr));
+  grid-template-rows: repeat(2,clamp(142px,18.5dvh,166px));
+  gap: var(--home-gap);
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}}
+
+.home-action-card {{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+  box-sizing: border-box;
+  padding: clamp(12px,1.7dvh,15px) 13px;
+  border: 1.5px solid rgba(8,79,134,.36);
+  border-radius: 15px;
+  background: #fff;
+  text-decoration: none !important;
+  box-shadow: 0 4px 0 rgba(8,79,134,.10),0 9px 18px rgba(8,79,134,.08);
+  overflow: hidden;
+}}
+.home-action-card:hover {{
+  border-color: rgba(8,79,134,.58);
+  box-shadow: 0 6px 0 rgba(8,79,134,.13),0 14px 28px rgba(8,79,134,.12);
+}}
+.home-action-card:active {{ transform: translateY(2px); }}
+.home-action-card .action-icon {{
+  font-size: clamp(22px,2.8dvh,26px);
+  line-height: 1;
+  margin: 0 0 8px;
+}}
+.home-action-card .action-title {{
+  font-size: clamp(15.5px,2dvh,18px);
+  line-height: 1.08;
+  margin: 0 0 5px;
+}}
+.home-action-card .action-copy {{
+  font-size: clamp(11px,1.35dvh,12.5px);
+  line-height: 1.22;
+  margin: 0;
+}}
+
+@media (max-width: 430px) {{
+  .block-container,
+  [data-testid="stMainBlockContainer"],
+  [data-testid="stAppViewBlockContainer"] {{
+    padding-left: var(--page-side) !important;
+    padding-right: var(--page-side) !important;
+  }}
+  .page-title {{ font-size: 28px; line-height: 1.1; }}
+  .section-title {{ margin: 3px 0 5px; }}
+  .action-grid {{ gap: 9px; margin-top: 2px; }}
+  .action-card {{ padding: 10px 11px; min-height: 88px; }}
+}}
+
+@media (max-width: 350px) {{
+  .action-grid {{ grid-template-columns: 1fr; }}
+  .home-action-grid {{
+    grid-template-columns: repeat(2,minmax(0,1fr));
+    gap: 8px;
+  }}
+  .home-action-card {{ padding-left: 9px; padding-right: 9px; }}
+  .home-action-card .action-title {{ font-size: 14px; }}
+  .home-action-card .action-copy {{ font-size: 10px; }}
+}}
+
+@media (max-height: 690px) {{
+  .block-container:has(.home-action-grid) iframe[title="streamlit_component"] {{
+    height: 112px !important;
+  }}
+  .home-action-grid {{
+    grid-template-rows: repeat(2,136px);
+  }}
+  .home-action-card {{ padding-top: 10px; padding-bottom: 10px; }}
+  .home-action-card .action-copy {{ font-size: 10.5px; line-height: 1.18; }}
+}}
 </style>
 """,
     unsafe_allow_html=True,
@@ -162,9 +519,7 @@ def page_header(kicker: str, title: str, copy: str):
 
 def approved_pcna_header(width: int = 105):
     """Render the locked approved PCNA logo asset exactly as stored in GitHub."""
-    left, center, right = st.columns([1.35, 1.3, 1.35])
-    with center:
-        st.image("IMG_2337.webp", width=width)
+    st.image("IMG_2337.webp", width=width)
 
 
 def live_pcna_banner():
@@ -177,13 +532,13 @@ def live_pcna_banner():
 </div>
 <style>
 html,body{margin:0;padding:0;background:#fff;overflow:hidden}
-.pcna-live-shell{position:relative;width:100%;height:150px;overflow:hidden;border-radius:14px;background:#fff;border:1px solid #d6e2eb;box-sizing:border-box}
+.pcna-live-shell{position:relative;width:100%;height:100%;overflow:hidden;border-radius:14px;background:#fff;border:1px solid #d6e2eb;box-sizing:border-box}
 .pcna-live-shell iframe{position:absolute;left:0;top:-92px;width:100%;height:620px;border:0;background:#fff;z-index:2}
 .pcna-fallback{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#084f86;font:700 14px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#fff;z-index:1}
 .pcna-hero-link{position:absolute;inset:0;z-index:3;display:block;cursor:pointer}
 </style>
 """,
-        height=152,
+        height=148,
         scrolling=False,
     )
 
@@ -383,216 +738,11 @@ def render_project(project: dict, expanded: bool = False):
 
 
 page = current_page()
-
-if page == "home":
-    st.markdown(
-        """
-<style>
-/* HOME: one source of truth. Custom HTML cards, always 2x2 on phones. */
-:root {
-  --home-nav-height: 76px;
-  --home-gap: 10px;
-}
-
-html, body, [data-testid="stAppViewContainer"] {
-  width: 100%;
-  min-height: 100%;
-  overflow-x: hidden !important;
-  overflow-y: auto !important;
-}
-
-[data-testid="stAppViewContainer"] > .main {
-  width: 100%;
-  min-height: 100dvh !important;
-  height: auto !important;
-  overflow-x: hidden !important;
-  overflow-y: auto !important;
-}
-
-.block-container {
-  width: 100% !important;
-  max-width: 620px !important;
-  height: calc(100dvh - var(--home-nav-height)) !important;
-  min-height: 0 !important;
-  box-sizing: border-box !important;
-  margin: 0 auto !important;
-  padding: calc(6px + env(safe-area-inset-top)) 10px 8px !important;
-  overflow: visible !important;
-}
-
-.block-container > [data-testid="stVerticalBlock"] {
-  display: flex !important;
-  flex-direction: column !important;
-  width: 100% !important;
-  height: 100% !important;
-  min-height: 0 !important;
-  gap: 0 !important;
-  overflow: visible !important;
-}
-
-.block-container [data-testid="stVerticalBlock"],
-.block-container [data-testid="stElementContainer"] {
-  min-height: 0 !important;
-}
-
-[data-testid="stImage"] {
-  flex: 0 0 auto !important;
-  margin: 0 0 2px !important;
-  padding: 0 !important;
-  overflow: visible !important;
-}
-
-[data-testid="stImage"] img {
-  display: block !important;
-  margin: 0 auto !important;
-  max-width: 100% !important;
-  height: auto !important;
-  object-fit: contain !important;
-}
-
-.block-container [data-testid="stElementContainer"]:has(iframe[title="streamlit_component"]) {
-  flex: 0 0 auto !important;
-  height: auto !important;
-  min-height: 0 !important;
-  margin: 0 !important;
-  overflow: visible !important;
-}
-
-iframe[title="streamlit_component"] {
-  display: block !important;
-  width: 100% !important;
-  height: clamp(116px, 16.5dvh, 148px) !important;
-  min-height: 0 !important;
-  margin: 0 !important;
-}
-
-.section-title {
-  flex: 0 0 auto !important;
-  font-size: 19px !important;
-  line-height: 1.08 !important;
-  margin: 5px 0 7px !important;
-}
-
-.block-container > [data-testid="stVerticalBlock"] > [data-testid="stElementContainer"]:has(.home-action-grid) {
-  flex: 1 1 0 !important;
-  width: 100% !important;
-  height: auto !important;
-  min-height: 0 !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  overflow: visible !important;
-}
-
-.block-container > [data-testid="stVerticalBlock"] > [data-testid="stElementContainer"]:has(.home-action-grid) > div {
-  width: 100% !important;
-  height: 100% !important;
-  min-height: 0 !important;
-  margin: 0 !important;
-  padding: 0 !important;
-}
-
-.home-action-grid {
-  display: grid !important;
-  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-  grid-template-rows: repeat(2, minmax(0, 1fr)) !important;
-  width: 100% !important;
-  height: 100% !important;
-  min-height: 0 !important;
-  gap: var(--home-gap) !important;
-  margin: 0 !important;
-  padding: 0 0 3px !important;
-  box-sizing: border-box !important;
-  align-items: stretch !important;
-}
-
-.home-action-card {
-  display: flex !important;
-  flex-direction: column !important;
-  justify-content: center !important;
-  width: 100% !important;
-  height: 100% !important;
-  min-width: 0 !important;
-  min-height: 0 !important;
-  box-sizing: border-box !important;
-  padding: clamp(10px, 1.8dvh, 15px) 12px !important;
-  border: 1.5px solid rgba(8,79,134,.36) !important;
-  border-radius: 15px !important;
-  background: #fff !important;
-  text-decoration: none !important;
-  box-shadow: 0 4px 0 rgba(8,79,134,.10), 0 9px 18px rgba(8,79,134,.08) !important;
-  overflow: hidden !important;
-}
-
-.home-action-card:hover {
-  border-color: rgba(8,79,134,.58) !important;
-  box-shadow: 0 6px 0 rgba(8,79,134,.13), 0 14px 28px rgba(8,79,134,.12) !important;
-}
-
-.home-action-card:active {
-  transform: translateY(2px);
-}
-
-.home-action-card .action-icon {
-  flex: 0 0 auto !important;
-  font-size: clamp(20px, 2.6dvh, 24px) !important;
-  line-height: 1 !important;
-  margin: 0 0 6px !important;
-}
-
-.home-action-card .action-title {
-  flex: 0 0 auto !important;
-  font-size: clamp(15px, 1.9dvh, 17px) !important;
-  line-height: 1.08 !important;
-  margin: 0 0 4px !important;
-}
-
-.home-action-card .action-copy {
-  flex: 0 1 auto !important;
-  font-size: clamp(10.5px, 1.3dvh, 12px) !important;
-  line-height: 1.2 !important;
-  margin: 0 !important;
-}
-
-.bottom-nav {
-  height: var(--home-nav-height) !important;
-  padding-bottom: max(7px, env(safe-area-inset-bottom)) !important;
-}
-
-/* Emergency fallback only: very short viewports may scroll, never clip. */
-@media (max-height: 650px) {
-  .block-container {
-    height: auto !important;
-    min-height: calc(100dvh - var(--home-nav-height)) !important;
-    padding-bottom: 10px !important;
-  }
-  .block-container > [data-testid="stVerticalBlock"] {
-    height: auto !important;
-    min-height: calc(100dvh - var(--home-nav-height) - 16px) !important;
-  }
-  iframe[title="streamlit_component"] {
-    height: 108px !important;
-  }
-  .block-container > [data-testid="stVerticalBlock"] > [data-testid="stElementContainer"]:has(.home-action-grid) {
-    flex: 0 0 auto !important;
-  }
-  .block-container > [data-testid="stVerticalBlock"] > [data-testid="stElementContainer"]:has(.home-action-grid) > div,
-  .home-action-grid {
-    height: auto !important;
-  }
-  .home-action-grid {
-    grid-template-rows: repeat(2, minmax(116px, auto)) !important;
-  }
-}
-</style>
-""",
-        unsafe_allow_html=True,
-    )
-
 approved_pcna_header(98 if page == "home" else 105)
 
 if page == "home":
     live_pcna_banner()
-    st.markdown('<div class="section-title">What do you need?</div>', unsafe_allow_html=True)
+    st.markdown('<div class="home-heading">What do you need?</div>', unsafe_allow_html=True)
     st.markdown(
         f"""
 <div class="home-action-grid">
