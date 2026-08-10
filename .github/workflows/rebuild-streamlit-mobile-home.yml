@@ -60,4 +60,5 @@ jobs:
             exit 0
           fi
           git commit -m "Rebuild Streamlit mobile home as single viewport shell"
+          git pull --rebase origin main
           git push origin main
