@@ -15,6 +15,8 @@ home_css = r'''
 @media(max-width:430px){.block-container{padding-top:calc(18px + env(safe-area-inset-top))!important;padding-left:12px!important;padding-right:12px!important;padding-bottom:104px!important}.home-topbar{height:68px}.home-logo{width:140px}.home-action-card{height:230px}.home-card-title{font-size:20px}.home-card-copy{font-size:12px}.pcna-live-shell{height:236px!important}}
 @media(max-width:350px){.home-action-grid{grid-template-columns:1fr 1fr!important;gap:8px}.home-action-card{height:220px;padding:13px 11px}.home-card-title{font-size:18px}.home-card-copy{font-size:11px}.home-card-icon{width:39px;height:39px;font-size:22px}}
 '''
+# app.py's main CSS is inside an f-string, so literal CSS braces must be doubled.
+home_css = home_css.replace('{', '{{').replace('}', '}}')
 if '/* Approved PCNA homepage reference layout */' not in text:
     text = text.replace(css_anchor, home_css + '\n' + css_anchor, 1)
 
