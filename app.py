@@ -3,46 +3,17 @@ from pathlib import Path
 source_path = Path(__file__).with_name("_pcna_app_source.py")
 source = source_path.read_text(encoding="utf-8")
 
-# Home-only mobile sizing correction.
-# Preserve the approved source, logo asset, hero, copy, navigation, and functionality.
-# The home screen becomes a fixed mobile viewport below the fixed bottom nav, and the
-# action-card element consumes the exact remaining vertical space instead of using
-# guessed/fixed card heights.
-source = source.replace(
-    '  html,body,[data-testid="stAppViewContainer"],[data-testid="stAppViewContainer"]>.main{min-height:100dvh!important;}\n  [data-testid="stAppViewContainer"]>.main{overflow-y:auto!important;}',
-    '  html,body,[data-testid="stAppViewContainer"],[data-testid="stAppViewContainer"]>.main{height:100dvh!important;max-height:100dvh!important;overflow:hidden!important;}\n  [data-testid="stAppViewContainer"]>.main{overflow:hidden!important;}',
-)
-source = source.replace(
-    '  .block-container{width:100%!important;max-width:none!important;min-height:calc(100dvh - 76px)!important;box-sizing:border-box!important;padding:calc(18px + env(safe-area-inset-top)) 10px 12px!important;margin:0!important;overflow:visible!important;}',
-    '  .block-container{width:100%!important;max-width:none!important;height:calc(100dvh - 76px)!important;max-height:calc(100dvh - 76px)!important;min-height:0!important;box-sizing:border-box!important;padding:calc(10px + env(safe-area-inset-top)) 10px 8px!important;margin:0!important;overflow:hidden!important;}',
-)
-source = source.replace(
-    '  .block-container [data-testid="stVerticalBlock"]{gap:0!important;}',
-    '  .block-container > [data-testid="stVerticalBlock"]{height:100%!important;min-height:0!important;display:flex!important;flex-direction:column!important;gap:0!important;}\n  .block-container > [data-testid="stVerticalBlock"] > [data-testid="stElementContainer"]:has(.action-grid){flex:1 1 0!important;min-height:0!important;overflow:hidden!important;}\n  .block-container > [data-testid="stVerticalBlock"] > [data-testid="stElementContainer"]:has(.action-grid) > div{height:100%!important;min-height:0!important;}',
-)
-source = source.replace(
-    '  .section-title{font-size:20px!important;margin:7px 0 8px!important;line-height:1.08!important;position:relative!important;z-index:2!important;}',
-    '  .section-title{font-size:20px!important;margin:3px 0 6px!important;line-height:1.08!important;position:relative!important;z-index:2!important;}',
-)
-source = source.replace(
-    '  .action-grid{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;grid-template-rows:repeat(2,1fr)!important;gap:8px!important;margin:0!important;height:auto!important;min-height:228px!important;max-height:none!important;}',
-    '  .action-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;grid-template-rows:repeat(2,minmax(0,1fr))!important;gap:12px!important;margin:0!important;height:100%!important;min-height:0!important;max-height:none!important;padding:2px 0 10px!important;box-sizing:border-box!important;}',
-)
-source = source.replace(
-    '  .action-card{box-sizing:border-box!important;padding:10px 12px!important;min-height:0!important;height:100%!important;border-radius:15px!important;overflow:hidden!important;display:flex!important;flex-direction:column!important;justify-content:flex-start!important;}',
-    '  .action-card{box-sizing:border-box!important;padding:13px 14px!important;min-width:0!important;min-height:0!important;width:100%!important;height:100%!important;border-radius:15px!important;overflow:hidden!important;display:flex!important;flex-direction:column!important;justify-content:flex-start!important;}',
-)
-source = source.replace(
-    '  .section-title{font-size:19px!important;margin:4px 0 7px!important;}',
-    '  .section-title{font-size:19px!important;margin:2px 0 6px!important;}',
-)
-source = source.replace(
-    '  .action-grid{gap:7px!important;height:auto!important;min-height:220px!important;}',
-    '  .action-grid{gap:10px!important;height:100%!important;min-height:0!important;grid-template-rows:repeat(2,minmax(0,1fr))!important;padding-bottom:8px!important;}',
-)
-source = source.replace(
-    '  .action-card{padding:9px 10px!important;}',
-    '  .action-card{padding:11px 12px!important;}',
-)
+# Replace the entire legacy home-only sizing layer with one viewport-based layout.
+# This deliberately removes the previous fixed-card/min-height/scroll-lock patch stack
+# before the application source is compiled.
+start_marker = '''if page == "home":\n    st.markdown(\n        """\n<style>\n'''
+end_marker = '''\n""",\n        unsafe_allow_html=True,\n    )\n\napproved_pcna_header(98 if page == "home" else 105)'''
+
+start = source.index(start_marker)
+end = source.index(end_marker, start) + len(end_marker)
+
+home_layout = '''if page == "home":\n    st.markdown(\n        """\n<style>\n/* HOME: one responsive mobile application shell. */\n@media(max-width:620px){\n  :root{\n    --home-nav-h:76px;\n    --home-x:10px;\n    --home-gap:10px;\n  }\n\n  html,body,[data-testid="stAppViewContainer"]{\n    min-height:100%;\n    overflow-x:hidden!important;\n  }\n\n  /* Never lock vertical scrolling. The viewport is the target size; overflow remains reachable. */\n  [data-testid="stAppViewContainer"]>.main{\n    height:100dvh!important;\n    min-height:100dvh!important;\n    overflow-x:hidden!important;\n    overflow-y:auto!important;\n    overscroll-behavior-y:auto;\n  }\n\n  .block-container{\n    width:100%!important;\n    max-width:620px!important;\n    height:calc(100dvh - var(--home-nav-h))!important;\n    min-height:0!important;\n    box-sizing:border-box!important;\n    margin:0 auto!important;\n    padding:calc(8px + env(safe-area-inset-top)) var(--home-x) 8px!important;\n    overflow:visible!important;\n  }\n\n  /* Treat Streamlit's top-level vertical block as one cohesive mobile shell. */\n  .block-container > [data-testid="stVerticalBlock"]{\n    height:100%!important;\n    min-height:0!important;\n    display:flex!important;\n    flex-direction:column!important;\n    gap:0!important;\n  }\n\n  .block-container > [data-testid="stVerticalBlock"] > [data-testid="stElementContainer"]{\n    flex:0 0 auto;\n    min-height:0!important;\n  }\n\n  /* Approved logo: preserve the asset itself; only tighten surrounding layout space. */\n  [data-testid="stImage"]{\n    margin:0 0 3px!important;\n    overflow:visible!important;\n  }\n  [data-testid="stImage"] img{\n    display:block!important;\n    margin:0 auto!important;\n    max-width:100%!important;\n    height:auto!important;\n    object-fit:contain!important;\n  }\n\n  /* Hero remains the approved live PCNA banner, but its viewport use is responsive. */\n  .block-container > [data-testid="stVerticalBlock"] > [data-testid="stElementContainer"]:has(iframe[title="streamlit_component"]){\n    height:clamp(118px,18dvh,152px)!important;\n    min-height:118px!important;\n    overflow:hidden!important;\n    margin:0!important;\n  }\n  iframe[title="streamlit_component"]{\n    display:block!important;\n    width:100%!important;\n    height:100%!important;\n    min-height:0!important;\n    margin:0!important;\n  }\n\n  .section-title{\n    flex:0 0 auto!important;\n    font-size:20px!important;\n    line-height:1.08!important;\n    margin:5px 0 7px!important;\n    position:relative!important;\n    z-index:2!important;\n  }\n\n  /* The card wrapper receives ALL remaining vertical space. */\n  .block-container > [data-testid="stVerticalBlock"] > [data-testid="stElementContainer"]:has(.action-grid){\n    flex:1 1 0!important;\n    min-height:0!important;\n    overflow:visible!important;\n  }\n  .block-container > [data-testid="stVerticalBlock"] > [data-testid="stElementContainer"]:has(.action-grid) > div{\n    height:100%!important;\n    min-height:0!important;\n  }\n\n  .action-grid{\n    width:100%!important;\n    height:100%!important;\n    min-height:0!important;\n    box-sizing:border-box!important;\n    display:grid!important;\n    grid-template-columns:repeat(2,minmax(0,1fr))!important;\n    grid-template-rows:repeat(2,minmax(0,1fr))!important;\n    gap:var(--home-gap)!important;\n    margin:0!important;\n    padding:0 0 2px!important;\n  }\n\n  .action-card{\n    width:100%!important;\n    height:100%!important;\n    min-width:0!important;\n    min-height:0!important;\n    box-sizing:border-box!important;\n    padding:clamp(10px,1.45dvh,14px) clamp(11px,3vw,15px)!important;\n    border-radius:15px!important;\n    overflow:hidden!important;\n    display:flex!important;\n    flex-direction:column!important;\n    justify-content:flex-start!important;\n  }\n  .action-icon{\n    flex:0 0 auto!important;\n    font-size:clamp(21px,2.8dvh,25px)!important;\n    line-height:1!important;\n    margin:0 0 6px!important;\n  }\n  .action-title{\n    flex:0 0 auto!important;\n    font-size:clamp(16px,2.05dvh,18px)!important;\n    line-height:1.08!important;\n    margin:0 0 4px!important;\n  }\n  .action-copy{\n    font-size:clamp(11.5px,1.42dvh,12.5px)!important;\n    line-height:1.2!important;\n    margin:0!important;\n  }\n\n  .bottom-nav{\n    height:var(--home-nav-h)!important;\n    padding-bottom:max(7px,env(safe-area-inset-bottom))!important;\n  }\n}\n\n/* Short-screen failsafe: preserve access rather than hiding overflow. */\n@media(max-width:620px) and (max-height:700px){\n  [data-testid="stAppViewContainer"]>.main{overflow-y:auto!important;}\n  .block-container{\n    height:auto!important;\n    min-height:calc(100dvh - var(--home-nav-h))!important;\n    padding-bottom:10px!important;\n  }\n  .block-container > [data-testid="stVerticalBlock"]{height:auto!important;}\n  .block-container > [data-testid="stVerticalBlock"] > [data-testid="stElementContainer"]:has(.action-grid){\n    flex:none!important;\n    min-height:300px!important;\n  }\n  .action-grid{min-height:300px!important;}\n}\n</style>\n""",\n        unsafe_allow_html=True,\n    )\n\napproved_pcna_header(98 if page == "home" else 105)'''
+
+source = source[:start] + home_layout + source[end:]
 
 exec(compile(source, str(source_path), "exec"), globals(), globals())
