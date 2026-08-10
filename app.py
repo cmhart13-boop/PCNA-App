@@ -25,6 +25,7 @@ from core import (
     search_products,
 )
 from generation import generate_concepts
+from home_reference import render_reference_home
 from pcna_brain import (
     PCNA_WORKFLOW_RULES,
     build_creative_pcna_context,
@@ -387,36 +388,7 @@ def render_virtual_projects():
 page = current_page()
 
 if page == "home":
-    home_header()
-    live_pcna_banner()
-    st.markdown('<div class="home-section-title">What do you need?</div><div class="home-title-underline"></div>', unsafe_allow_html=True)
-    st.markdown(
-        f"""
-<div class="home-action-grid">
-<a class="home-action-card" href="{nav_link('spec')}">
-  <div class="home-card-icon">✓</div><div class="home-card-title">Spec Sample<br>Order</div>
-  <div class="home-card-copy">Tell Nova what you need and build the verified PCNA order.</div>
-  <div class="home-card-visual visual-bag" aria-hidden="true"></div><div class="home-arrow">→</div>
-</a>
-<a class="home-action-card" href="{nav_link('virtual')}">
-  <div class="home-card-icon">◇</div><div class="home-card-title">Virtuals /<br>Designs</div>
-  <div class="home-card-copy">Ask Nova for product, kit or packaging virtuals and keep them in Projects.</div>
-  <div class="home-card-visual visual-laptop" aria-hidden="true"></div><div class="home-arrow">→</div>
-</a>
-<a class="home-action-card" href="{nav_link('quote')}">
-  <div class="home-card-icon">$</div><div class="home-card-title">Quote<br>Request</div>
-  <div class="home-card-copy">Quote a verified PCNA product at the requested quantity.</div>
-  <div class="home-card-visual visual-quote" aria-hidden="true"></div><div class="home-arrow">→</div>
-</a>
-<a class="home-action-card" href="{virtual_projects_link()}">
-  <div class="home-card-icon">□</div><div class="home-card-title">Projects</div>
-  <div class="home-card-copy">View and manage your saved projects, orders and virtuals in one place.</div>
-  <div class="home-card-visual visual-project" aria-hidden="true"></div><div class="home-arrow">→</div>
-</a>
-</div>
-""",
-        unsafe_allow_html=True,
-    )
+    render_reference_home()
 
 elif page == "create":
     page_header("Create", "Choose a workflow", "Four workflows. Everything else stays inside them.")
@@ -661,4 +633,5 @@ else:
     st.query_params["page"] = "home"
     st.rerun()
 
-bottom_nav(page)
+if page != "home":
+    bottom_nav(page)
