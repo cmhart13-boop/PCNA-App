@@ -381,12 +381,12 @@ if page == "home":
 @media(max-width:430px){
   html,body,[data-testid="stAppViewContainer"],[data-testid="stAppViewContainer"]>.main{min-height:100dvh!important;}
   [data-testid="stAppViewContainer"]>.main{overflow-y:hidden!important;}
-  .block-container{width:100%!important;max-width:none!important;height:calc(100dvh - 76px)!important;box-sizing:border-box!important;padding:calc(2px + env(safe-area-inset-top)) 10px 6px!important;margin:0!important;overflow:hidden!important;}
+  .block-container{width:100%!important;max-width:none!important;height:calc(100dvh - 76px)!important;box-sizing:border-box!important;padding:calc(16px + env(safe-area-inset-top)) 10px 8px!important;margin:0!important;overflow:hidden!important;}
   .block-container [data-testid="stVerticalBlock"]{gap:0!important;}
-  [data-testid="stImage"]{margin:0!important;}
-  [data-testid="stImage"] img{display:block!important;margin:0 auto!important;}
-  iframe[title="streamlit_component"]{display:block!important;margin:2px 0 0!important;}
-  .section-title{font-size:20px!important;margin:5px 0 8px!important;line-height:1.08!important;position:relative!important;z-index:2!important;}
+  [data-testid="stImage"]{margin:0 0 2px!important;overflow:visible!important;}
+  [data-testid="stImage"] img{display:block!important;margin:0 auto!important;max-width:100%!important;height:auto!important;object-fit:contain!important;}
+  iframe[title="streamlit_component"]{display:block!important;margin:0!important;}
+  .section-title{font-size:20px!important;margin:4px 0 7px!important;line-height:1.08!important;position:relative!important;z-index:2!important;}
   .action-grid{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;grid-template-rows:repeat(2,minmax(0,1fr))!important;gap:8px!important;margin:0!important;height:calc(100dvh - 76px - env(safe-area-inset-top) - 295px)!important;min-height:250px!important;max-height:330px!important;}
   .action-card{box-sizing:border-box!important;padding:10px 12px!important;min-height:0!important;height:100%!important;border-radius:15px!important;overflow:hidden!important;display:flex!important;flex-direction:column!important;justify-content:flex-start!important;}
   .action-icon{font-size:22px!important;line-height:1!important;margin:0 0 5px!important;flex:0 0 auto!important;}
@@ -407,7 +407,7 @@ if page == "home":
         unsafe_allow_html=True,
     )
 
-approved_pcna_header(104 if page == "home" else 105)
+approved_pcna_header(100 if page == "home" else 105)
 
 if page == "home":
     live_pcna_banner()
