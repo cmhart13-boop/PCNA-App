@@ -1,10 +1,7 @@
 name: Apply PCNA home card and nav update
 
+# Manual recovery utility only. Do not auto-run on pushes.
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'scripts/apply_home_card_nav_update.py'
   workflow_dispatch:
 
 permissions:
@@ -30,5 +27,5 @@ jobs:
           git config user.name "PCNA App Automation"
           git config user.email "actions@users.noreply.github.com"
           git add app.py
-          git commit -m "Display live PCNA.com hero banner"
+          git commit -m "Apply manual PCNA homepage recovery patch"
           git push origin main
