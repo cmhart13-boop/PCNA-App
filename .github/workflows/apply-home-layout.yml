@@ -1,0 +1,78 @@
+name: Apply PCNA home layout
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/apply-home-layout.yml'
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch homepage layout
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          path = Path('app.py')
+          text = path.read_text()
+
+          replacement = '''if page == "home":
+    st.markdown(
+        """
+<style>
+@media(max-width:620px){
+  html,body,[data-testid="stAppViewContainer"],[data-testid="stAppViewContainer"]>.main{min-height:100dvh!important;background:#fff!important;}
+  [data-testid="stAppViewContainer"]>.main{overflow-y:auto!important;}
+  .block-container,[data-testid="stMainBlockContainer"],[data-testid="stAppViewBlockContainer"]{width:100%!important;max-width:480px!important;margin:0 auto!important;padding:12px 16px 22px 16px!important;box-sizing:border-box!important;}
+  .block-container [data-testid="stVerticalBlock"]{gap:0!important;}
+  [data-testid="stImage"]{margin:0 auto 10px!important;overflow:visible!important;}
+  [data-testid="stImage"] img{display:block!important;margin:0 auto!important;max-width:138px!important;width:138px!important;height:auto!important;object-fit:contain!important;}
+  iframe[title="streamlit_component"]{display:block!important;margin:0 0 14px!important;width:100%!important;}
+  .section-title{margin:0 0 10px 1px!important;padding:0!important;color:#172b3f!important;font-family:Arial,sans-serif!important;font-size:20px!important;line-height:24px!important;font-weight:700!important;}
+  .action-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:12px!important;width:100%!important;margin:0!important;padding:0!important;align-items:start!important;align-content:start!important;}
+  .action-card{height:145px!important;min-height:145px!important;box-sizing:border-box!important;overflow:hidden!important;margin:0!important;padding:14px!important;border:1px solid #dce3e9!important;border-radius:12px!important;background:#fff!important;box-shadow:0 2px 8px rgba(20,42,62,.07)!important;display:flex!important;flex-direction:column!important;align-items:flex-start!important;justify-content:flex-start!important;text-decoration:none!important;}
+  .action-icon{width:30px!important;height:30px!important;flex:0 0 30px!important;margin:0 0 11px 0!important;padding:0!important;display:flex!important;align-items:center!important;justify-content:center!important;box-sizing:border-box!important;border-radius:8px!important;background:#f1f5f8!important;color:#173d60!important;font-family:Arial,sans-serif!important;font-size:18px!important;line-height:18px!important;font-weight:700!important;}
+  .action-title{width:100%!important;margin:0 0 5px 0!important;padding:0!important;color:#172b3f!important;font-family:Arial,sans-serif!important;font-size:15px!important;line-height:17px!important;font-weight:700!important;}
+  .action-copy{width:100%!important;margin:0!important;padding:0!important;color:#6d7985!important;font-family:Arial,sans-serif!important;font-size:11.5px!important;line-height:14px!important;font-weight:400!important;}
+}
+@media(max-width:350px){
+  .action-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important;}
+  .action-card{padding:12px!important;}
+}
+</style>
+""",
+        unsafe_allow_html=True,
+    )
+
+approved_pcna_header(138 if page == "home" else 105)'''
+
+          pattern = r'if page == "home":\n    st\.markdown\(\n        """\n<style>.*?unsafe_allow_html=True,\n    \)\n\napproved_pcna_header\(98 if page == "home" else 105\)'
+          text, count = re.subn(pattern, replacement, text, count=1, flags=re.S)
+          if count != 1:
+              raise SystemExit(f'Homepage style block replacement count was {count}, expected 1')
+
+          text = text.replace('height:150px;overflow:hidden;border-radius:14px', 'height:145px;overflow:hidden;border-radius:12px', 1)
+          text = text.replace('        height=152,', '        height=145,', 1)
+
+          text = text.replace('Tell Nova what you need and build the verified PCNA order.', 'Create and submit a new spec sample order.', 1)
+          text = text.replace('Ask Nova for product, kit or packaging virtuals and keep them in Projects.', 'Build and review branded product concepts.', 1)
+          text = text.replace('Quote a verified PCNA product at the requested quantity.', 'Prepare product pricing and quote requests.', 1)
+          text = text.replace('Open your saved PCNA virtual and design projects.', 'Access and manage active customer projects.', 1)
+          text = text.replace('<div class="action-icon">▣</div><div class="action-title">Projects</div>', '<div class="action-icon">❑</div><div class="action-title">Projects</div>', 1)
+
+          path.write_text(text)
+          PY
+      - name: Validate Python
+        run: python -m py_compile app.py
+      - name: Commit patch and remove one-time workflow
+        run: |
+          rm .github/workflows/apply-home-layout.yml
+          git config user.name "PCNA App Automation"
+          git config user.email "actions@users.noreply.github.com"
+          git add app.py .github/workflows/apply-home-layout.yml
+          git commit -m "Apply compact PCNA mobile home layout"
+          git push
