@@ -226,6 +226,13 @@ def list_projects(limit: int = 500) -> list[dict]:
     for row in rows:
         item = _project_dict(row)
         item.update({"virtual_count": int(row["virtual_count"] or 0), "quote_count": int(row["quote_count"] or 0), "spec_count": int(row["spec_count"] or 0)})
+        artifacts = list_artifacts(item["id"])
+        if artifacts:
+            item["payload"] = artifacts[0]["structured_data"]
+            item["type"] = artifacts[0]["artifact_type"]
+        else:
+            item["payload"] = {}
+            item["type"] = "project"
         result.append(item)
     return result
 
