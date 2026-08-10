@@ -13,8 +13,8 @@ replacements = [
         "color:rgba(255,255,255,.58)!important;font-size:10px;font-weight:800;",
     ),
     (
-        ".nav-item.active{color:var(--pcna)!important;background:#eff6fb;}",
-        ".nav-item.active{color:rgba(255,255,255,.92)!important;background:rgba(255,255,255,.08);}",
+        ".nav-item.active{{color:var(--pcna)!important;background:#eff6fb;}}",
+        ".nav-item.active{{color:rgba(255,255,255,.92)!important;background:rgba(255,255,255,.08);}}",
     ),
 ]
 for old, new in replacements:
