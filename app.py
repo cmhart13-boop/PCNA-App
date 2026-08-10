@@ -60,10 +60,10 @@ st.markdown(
 :root{{--pcna:{PCNA_BLUE};--ink:{INK};--muted:{MUTED};--line:{LINE};--panel:{PANEL};}}
 html,body,[data-testid="stAppViewContainer"]{{background:#fff;color:var(--ink);}}
 [data-testid="stAppViewContainer"]>.main{{overflow-x:hidden;}}
-[data-testid="stHeader"]{{height:0;background:rgba(255,255,255,.96);}}
+[data-testid="stHeader"]{{height:0!important;background:transparent!important;}}
 [data-testid="stSidebar"]{{display:none;}}
 #MainMenu,footer,[data-testid="stToolbar"]{{visibility:hidden!important;height:0!important;}}
-.block-container{{max-width:620px!important;padding:calc(34px + env(safe-area-inset-top)) 15px 104px!important;margin:0 auto!important;}}
+.block-container{{max-width:620px!important;padding:calc(24px + env(safe-area-inset-top)) 15px 104px!important;margin:0 auto!important;}}
 .page-kicker{{font-size:11px;font-weight:900;letter-spacing:.10em;color:var(--pcna);text-transform:uppercase;margin-top:2px;}}
 .page-title{{font-size:29px;line-height:1.08;font-weight:850;letter-spacing:-.035em;color:var(--pcna);margin:4px 0 9px;}}
 .page-copy{{font-size:15px;line-height:1.48;color:var(--muted);margin:0 0 18px;}}
@@ -92,7 +92,7 @@ label,[data-testid="stWidgetLabel"],[data-testid="stWidgetLabel"] p{{font-weight
 .nav-item{{display:flex;flex-direction:column;align-items:center;justify-content:center;text-decoration:none!important;color:rgba(255,255,255,.58)!important;font-size:10px;font-weight:800;gap:3px;border-radius:12px;}}
 .nav-icon{{font-size:20px;line-height:1;}}
 .nav-item.active{{color:rgba(255,255,255,.92)!important;background:rgba(255,255,255,.08);}}
-@media(max-width:430px){{.block-container{{padding-top:calc(30px + env(safe-area-inset-top))!important;padding-left:12px!important;padding-right:12px!important;}}.page-title{{font-size:28px;line-height:1.1;}}.section-title{{margin:3px 0 5px;}}.action-grid{{gap:9px;margin-top:2px;}}.action-card{{padding:10px 11px;min-height:88px;}}}}
+@media(max-width:430px){{.block-container{{padding-top:calc(24px + env(safe-area-inset-top))!important;padding-left:12px!important;padding-right:12px!important;}}.page-title{{font-size:28px;line-height:1.1;}}.section-title{{margin:3px 0 5px;}}.action-grid{{gap:9px;margin-top:2px;}}.action-card{{padding:10px 11px;min-height:88px;}}}}
 @media(max-width:350px){{.action-grid{{grid-template-columns:1fr;}}}}
 </style>
 """,
