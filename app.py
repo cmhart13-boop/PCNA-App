@@ -83,10 +83,10 @@ html,body,[data-testid="stAppViewContainer"]{{background:#fff;color:var(--ink);}
 [data-testid="stFileUploaderDropzone"]{{border-radius:14px!important;padding:14px 10px!important;border-color:#b8cad8!important;background:#fbfdff!important;}}
 [data-testid="stExpander"]{{border:1px solid var(--line)!important;border-radius:14px!important;overflow:hidden;margin:8px 0;}}
 label,[data-testid="stWidgetLabel"],[data-testid="stWidgetLabel"] p{{font-weight:800!important;color:var(--pcna)!important;}}
-.bottom-nav{{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:min(620px,100%);height:76px;background:rgba(255,255,255,.96);backdrop-filter:blur(16px);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(4,1fr);z-index:9999;padding:7px 7px max(7px,env(safe-area-inset-bottom));box-sizing:border-box;}}
-.nav-item{{display:flex;flex-direction:column;align-items:center;justify-content:center;text-decoration:none!important;color:#7890a0!important;font-size:10px;font-weight:800;gap:3px;border-radius:12px;}}
+.bottom-nav{{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:min(620px,100%);height:76px;background:var(--pcna);backdrop-filter:blur(16px);border-top:1px solid rgba(255,255,255,.10);display:grid;grid-template-columns:repeat(4,1fr);z-index:9999;padding:7px 7px max(7px,env(safe-area-inset-bottom));box-sizing:border-box;}}
+.nav-item{{display:flex;flex-direction:column;align-items:center;justify-content:center;text-decoration:none!important;color:rgba(255,255,255,.58)!important;font-size:10px;font-weight:800;gap:3px;border-radius:12px;}}
 .nav-icon{{font-size:20px;line-height:1;}}
-.nav-item.active{{color:var(--pcna)!important;background:#eff6fb;}}
+.nav-item.active{{color:rgba(255,255,255,.92)!important;background:rgba(255,255,255,.08);}}
 @media(max-width:430px){{.block-container{{padding-top:calc(38px + env(safe-area-inset-top))!important;padding-left:12px!important;padding-right:12px!important;}}.page-title{{font-size:28px;line-height:1.1;}}.action-grid{{gap:11px;}}.action-card{{padding:15px 13px;min-height:116px;}}}}
 @media(max-width:350px){{.action-grid{{grid-template-columns:1fr;}}}}
 </style>
@@ -368,9 +368,9 @@ if page == "home":
         f"""
 <div class="action-grid">
 <a class="action-card" href="{nav_link('spec')}"><div class="action-icon">✓</div><div class="action-title">Spec Sample Order</div><div class="action-copy">Tell Nova what you need and build the verified PCNA order.</div></a>
-<a class="action-card" href="{nav_link('blank')}"><div class="action-icon">□</div><div class="action-title">Blank Sample Order</div><div class="action-copy">Create a blank sample request from verified PCNA product data.</div></a>
+<a class="action-card" href="{nav_link('virtual')}"><div class="action-icon">◇</div><div class="action-title">Virtual Designs</div><div class="action-copy">Ask Nova for product, kit or packaging virtuals and keep them in Projects.</div></a>
 <a class="action-card" href="{nav_link('quote')}"><div class="action-icon">$</div><div class="action-title">Quote Request</div><div class="action-copy">Quote a verified PCNA product at the requested quantity.</div></a>
-<a class="action-card" href="{nav_link('virtual')}"><div class="action-icon">◇</div><div class="action-title">Virtuals / Design</div><div class="action-copy">Ask Nova for product, kit or packaging virtuals and keep them in Projects.</div></a>
+<a class="action-card" href="{virtual_projects_link()}"><div class="action-icon">▣</div><div class="action-title">Projects</div><div class="action-copy">Open your saved PCNA virtual and design projects.</div></a>
 </div>
 """,
         unsafe_allow_html=True,
