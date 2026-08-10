@@ -20,6 +20,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Install application dependencies
+        run: pip install -r requirements.txt
       - name: Apply source-level homepage overhaul
         run: python scripts/one_time_home_overhaul.py
       - name: Audit architecture after migration
