@@ -20,7 +20,7 @@ from core import (
 
 PCNA_WORKFLOW_RULES = """
 You are the reasoning layer for a PCNA workflow app. You interpret natural language, but you NEVER invent PCNA facts.
-The application's verified PCNA product and decoration data are authoritative. Deterministic application code resolves the final product facts.
+The application's verified PCNA product, decoration and pricing data are authoritative. Deterministic application code resolves final facts and prices.
 
 SPEC SAMPLE RULES:
 - Never invent product names, item numbers, colors, sizes, decoration methods or locations.
@@ -29,6 +29,12 @@ SPEC SAMPLE RULES:
 - For laser engraving or deboss, imprint color is N/A.
 - Imprint Size defaults to Max Imprint.
 - Do not add pricing, inventory or MOQ to a spec sample.
+
+QUOTE RULES:
+- Never invent product names, item numbers, quantities, colors, sizes, decoration methods, locations or prices.
+- Interpret the user's requested quantities and product/decorating intent only.
+- Deterministic application code resolves products/decorations and calculates decorated pricing from verified PCNA pricing data.
+- If a user does not give a quantity, leave quantity null/empty rather than guessing.
 
 CREATIVE / VIRTUAL / PERFECTLY PACKAGED RULES:
 - Use verified PCNA products only.
@@ -72,6 +78,20 @@ def interpret_request(api_key: str, request: str, mode: str) -> dict[str, Any]:
             "in_hands_date": "",
             "ship_to": "",
         }
+    elif mode == "quote":
+        schema = {
+            "project_name": "project/customer name if stated, otherwise empty",
+            "customer": "customer/account if stated, otherwise empty",
+            "items": [{
+                "product_query": "product name as user said it",
+                "quantity": 100,
+                "color": "requested color or empty",
+                "size": "requested size or empty",
+                "decoration_method": "requested method or empty",
+                "decoration_location": "requested location or empty",
+                "imprint_color": "requested imprint color or empty"
+            }]
+        }
     else:
         schema = {
             "project_goal": "short project summary",
@@ -79,15 +99,16 @@ def interpret_request(api_key: str, request: str, mode: str) -> dict[str, Any]:
             "customer": "customer or brand if present, otherwise empty",
             "requested_concepts": 5,
             "perfectly_packaged": False,
-            "product_needs": [
-                {
-                    "search_term": "generic PCNA category or user-named product search term",
-                    "role": "why this product belongs in the project",
-                    "requested_color": "user-requested color or empty",
-                    "decoration_method": "requested/preferred decoration or empty",
-                    "decoration_location": "requested/preferred location or empty",
-                }
-            ],
+            "product_needs": [{
+                "search_term": "generic PCNA category or user-named product search term",
+                "role": "why this product belongs in the project",
+                "requested_color": "user-requested color or empty",
+                "size": "requested size or empty",
+                "quantity": None,
+                "decoration_method": "requested/preferred decoration or empty",
+                "decoration_location": "requested/preferred location or empty",
+                "imprint_color": "requested imprint color or empty"
+            }],
             "creative_direction": "concise direction preserving user intent",
         }
     response = client.responses.create(
@@ -171,88 +192,105 @@ def _resolve_decoration(
     }
 
 
+def _resolved_product(raw: dict[str, Any], products: pd.DataFrame, decorations: pd.DataFrame, *, allow_defaults: bool = False) -> tuple[dict[str, Any] | None, str | None]:
+    query = str(raw.get("product_query") or raw.get("search_term") or "").strip()
+    identity = _best_product(products, query)
+    if not identity:
+        return None, query or "Unnamed product"
+    item = identity["Item Number"]
+    color = _resolve_color(products, item, str(raw.get("color") or raw.get("requested_color") or ""), allow_verified_default=allow_defaults)
+    dec = _resolve_decoration(
+        decorations,
+        item,
+        str(raw.get("decoration_method", "")),
+        str(raw.get("decoration_location", "")),
+        allow_verified_default=allow_defaults,
+    )
+    if not dec:
+        return None, f"{identity['Product Name']} decoration"
+    method = dec["Decoration Method"]
+    imprint = "N/A" if is_no_ink_decoration(method) else str(raw.get("imprint_color", "")).strip()
+    resolved = {
+        **identity,
+        "Color": color,
+        "Size": str(raw.get("size", "") or "").strip(),
+        "Decoration Method": method,
+        "Decoration Location": dec["Decoration Location"],
+        "Imprint Color": imprint,
+        "Max Imprint": dec["Max Imprint"],
+    }
+    if raw.get("quantity") not in (None, ""):
+        try:
+            resolved["Quantity"] = int(raw.get("quantity"))
+        except (TypeError, ValueError):
+            pass
+    return resolved, None
+
+
 def resolve_spec_request(api_key: str, request: str, products: pd.DataFrame, decorations: pd.DataFrame) -> dict[str, Any]:
     intent = interpret_request(api_key, request, "spec")
     resolved_items: list[SpecItem] = []
+    product_data: list[dict[str, Any]] = []
     unresolved: list[str] = []
     for raw in intent.get("items", []):
-        query = str(raw.get("product_query", "")).strip()
-        identity = _best_product(products, query)
-        if not identity:
-            unresolved.append(query or "Unnamed product")
+        resolved, error = _resolved_product(raw, products, decorations)
+        if error or not resolved:
+            unresolved.append(error or "Unknown item")
             continue
-        item = identity["Item Number"]
-        color = _resolve_color(products, item, str(raw.get("color", "")))
-        dec = _resolve_decoration(
-            decorations,
-            item,
-            str(raw.get("decoration_method", "")),
-            str(raw.get("decoration_location", "")),
-        )
-        if not dec:
-            unresolved.append(f"{identity['Product Name']} decoration")
-            continue
-        method = dec["Decoration Method"]
-        imprint = "N/A" if is_no_ink_decoration(method) else str(raw.get("imprint_color", "")).strip()
+        product_data.append(resolved)
         resolved_items.append(
             SpecItem(
-                product=identity["Product Name"],
-                item_number=item,
-                color=color,
-                size=str(raw.get("size", "")).strip(),
-                decoration_method=method,
-                decoration_location=dec["Decoration Location"],
-                imprint_color=imprint,
+                product=resolved["Product Name"],
+                item_number=resolved["Item Number"],
+                color=resolved["Color"],
+                size=resolved["Size"],
+                decoration_method=resolved["Decoration Method"],
+                decoration_location=resolved["Decoration Location"],
+                imprint_color=resolved["Imprint Color"],
                 imprint_size="Max Imprint",
             )
         )
-    order = (
-        build_spec_order(
-            resolved_items,
-            po=str(intent.get("po", "")).strip(),
-            ship_date=str(intent.get("ship_date", "")).strip(),
-            in_hands_date=str(intent.get("in_hands_date", "")).strip(),
-            ship_to=str(intent.get("ship_to", "")).strip(),
-        )
-        if resolved_items
-        else ""
-    )
-    return {"order": order, "items": resolved_items, "unresolved": unresolved, "intent": intent}
+    order = build_spec_order(
+        resolved_items,
+        po=str(intent.get("po", "")).strip(),
+        ship_date=str(intent.get("ship_date", "")).strip(),
+        in_hands_date=str(intent.get("in_hands_date", "")).strip(),
+        ship_to=str(intent.get("ship_to", "")).strip(),
+    ) if resolved_items else ""
+    return {"order": order, "items": resolved_items, "products": product_data, "unresolved": unresolved, "intent": intent}
+
+
+def resolve_quote_request(api_key: str, request: str, products: pd.DataFrame, decorations: pd.DataFrame) -> dict[str, Any]:
+    intent = interpret_request(api_key, request, "quote")
+    resolved_products: list[dict[str, Any]] = []
+    unresolved: list[str] = []
+    for raw in intent.get("items", []):
+        resolved, error = _resolved_product(raw, products, decorations)
+        if error or not resolved:
+            unresolved.append(error or "Unknown item")
+            continue
+        if not resolved.get("Quantity"):
+            unresolved.append(f"{resolved['Product Name']} quantity")
+        resolved_products.append(resolved)
+    return {"products": resolved_products, "unresolved": unresolved, "intent": intent}
 
 
 def build_creative_pcna_context(api_key: str, request: str, products: pd.DataFrame, decorations: pd.DataFrame) -> dict[str, Any]:
     intent = interpret_request(api_key, request, "creative")
     selected: list[dict[str, Any]] = []
+    unresolved: list[str] = []
     seen: set[str] = set()
-    needs = intent.get("product_needs", []) or []
-    for need in needs[:6]:
-        term = str(need.get("search_term", "")).strip()
-        identity = _best_product(products, term)
-        if not identity or identity["Item Number"] in seen:
+    for need in (intent.get("product_needs", []) or [])[:6]:
+        resolved, error = _resolved_product(need, products, decorations, allow_defaults=True)
+        if error or not resolved:
+            unresolved.append(error or "Unknown item")
             continue
-        item = identity["Item Number"]
-        color = _resolve_color(products, item, str(need.get("requested_color", "")), allow_verified_default=True)
-        dec = _resolve_decoration(
-            decorations,
-            item,
-            str(need.get("decoration_method", "")),
-            str(need.get("decoration_location", "")),
-            allow_verified_default=True,
-        )
-        if not dec:
+        if resolved["Item Number"] in seen:
             continue
-        seen.add(item)
-        selected.append(
-            {
-                **identity,
-                "Color": color,
-                "Decoration Method": dec["Decoration Method"],
-                "Decoration Location": dec["Decoration Location"],
-                "Max Imprint": dec["Max Imprint"],
-                "Project Role": str(need.get("role", "")).strip(),
-                "Resolution Source": "Verified PCNA product + decoration masters",
-            }
-        )
+        seen.add(resolved["Item Number"])
+        resolved["Project Role"] = str(need.get("role", "")).strip()
+        resolved["Resolution Source"] = "Verified PCNA product + decoration masters"
+        selected.append(resolved)
     try:
         requested_concepts = int(intent.get("requested_concepts", 5) or 5)
     except Exception:
@@ -262,6 +300,7 @@ def build_creative_pcna_context(api_key: str, request: str, products: pd.DataFra
         "intent": intent,
         "selected_products": selected,
         "verified_products": selected,
+        "unresolved": unresolved,
         "requested_concepts": requested_concepts,
         "perfectly_packaged": bool(intent.get("perfectly_packaged", False)) or "perfectly packaged" in request.lower() or "packag" in request.lower(),
     }
@@ -271,8 +310,7 @@ def creative_generation_prompt(request: str, context: dict[str, Any], extra_dire
     selected = context.get("selected_products", [])
     packaging_rule = (
         "This request includes Perfectly Packaged work. Use only approved PCNA Perfectly Packaged structures/templates supplied in the request/app context; do not invent a box structure. "
-        if context.get("perfectly_packaged")
-        else ""
+        if context.get("perfectly_packaged") else ""
     )
     return (
         "You are executing the PCNA-trained Nova creative workflow. Every product fact below was resolved from verified PCNA data. "
