@@ -223,9 +223,10 @@ def build_spec_order(
         lines.extend([
             f"ITEM {i}",
             f"Product: {item.product}",
-            f"Item Number: {item.item_number}",
-            f"Item Color: {item.color}",
         ])
+        if item.item_number.strip():
+            lines.append(f"Item Number: {item.item_number.strip()}")
+        lines.append(f"Item Color: {item.color}")
         if item.size.strip():
             lines.append(f"Size: {item.size.strip()}")
         lines.extend([
