@@ -1,0 +1,34 @@
+name: Fix approved PCNA logo reference once
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  swap-logo:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Replace header image reference only
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('app.py')
+          s = p.read_text()
+          old = 'st.image("assets/pcna-logo.webp", width=105)'
+          new = 'st.image("IMG_2337.webp", width=105)'
+          if old not in s:
+              raise SystemExit('Current logo reference not found')
+          p.write_text(s.replace(old, new, 1))
+          PY
+          python -m py_compile app.py
+          git config user.name "PCNA App Automation"
+          git config user.email "actions@users.noreply.github.com"
+          git add app.py
+          git commit -m "Use approved original PCNA logo file"
+          git push
