@@ -46,8 +46,8 @@ st.set_page_config(page_title="PCNA", layout="centered", initial_sidebar_state="
 PCNA_BLUE = "#084f86"
 INK = "#14273a"
 MUTED = "#66798a"
-LINE = "#e2e9ef"
-PANEL = "#f5f8fa"
+LINE = "#d6e2eb"
+PANEL = "#f7fafc"
 
 st.markdown(
     f"""
@@ -59,19 +59,18 @@ html,body,[data-testid="stAppViewContainer"]{{background:#fff;color:var(--ink);}
 [data-testid="stSidebar"]{{display:none;}}
 #MainMenu,footer,[data-testid="stToolbar"]{{visibility:hidden!important;height:0!important;}}
 .block-container{{max-width:620px!important;padding:calc(34px + env(safe-area-inset-top)) 15px 104px!important;margin:0 auto!important;}}
-.pcna-live-wrap{{margin:0 0 18px;}}
 .page-kicker{{font-size:11px;font-weight:900;letter-spacing:.10em;color:var(--pcna);text-transform:uppercase;margin-top:2px;}}
 .page-title{{font-size:29px;line-height:1.08;font-weight:850;letter-spacing:-.035em;color:var(--pcna);margin:4px 0 9px;}}
 .page-copy{{font-size:15px;line-height:1.48;color:var(--muted);margin:0 0 18px;}}
-.section-title{{font-size:18px;font-weight:850;letter-spacing:-.015em;margin:20px 0 9px;color:var(--pcna);}}
-.action-grid{{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:4px 0 6px;}}
-.action-card{{display:block;text-decoration:none!important;border:1px solid var(--line);border-radius:17px;padding:16px 14px;background:#fff;min-height:118px;box-shadow:0 5px 17px rgba(20,55,80,.055);}}
+.section-title{{font-size:18px;font-weight:850;letter-spacing:-.015em;margin:22px 0 10px;color:var(--pcna);}}
+.action-grid{{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin:8px 0 10px;}}
+.action-card{{display:block;text-decoration:none!important;border:1.5px solid rgba(8,79,134,.36);border-radius:17px;padding:17px 15px;background:#fff;min-height:122px;box-shadow:0 5px 0 rgba(8,79,134,.10),0 12px 24px rgba(8,79,134,.09);transition:transform .12s ease,box-shadow .12s ease,border-color .12s ease;}}
+.action-card:hover{{border-color:rgba(8,79,134,.58);box-shadow:0 6px 0 rgba(8,79,134,.13),0 14px 28px rgba(8,79,134,.12);}}
+.action-card:active{{transform:translateY(3px);box-shadow:0 2px 0 rgba(8,79,134,.12),0 7px 14px rgba(8,79,134,.08);}}
 .action-icon{{font-size:24px;line-height:1;margin-bottom:14px;color:var(--pcna);}}
-.action-title{{font-size:15px;font-weight:850;color:var(--pcna);line-height:1.15;margin-bottom:5px;}}
+.action-title{{font-size:16px;font-weight:850;color:var(--pcna);line-height:1.15;margin-bottom:6px;}}
 .action-copy{{font-size:12px;color:var(--muted);line-height:1.35;}}
-.wide-card{{grid-column:1/-1;min-height:auto;display:flex;align-items:center;gap:12px;padding:14px 15px;}}
-.wide-card .action-icon{{margin:0;font-size:22px;}}
-.info-card{{border:1px solid var(--line);border-radius:16px;padding:14px;background:#fff;margin:8px 0;box-shadow:0 4px 15px rgba(20,55,80,.04);}}
+.info-card{{border:1px solid var(--line);border-radius:16px;padding:14px;background:#fff;margin:8px 0;box-shadow:0 4px 14px rgba(8,79,134,.05);}}
 .info-card-title{{font-size:15px;font-weight:850;color:var(--pcna);}}
 .info-card-meta{{font-size:12px;color:var(--muted);margin-top:3px;}}
 .data-chip{{display:inline-block;padding:5px 8px;border-radius:999px;background:#eef5fa;color:var(--pcna);font-size:11px;font-weight:850;margin-right:5px;}}
@@ -80,7 +79,7 @@ html,body,[data-testid="stAppViewContainer"]{{background:#fff;color:var(--ink);}
 .stTextInput input,.stNumberInput input,.stTextArea textarea,[data-baseweb="select"]>div{{min-height:50px!important;border-radius:12px!important;font-size:16px!important;background:#fff!important;border-color:#b8cad8!important;color:var(--ink)!important;}}
 .stTextInput input:focus,.stNumberInput input:focus,.stTextArea textarea:focus{{border-color:var(--pcna)!important;box-shadow:0 0 0 1px var(--pcna)!important;}}
 [data-baseweb="select"]>div:focus-within{{border-color:var(--pcna)!important;box-shadow:0 0 0 1px var(--pcna)!important;}}
-.stTextArea textarea{{min-height:112px!important;}}
+.stTextArea textarea{{min-height:120px!important;}}
 [data-testid="stFileUploaderDropzone"]{{border-radius:14px!important;padding:14px 10px!important;border-color:#b8cad8!important;background:#fbfdff!important;}}
 [data-testid="stExpander"]{{border:1px solid var(--line)!important;border-radius:14px!important;overflow:hidden;margin:8px 0;}}
 label,[data-testid="stWidgetLabel"],[data-testid="stWidgetLabel"] p{{font-weight:800!important;color:var(--pcna)!important;}}
@@ -88,12 +87,13 @@ label,[data-testid="stWidgetLabel"],[data-testid="stWidgetLabel"] p{{font-weight
 .nav-item{{display:flex;flex-direction:column;align-items:center;justify-content:center;text-decoration:none!important;color:#7890a0!important;font-size:10px;font-weight:800;gap:3px;border-radius:12px;}}
 .nav-icon{{font-size:20px;line-height:1;}}
 .nav-item.active{{color:var(--pcna)!important;background:#eff6fb;}}
-@media(max-width:430px){{.block-container{{padding-top:calc(38px + env(safe-area-inset-top))!important;padding-left:12px!important;padding-right:12px!important;}}.page-title{{font-size:28px;line-height:1.1;}}.action-grid{{gap:9px;}}.action-card{{padding:15px 12px;min-height:112px;}}}}
-@media(max-width:350px){{.action-grid{{grid-template-columns:1fr;}}.wide-card{{grid-column:auto;}}}}
+@media(max-width:430px){{.block-container{{padding-top:calc(38px + env(safe-area-inset-top))!important;padding-left:12px!important;padding-right:12px!important;}}.page-title{{font-size:28px;line-height:1.1;}}.action-grid{{gap:11px;}}.action-card{{padding:15px 13px;min-height:116px;}}}}
+@media(max-width:350px){{.action-grid{{grid-template-columns:1fr;}}}}
 </style>
 """,
     unsafe_allow_html=True,
 )
+
 
 @st.cache_data(show_spinner=False)
 def read_csv_bytes(data: bytes, name: str) -> pd.DataFrame:
@@ -147,6 +147,10 @@ def nav_link(page: str) -> str:
     return f"?page={quote(page)}"
 
 
+def virtual_projects_link() -> str:
+    return "?page=virtual&view=projects"
+
+
 def page_header(kicker: str, title: str, copy: str):
     st.markdown(f'<div class="page-kicker">{kicker}</div><div class="page-title">{title}</div><div class="page-copy">{copy}</div>', unsafe_allow_html=True)
 
@@ -155,7 +159,7 @@ def live_pcna_banner():
     components.html(
         """
 <div class="pcna-live-shell"><div class="fallback"><a href="https://www.pcna.com/en-us" target="_blank" rel="noopener">Open live PCNA.com</a></div><iframe src="https://www.pcna.com/en-us" title="Live PCNA.com promotional banner" loading="eager"></iframe></div>
-<style>html,body{margin:0;padding:0;background:#fff;overflow:hidden}.pcna-live-shell{position:relative;height:228px;overflow:hidden;border-radius:14px;background:#fff}.pcna-live-shell iframe{position:absolute;left:0;top:-92px;width:100%;height:620px;border:0;background:#fff;z-index:2}.fallback{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;border:1px solid #e2e9ef;border-radius:14px;background:#fff;z-index:1}.fallback a{color:#084f86;font-size:15px;font-weight:700;text-decoration:none}@media(max-width:430px){.pcna-live-shell{height:208px}.pcna-live-shell iframe{top:-82px;height:590px}}</style>
+<style>html,body{margin:0;padding:0;background:#fff;overflow:hidden}.pcna-live-shell{position:relative;height:228px;overflow:hidden;border-radius:14px;background:#fff}.pcna-live-shell iframe{position:absolute;left:0;top:-92px;width:100%;height:620px;border:0;background:#fff;z-index:2}.fallback{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;border:1px solid #d6e2eb;border-radius:14px;background:#fff;z-index:1}.fallback a{color:#084f86;font-size:15px;font-weight:700;text-decoration:none}@media(max-width:430px){.pcna-live-shell{height:208px}.pcna-live-shell iframe{top:-82px;height:590px}}</style>
 """,
         height=228,
         scrolling=False,
@@ -163,14 +167,16 @@ def live_pcna_banner():
 
 
 def bottom_nav(page: str):
-    group = "create" if page in {"spec", "blank", "quote", "virtual", "package", "concept"} else page
+    group = "create" if page in {"spec", "blank", "quote"} else page
+    if page == "virtual":
+        group = "projects"
     st.markdown(
         f"""
 <div class="bottom-nav">
 <a class="nav-item {'active' if group=='home' else ''}" href="{nav_link('home')}"><span class="nav-icon">⌂</span><span>Home</span></a>
 <a class="nav-item {'active' if group=='search' else ''}" href="{nav_link('search')}"><span class="nav-icon">⌕</span><span>Products</span></a>
 <a class="nav-item {'active' if group=='create' else ''}" href="{nav_link('create')}"><span class="nav-icon">＋</span><span>Create</span></a>
-<a class="nav-item {'active' if group=='saved' else ''}" href="{nav_link('saved')}"><span class="nav-icon">▣</span><span>Saved</span></a>
+<a class="nav-item {'active' if group=='projects' else ''}" href="{virtual_projects_link()}"><span class="nav-icon">▣</span><span>Projects</span></a>
 </div>
 """,
         unsafe_allow_html=True,
@@ -229,59 +235,156 @@ def product_configuration(prefix: str):
     return {**identity, "Color": color, "Size": size, "Decoration Method": method, "Decoration Location": location, "Imprint Color": imprint_color}
 
 
-def show_generated(project_id: int):
-    images = [p for p in list_project_files(project_id) if p.suffix.lower() in {".png", ".jpg", ".jpeg", ".webp"} and p.name.startswith("generated_")]
-    if not images:
-        return
-    st.markdown('<div class="section-title">Generated concepts</div>', unsafe_allow_html=True)
-    for path in images:
-        st.image(path.read_bytes(), caption=path.stem.replace("generated_", "Concept "), use_container_width=True)
-        st.download_button(f"Download {path.name}", path.read_bytes(), file_name=path.name, key=f"gen_{project_id}_{path.name}", use_container_width=True)
+def quote_products(products: list[dict], quantity: int) -> tuple[list[dict], float]:
+    lines: list[dict] = []
+    unit_total = 0.0
+    for product in products:
+        item = str(product.get("Item Number", ""))
+        schedules = pricing_schedules(st.session_state.pricing, item, currency="USD", decorated=True)
+        if not schedules:
+            lines.append({**product, "Quantity": quantity, "Pricing Available": False})
+            continue
+        tier = quote_tier(st.session_state.pricing, item, quantity, currency="USD", decorated=True, schedule=schedules[0])
+        if not tier:
+            lines.append({**product, "Quantity": quantity, "Pricing Available": False})
+            continue
+        unit_total += float(tier["Unit Price"])
+        lines.append({**product, **tier, "Pricing Available": True})
+    return lines, unit_total
+
+
+def quote_text(project: dict, virtual_name: str, quantity: int, quote_lines: list[dict], unit_total: float) -> str:
+    out = [
+        "PCNA VIRTUAL QUOTE",
+        "",
+        f"Project: {project['project']}",
+        f"Customer: {project['customer']}",
+        f"Virtual: {virtual_name}",
+        f"Quantity: {quantity}",
+        "",
+    ]
+    for i, line in enumerate(quote_lines, 1):
+        out.extend([
+            f"ITEM {i}",
+            f"Product: {line.get('Product Name','')}",
+            f"Item Number: {line.get('Item Number','')}",
+            f"Color: {line.get('Color','')}",
+            f"Decoration Method: {line.get('Decoration Method','')}",
+            f"Decoration Location: {line.get('Decoration Location','')}",
+        ])
+        if line.get("Pricing Available"):
+            out.extend([
+                f"Unit Price: ${float(line.get('Unit Price',0)):,.2f}",
+                f"Extended: ${float(line.get('Unit Price',0))*quantity:,.2f}",
+                f"Schedule: {line.get('Schedule','')}",
+            ])
+        else:
+            out.append("Pricing: Not available in active pricing data")
+        out.append("")
+    if unit_total:
+        out.extend([
+            f"Combined Unit Total: ${unit_total:,.2f}",
+            f"Combined Extended Total: ${unit_total*quantity:,.2f}",
+        ])
+    return "\n".join(out)
+
+
+def render_virtual_project(project: dict, *, expanded: bool = False):
+    payload = project.get("payload", {})
+    products = payload.get("Verified Products", []) or payload.get("Selected Products", []) or []
+    files = list_project_files(project["id"])
+    generated = [f for f in files if f.name.startswith("generated_") and f.suffix.lower() in {".png", ".jpg", ".jpeg", ".webp"}]
+    originals = [f for f in files if f not in generated and not f.name.endswith(".txt")]
+    with st.expander(f"{project['customer']} · {project['project']}", expanded=expanded):
+        st.caption(f"{project['date'][:10]} · {len(generated)} generated virtuals")
+        if payload.get("Request"):
+            st.write(payload["Request"])
+        if originals:
+            with st.expander("Original artwork / references"):
+                for f in originals:
+                    st.download_button(f"Download {f.name}", f.read_bytes(), file_name=f.name, key=f"orig_{project['id']}_{f.name}", use_container_width=True)
+        if not generated:
+            st.info("No generated virtual files are stored in this project yet.")
+        for virtual_index, f in enumerate(generated, 1):
+            st.markdown(f'<div class="section-title">Virtual {virtual_index}</div>', unsafe_allow_html=True)
+            st.image(f.read_bytes(), caption=f.name, use_container_width=True)
+            st.download_button("Download Virtual", f.read_bytes(), file_name=f.name, key=f"download_{project['id']}_{f.name}", use_container_width=True)
+            with st.expander("Product Info"):
+                if not products:
+                    st.info("No verified product configuration is attached to this virtual.")
+                for i, product in enumerate(products, 1):
+                    st.markdown(f"**{i}. {product.get('Product Name','')}**")
+                    st.write(f"Item Number: {product.get('Item Number','')}")
+                    st.write(f"Color: {product.get('Color','')}")
+                    st.write(f"Decoration Method: {product.get('Decoration Method','')}")
+                    st.write(f"Decoration Location: {product.get('Decoration Location','')}")
+                    if product.get("Max Imprint"):
+                        st.write(f"Max Imprint: {product.get('Max Imprint')}")
+                    if product.get("Project Role"):
+                        st.caption(product.get("Project Role"))
+                    if i < len(products):
+                        st.divider()
+            with st.expander("Quote Virtual"):
+                qty = int(st.number_input("Quantity", min_value=1, value=100, step=1, key=f"qty_{project['id']}_{f.name}"))
+                if st.button("Quote This Virtual", key=f"quote_{project['id']}_{f.name}", use_container_width=True, disabled=not products):
+                    quote_lines, unit_total = quote_products(products, qty)
+                    text = quote_text(project, f.name, qty, quote_lines, unit_total)
+                    quote_filename = f"{f.stem}_quote_{qty}.txt"
+                    save_upload(project["id"], quote_filename, text.encode("utf-8"))
+                    st.session_state[f"quote_result_{project['id']}_{f.name}"] = text
+                result = st.session_state.get(f"quote_result_{project['id']}_{f.name}")
+                if result:
+                    st.markdown(f'<div class="order-box">{result}</div>', unsafe_allow_html=True)
+                    st.download_button("Download Quote", result, file_name=f"{f.stem}_quote.txt", key=f"quote_dl_{project['id']}_{f.name}", use_container_width=True)
+        quote_files = [f for f in files if f.name.endswith(".txt") and "_quote_" in f.name]
+        if quote_files:
+            with st.expander("Saved Quotes"):
+                for f in quote_files:
+                    st.download_button(f"Download {f.name}", f.read_bytes(), file_name=f.name, key=f"savedquote_{project['id']}_{f.name}", use_container_width=True)
+        if st.button("Delete Project", key=f"delete_virtual_{project['id']}", use_container_width=True):
+            delete_project(project["id"])
+            st.rerun()
+
+
+def render_virtual_projects():
+    projects = [p for p in persistent_projects() if p.get("type") in {"Virtual / Design", "Virtual Request", "Perfectly Packaged"}]
+    st.markdown('<div class="section-title">Projects</div>', unsafe_allow_html=True)
+    search = st.text_input("Find a project", placeholder="Customer or project name", key="virtual_project_search")
+    if search:
+        q = search.lower()
+        projects = [p for p in projects if q in f"{p['customer']} {p['project']}".lower()]
+    if not projects:
+        st.info("No matching virtual projects yet.")
+    for p in projects:
+        render_virtual_project(p)
 
 
 page = current_page()
 
 if page == "home":
     live_pcna_banner()
-    projects = persistent_projects()
-    st.markdown(f'<span class="data-chip">{st.session_state.data_source}</span><span class="data-chip">{len(projects)} saved</span>', unsafe_allow_html=True)
-    st.markdown('<div class="section-title">Quick actions</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-title">What do you need?</div>', unsafe_allow_html=True)
     st.markdown(
         f"""
 <div class="action-grid">
-<a class="action-card" href="{nav_link('search')}"><div class="action-icon">⌕</div><div class="action-title">Find a Product</div><div class="action-copy">Search names, item numbers, colors and decoration.</div></a>
-<a class="action-card" href="{nav_link('spec')}"><div class="action-icon">✓</div><div class="action-title">Spec Sample</div><div class="action-copy">Tell Nova what you need in plain English.</div></a>
-<a class="action-card" href="{nav_link('quote')}"><div class="action-icon">$</div><div class="action-title">Quick Quote</div><div class="action-copy">Decorated pricing by quantity.</div></a>
-<a class="action-card" href="{nav_link('virtual')}"><div class="action-icon">◇</div><div class="action-title">Generate Virtuals</div><div class="action-copy">PCNA-trained generation using verified catalog data.</div></a>
-<a class="action-card wide-card" href="{nav_link('assistant')}"><div class="action-icon">✦</div><div><div class="action-title">Ask PCNA Nova</div><div class="action-copy">Natural-language PCNA workflow assistant grounded in the catalog.</div></div></a>
-</div>
-""",
-        unsafe_allow_html=True,
-    )
-    st.markdown('<div class="section-title">More workflows</div>', unsafe_allow_html=True)
-    st.markdown(
-        f"""
-<div class="action-grid">
-<a class="action-card" href="{nav_link('blank')}"><div class="action-title">Blank Sample</div><div class="action-copy">Create a fast blank sample request.</div></a>
-<a class="action-card" href="{nav_link('package')}"><div class="action-title">Perfectly Packaged</div><div class="action-copy">PCNA-grounded customer kit concepts.</div></a>
-<a class="action-card" href="{nav_link('concept')}"><div class="action-title">Design Concepts</div><div class="action-copy">Save creative briefs and reference art.</div></a>
-<a class="action-card" href="{nav_link('data')}"><div class="action-title">Data Sources</div><div class="action-copy">Load and validate PCNA master files.</div></a>
+<a class="action-card" href="{nav_link('spec')}"><div class="action-icon">✓</div><div class="action-title">Spec Sample Order</div><div class="action-copy">Tell Nova what you need and build the verified PCNA order.</div></a>
+<a class="action-card" href="{nav_link('blank')}"><div class="action-icon">□</div><div class="action-title">Blank Sample Order</div><div class="action-copy">Create a blank sample request from verified PCNA product data.</div></a>
+<a class="action-card" href="{nav_link('quote')}"><div class="action-icon">$</div><div class="action-title">Quote Request</div><div class="action-copy">Quote a verified PCNA product at the requested quantity.</div></a>
+<a class="action-card" href="{nav_link('virtual')}"><div class="action-icon">◇</div><div class="action-title">Virtuals / Design</div><div class="action-copy">Ask Nova for product, kit or packaging virtuals and keep them in Projects.</div></a>
 </div>
 """,
         unsafe_allow_html=True,
     )
 
 elif page == "create":
-    page_header("Create", "What do you need?", "Choose a PCNA workflow.")
+    page_header("Create", "Choose a workflow", "Four workflows. Everything else stays inside them.")
     st.markdown(
         f"""
 <div class="action-grid">
-<a class="action-card" href="{nav_link('spec')}"><div class="action-title">Spec Sample</div><div class="action-copy">Plain-English request → verified order.</div></a>
-<a class="action-card" href="{nav_link('blank')}"><div class="action-title">Blank Sample</div><div class="action-copy">Fast blank item request.</div></a>
-<a class="action-card" href="{nav_link('quote')}"><div class="action-title">Quote</div><div class="action-copy">Decorated price by quantity.</div></a>
-<a class="action-card" href="{nav_link('virtual')}"><div class="action-title">Virtual</div><div class="action-copy">PCNA-grounded product virtuals.</div></a>
-<a class="action-card" href="{nav_link('package')}"><div class="action-title">Packaging</div><div class="action-copy">PCNA Perfectly Packaged concepts.</div></a>
-<a class="action-card" href="{nav_link('concept')}"><div class="action-title">Concept</div><div class="action-copy">Save a creative brief.</div></a>
+<a class="action-card" href="{nav_link('spec')}"><div class="action-title">Spec Sample Order</div><div class="action-copy">Plain-English request → verified order.</div></a>
+<a class="action-card" href="{nav_link('blank')}"><div class="action-title">Blank Sample Order</div><div class="action-copy">Verified blank sample request.</div></a>
+<a class="action-card" href="{nav_link('quote')}"><div class="action-title">Quote Request</div><div class="action-copy">Decorated PCNA pricing by quantity.</div></a>
+<a class="action-card" href="{nav_link('virtual')}"><div class="action-title">Virtuals / Design</div><div class="action-copy">Product, kit and packaging creative projects.</div></a>
 </div>
 """,
         unsafe_allow_html=True,
@@ -306,9 +409,9 @@ elif page == "search":
                     st.divider()
 
 elif page == "spec":
-    page_header("Orders", "Spec Sample", "Tell Nova the request exactly like you would in ChatGPT. Nova interprets it, then the app resolves product facts from the verified PCNA masters before building the order.")
-    natural = st.text_area("Tell Nova what you need", placeholder="Make me a spec sample order of the Dade Polo in black, medium, embroidery left chest, white imprint, and the Stanley 30 oz Quencher in Polar, laser left of handle.", height=150)
-    customer = st.text_input("Customer / Project", placeholder="Optional project name")
+    page_header("Orders", "Spec Sample Order", "Tell Nova the request in plain English. Product and decoration facts are resolved from verified PCNA data before the order is built.")
+    natural = st.text_area("Tell Nova what you need", placeholder="Make me a spec sample order with the Dade Polo in black, medium, embroidery left chest, white imprint.", height=150)
+    customer = st.text_input("Customer / Project", placeholder="Optional")
     if not api_key():
         st.info("Add OPENAI_API_KEY in Streamlit Secrets to enable Nova requests.")
     if st.button("Build with Nova", type="primary", use_container_width=True, disabled=not natural.strip() or not api_key()):
@@ -317,7 +420,7 @@ elif page == "spec":
             if result["unresolved"]:
                 st.warning("Nova could not confidently verify: " + ", ".join(result["unresolved"]))
             if result["order"]:
-                project_id = save_project("Spec Sample Order", customer, customer, {"order": result["order"], "request": natural, "resolution": "PCNA-trained Nova"})
+                save_project("Spec Sample Order", customer, customer, {"order": result["order"], "request": natural, "resolution": "PCNA-trained Nova"})
                 st.session_state.last_spec = result["order"]
                 st.success("Verified spec sample built and saved.")
         except Exception as exc:
@@ -325,7 +428,6 @@ elif page == "spec":
     if st.session_state.get("last_spec"):
         st.markdown(f'<div class="order-box">{st.session_state.last_spec}</div>', unsafe_allow_html=True)
         st.download_button("Download Order", st.session_state.last_spec, file_name="PCNA_Spec_Sample_Order.txt", use_container_width=True)
-
     with st.expander("Manual build"):
         po = st.text_input("PO#")
         ship_date = st.text_input("Ship Date")
@@ -346,7 +448,7 @@ elif page == "spec":
             st.session_state.last_spec = order
 
 elif page == "blank":
-    page_header("Orders", "Blank Sample", "Create a clean blank sample request from a verified item and color.")
+    page_header("Orders", "Blank Sample Order", "Create a clean blank sample request from a verified PCNA item and color.")
     customer = st.text_input("Customer / Project")
     identity = product_picker("blank")
     if identity:
@@ -359,7 +461,7 @@ elif page == "blank":
             st.success("Blank sample saved.")
 
 elif page == "quote":
-    page_header("Pricing", "Quick Quote", "Standard quotes default to decorated pricing.")
+    page_header("Pricing", "Quote Request", "Quote a verified PCNA product at the requested decorated quantity.")
     customer = st.text_input("Customer / Project")
     identity = product_picker("quote")
     if identity:
@@ -379,86 +481,70 @@ elif page == "quote":
                     st.success("Quote saved.")
 
 elif page == "virtual":
-    page_header("Creative", "Generate Virtuals", "Give Nova the project request, upload customer artwork, and let the PCNA workflow resolve verified product context before generation.")
-    customer = st.text_input("Customer / Project")
-    request = st.text_area("Project request", placeholder="Create five Ford Motors new-hire virtual concepts using appropriate PCNA products. Keep the Ford artwork exact and make each concept unique.", height=150)
-    artwork = st.file_uploader("Artwork / reference files", accept_multiple_files=True, type=["png", "jpg", "jpeg", "webp", "pdf", "svg", "eps", "ai"])
-    count = int(st.number_input("Number of virtuals", min_value=1, max_value=8, value=5, step=1))
-    if not api_key():
-        st.info("Add OPENAI_API_KEY in Streamlit Secrets to enable Nova generation.")
-    if st.button("Submit to Nova", type="primary", use_container_width=True, disabled=not request.strip() or not api_key()):
-        try:
-            context = build_creative_pcna_context(api_key(), request, st.session_state.products, st.session_state.decorations)
-            if not context["verified_products"]:
-                st.error("Nova could not resolve verified PCNA products for this request. Add product names or more specific product direction.")
-            else:
-                payload = {"Request": request, "Artwork": [f.name for f in artwork], "Requested Concepts": count, "Verified Products": context["verified_products"], "Generation": "PCNA-trained Nova"}
-                project_id = save_project("Virtual Request", customer, customer, payload, artwork)
-                prompt = creative_generation_prompt(request, context)
-                progress = st.progress(0, text=f"Nova is creating 0 of {count}...")
-                for i in range(count):
-                    progress.progress(i / count, text=f"Nova is creating {i+1} of {count}...")
-                    new_image = generate_concepts(api_key=api_key(), prompt=prompt, uploads=artwork, count=1)[0]
-                    save_upload(project_id, f"generated_{i+1:02d}.png", new_image)
-                progress.progress(1.0, text=f"Nova completed {count} of {count}.")
-                st.success(f"{count} PCNA-grounded virtuals generated and saved to this project.")
-                st.session_state.last_generated_project = project_id
-        except Exception as exc:
-            st.error(f"Nova could not complete the project: {exc}")
-    if st.session_state.get("last_generated_project"):
-        show_generated(st.session_state.last_generated_project)
+    view = st.query_params.get("view", "new")
+    page_header("Creative", "Virtuals / Design", "Tell Nova what you want created. Product, kit and Perfectly Packaged requests all start here and save back into Projects.")
+    c1, c2 = st.columns(2)
+    if c1.button("New Request", use_container_width=True, type="primary" if view != "projects" else "secondary"):
+        st.query_params["view"] = "new"
+        st.rerun()
+    if c2.button("Projects", use_container_width=True, type="primary" if view == "projects" else "secondary"):
+        st.query_params["view"] = "projects"
+        st.rerun()
 
-elif page == "package":
-    page_header("Kitting", "Perfectly Packaged", "Give Nova the brief and artwork. Nova resolves verified PCNA product context and generates concepts without inventing PCNA products or packaging structures.")
-    customer = st.text_input("Customer")
-    package_name = st.text_input("Package / Concept Name", placeholder="Ford New Hire Kit")
-    request = st.text_area("Project request", placeholder="Create five unique Ford Motors new-hire kits using approved PCNA Perfectly Packaged structures and appropriate verified PCNA products.", height=150)
-    refs = st.file_uploader("Artwork / Perfectly Packaged templates / reference files", accept_multiple_files=True, type=["png", "jpg", "jpeg", "webp", "pdf", "svg", "eps", "ai"])
-    count = int(st.number_input("Number of packaging concepts", min_value=1, max_value=8, value=5, step=1))
-    if not api_key():
-        st.info("Add OPENAI_API_KEY in Streamlit Secrets to enable Nova generation.")
-    if st.button("Submit Packaging Project to Nova", type="primary", use_container_width=True, disabled=not request.strip() or not api_key()):
-        try:
-            context = build_creative_pcna_context(api_key(), request, st.session_state.products, st.session_state.decorations)
-            if not context["verified_products"]:
-                st.error("Nova could not resolve verified PCNA products for this request. Add product names or more specific kit direction.")
-            else:
-                payload = {"Request": request, "Files": [f.name for f in refs], "Requested Concepts": count, "Verified Products": context["verified_products"], "Generation": "PCNA-trained Nova"}
-                project_id = save_project("Perfectly Packaged", customer, package_name, payload, refs)
-                prompt = creative_generation_prompt(request, context, "This is a Perfectly Packaged project. Use only supplied approved PCNA Perfectly Packaged template/reference structures.")
-                progress = st.progress(0, text=f"Nova is creating 0 of {count}...")
-                for i in range(count):
-                    progress.progress(i / count, text=f"Nova is creating {i+1} of {count}...")
-                    new_image = generate_concepts(api_key=api_key(), prompt=prompt, uploads=refs, count=1)[0]
-                    save_upload(project_id, f"generated_{i+1:02d}.png", new_image)
-                progress.progress(1.0, text=f"Nova completed {count} of {count}.")
-                st.success(f"{count} PCNA-grounded packaging concepts generated and saved to this project.")
-                st.session_state.last_generated_project = project_id
-        except Exception as exc:
-            st.error(f"Nova could not complete the packaging project: {exc}")
-    if st.session_state.get("last_generated_project"):
-        show_generated(st.session_state.last_generated_project)
-
-elif page == "concept":
-    page_header("Creative", "Design Concept", "Capture a customer idea, campaign brief and reference files.")
-    customer = st.text_input("Customer")
-    concept_name = st.text_input("Concept Name")
-    brief = st.text_area("Creative Brief", height=180)
-    files = st.file_uploader("Reference files", accept_multiple_files=True, type=["png", "jpg", "jpeg", "pdf", "svg"])
-    if st.button("Save Design Concept", type="primary", use_container_width=True):
-        save_project("Design Concept", customer, concept_name, {"Brief": brief, "Files": [f.name for f in files]}, files)
-        st.success("Design concept saved.")
+    if view == "projects":
+        render_virtual_projects()
+    else:
+        project_name = st.text_input("Project name", placeholder="Ford Motors New Hire Kit")
+        request = st.text_area("What would you like Nova to create?", placeholder="Create five virtuals for a Ford Motors new-hire kit. Choose appropriate PCNA products, use the uploaded Ford artwork, and use Perfectly Packaged for the kit presentation.", height=170)
+        artwork = st.file_uploader("Artwork / reference files", accept_multiple_files=True, type=["png", "jpg", "jpeg", "webp", "pdf", "svg", "eps", "ai"])
+        if not api_key():
+            st.info("Add OPENAI_API_KEY in Streamlit Secrets to enable Nova generation.")
+        if st.button("Submit to Nova", type="primary", use_container_width=True, disabled=not request.strip() or not api_key()):
+            try:
+                context = build_creative_pcna_context(api_key(), request, st.session_state.products, st.session_state.decorations)
+                selected_products = context.get("selected_products", [])
+                if not selected_products:
+                    st.error("Nova could not confidently resolve verified PCNA products for this request. Add a little more product direction and submit again.")
+                else:
+                    intent = context.get("intent", {})
+                    customer = str(intent.get("customer", "")).strip() or "Unassigned"
+                    resolved_project_name = project_name.strip() or str(intent.get("project_name", "")).strip() or str(intent.get("project_goal", "")).strip() or "Virtual Project"
+                    count = context.get("requested_concepts", 5)
+                    payload = {
+                        "Request": request,
+                        "Artwork": [f.name for f in artwork],
+                        "Requested Concepts": count,
+                        "Verified Products": selected_products,
+                        "Perfectly Packaged": context.get("perfectly_packaged", False),
+                        "Generation": "PCNA-trained Nova",
+                    }
+                    project_id = save_project("Virtual / Design", customer, resolved_project_name, payload, artwork)
+                    prompt = creative_generation_prompt(request, context)
+                    progress = st.progress(0, text=f"Nova is creating 0 of {count}...")
+                    for i in range(count):
+                        progress.progress(i / count, text=f"Nova is creating {i+1} of {count}...")
+                        new_image = generate_concepts(api_key=api_key(), prompt=prompt, uploads=artwork, count=1)[0]
+                        save_upload(project_id, f"generated_{i+1:02d}.png", new_image)
+                    progress.progress(1.0, text=f"Nova completed {count} of {count}.")
+                    st.success(f"{count} virtuals generated and saved to {resolved_project_name}.")
+                    st.session_state.last_generated_project = project_id
+            except Exception as exc:
+                st.error(f"Nova could not complete the project: {exc}")
+        if st.session_state.get("last_generated_project"):
+            recent = next((p for p in persistent_projects() if p["id"] == st.session_state.last_generated_project), None)
+            if recent:
+                st.markdown('<div class="section-title">Completed Project</div>', unsafe_allow_html=True)
+                render_virtual_project(recent, expanded=True)
 
 elif page == "saved":
-    page_header("Workspace", "Saved Projects", "Open prior requests and download original artwork and generated files.")
+    page_header("Workspace", "Saved Work", "All saved PCNA workflow records.")
     projects = persistent_projects()
-    search = st.text_input("Filter saved work", placeholder="Customer, project, quote, virtual...")
-    if search:
-        q = search.lower()
-        projects = [p for p in projects if q in f"{p['customer']} {p['project']} {p['type']}".lower()]
     if not projects:
-        st.info("No matching saved projects yet.")
+        st.info("No saved projects yet.")
     for project in projects:
+        if project.get("type") in {"Virtual / Design", "Virtual Request", "Perfectly Packaged"}:
+            render_virtual_project(project)
+            continue
         with st.expander(f"{project['customer']} · {project['project']}"):
             st.caption(f"{project['type']} · {project['date'][:10]}")
             payload = project["payload"]
@@ -466,22 +552,11 @@ elif page == "saved":
                 st.markdown(f'<div class="order-box">{payload["order"]}</div>', unsafe_allow_html=True)
             else:
                 st.json(payload)
-            files = list_project_files(project["id"])
-            generated = [f for f in files if f.name.startswith("generated_") and f.suffix.lower() in {".png", ".jpg", ".jpeg", ".webp"}]
-            for f in generated:
-                st.image(f.read_bytes(), caption=f.name, use_container_width=True)
-                st.download_button(f"Download {f.name}", f.read_bytes(), file_name=f.name, key=f"file_{project['id']}_{f.name}", use_container_width=True)
-            originals = [f for f in files if f not in generated]
-            for f in originals:
-                st.download_button(f"Download original · {f.name}", f.read_bytes(), file_name=f.name, key=f"orig_{project['id']}_{f.name}", use_container_width=True)
-            if st.button("Delete Project", key=f"delete_{project['id']}", use_container_width=True):
-                delete_project(project["id"])
-                st.rerun()
     if projects:
         st.download_button("Export All Projects", export_projects(), file_name="PCNA_Assistant_Projects.json", mime="application/json", use_container_width=True)
 
 elif page == "assistant":
-    page_header("AI Workspace", "Ask PCNA Nova", "This assistant interprets your request, then grounds PCNA facts in the app's verified product and decoration data before answering.")
+    page_header("AI Workspace", "Ask PCNA Nova", "Natural-language help grounded in verified PCNA data.")
     key = api_key()
     for msg in st.session_state.chat_history:
         with st.chat_message(msg["role"]):
@@ -534,6 +609,11 @@ elif page == "data":
                 st.success("Full masters validated and loaded.")
             except Exception as exc:
                 st.error(f"Data validation failed: {exc}")
+
+elif page in {"package", "concept"}:
+    st.query_params["page"] = "virtual"
+    st.query_params["view"] = "new"
+    st.rerun()
 
 else:
     st.query_params["page"] = "home"
