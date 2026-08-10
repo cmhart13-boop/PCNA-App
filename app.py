@@ -170,23 +170,20 @@ def approved_pcna_header(width: int = 105):
 def live_pcna_banner():
     components.html(
         """
-<a class="pcna-hero" href="https://www.pcna.com/en-us" target="_blank" rel="noopener noreferrer" aria-label="Open PCNA.com">
-  <div class="pcna-hero-copy">
-    <div class="pcna-hero-kicker">PCNA.COM</div>
-    <div class="pcna-hero-title">Explore products, brands &amp; tools</div>
-    <div class="pcna-hero-link">Open PCNA.com&nbsp;&nbsp;→</div>
-  </div>
-</a>
+<div class="pcna-live-shell">
+  <div class="pcna-fallback">Loading PCNA.com…</div>
+  <iframe src="https://www.pcna.com/en-us" title="Live PCNA.com hero banner" loading="eager"></iframe>
+  <a class="pcna-hero-link" href="https://www.pcna.com/en-us" target="_blank" rel="noopener noreferrer" aria-label="Open PCNA.com"></a>
+</div>
 <style>
-html,body{margin:0;padding:0;background:transparent;overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-.pcna-hero{display:flex;align-items:flex-end;box-sizing:border-box;width:100%;height:146px;padding:18px 20px;border-radius:14px;text-decoration:none;background:linear-gradient(135deg,#003b5c 0%,#084f86 68%,#0d689f 100%);box-shadow:inset 0 0 0 1px rgba(255,255,255,.10);overflow:hidden}
-.pcna-hero-copy{color:#fff}
-.pcna-hero-kicker{font-size:11px;font-weight:800;letter-spacing:.13em;opacity:.72;margin-bottom:5px}
-.pcna-hero-title{font-size:21px;line-height:1.08;font-weight:800;letter-spacing:-.02em;margin-bottom:8px}
-.pcna-hero-link{font-size:12px;font-weight:750;opacity:.88}
+html,body{margin:0;padding:0;background:#fff;overflow:hidden}
+.pcna-live-shell{position:relative;width:100%;height:150px;overflow:hidden;border-radius:14px;background:#fff;border:1px solid #d6e2eb;box-sizing:border-box}
+.pcna-live-shell iframe{position:absolute;left:0;top:-92px;width:100%;height:620px;border:0;background:#fff;z-index:2}
+.pcna-fallback{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#084f86;font:700 14px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#fff;z-index:1}
+.pcna-hero-link{position:absolute;inset:0;z-index:3;display:block;cursor:pointer}
 </style>
 """,
-        height=150,
+        height=152,
         scrolling=False,
     )
 
