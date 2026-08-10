@@ -4,39 +4,25 @@ import re
 p = Path("app.py")
 s = p.read_text()
 
-# Restore the homepage hero as a live crop of PCNA.com itself. The transparent
-# overlay makes the entire visible hero link directly to PCNA.com.
-hero = '''def live_pcna_banner():
-    components.html(
-        """
-<div class="pcna-live-shell">
-  <div class="pcna-fallback">Loading PCNA.com…</div>
-  <iframe src="https://www.pcna.com/en-us" title="Live PCNA.com hero banner" loading="eager"></iframe>
-  <a class="pcna-hero-link" href="https://www.pcna.com/en-us" target="_blank" rel="noopener noreferrer" aria-label="Open PCNA.com"></a>
-</div>
-<style>
-html,body{margin:0;padding:0;background:#fff;overflow:hidden}
-.pcna-live-shell{position:relative;width:100%;height:150px;overflow:hidden;border-radius:14px;background:#fff;border:1px solid #d6e2eb;box-sizing:border-box}
-.pcna-live-shell iframe{position:absolute;left:0;top:-92px;width:100%;height:620px;border:0;background:#fff;z-index:2}
-.pcna-fallback{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#084f86;font:700 14px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#fff;z-index:1}
-.pcna-hero-link{position:absolute;inset:0;z-index:3;display:block;cursor:pointer}
-</style>
-""",
-        height=152,
-        scrolling=False,
-    )
-'''
-
-s, n = re.subn(
-    r'def live_pcna_banner\(\):\n.*?\n\n\ndef bottom_nav',
-    hero + '\n\ndef bottom_nav',
-    s,
-    count=1,
-    flags=re.S,
+# Keep the approved PCNA logo implementation exactly as-is. Only adjust the
+# surrounding Streamlit spacing so the logo sits cleanly without clipping.
+s = s.replace(
+    '[data-testid="stHeader"]{{height:0;background:rgba(255,255,255,.96);}}',
+    '[data-testid="stHeader"]{{height:0!important;background:transparent!important;}}',
+    1,
 )
-if n != 1:
-    raise SystemExit("Could not replace live_pcna_banner")
+s = s.replace(
+    '.block-container{{max-width:620px!important;padding:calc(34px + env(safe-area-inset-top)) 15px 104px!important;margin:0 auto!important;}}',
+    '.block-container{{max-width:620px!important;padding:calc(24px + env(safe-area-inset-top)) 15px 104px!important;margin:0 auto!important;}}',
+    1,
+)
+s = s.replace(
+    '@media(max-width:430px){{.block-container{{padding-top:calc(30px + env(safe-area-inset-top))!important;padding-left:12px!important;padding-right:12px!important;}}',
+    '@media(max-width:430px){{.block-container{{padding-top:calc(24px + env(safe-area-inset-top))!important;padding-left:12px!important;padding-right:12px!important;}}',
+    1,
+)
 
+# Preserve the live PCNA.com hero and the locked logo asset.
 required = [
     'st.image("IMG_2337.webp"',
     'iframe src="https://www.pcna.com/en-us"',
