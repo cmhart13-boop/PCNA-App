@@ -171,9 +171,9 @@ def live_pcna_banner():
     components.html(
         """
 <div class="pcna-live-shell"><div class="fallback"><a href="https://www.pcna.com/en-us" target="_blank" rel="noopener">Open live PCNA.com</a></div><iframe src="https://www.pcna.com/en-us" title="Live PCNA.com promotional banner" loading="eager"></iframe></div>
-<style>html,body{margin:0;padding:0;background:#fff;overflow:hidden}.pcna-live-shell{position:relative;height:228px;overflow:hidden;border-radius:14px;background:#fff}.pcna-live-shell iframe{position:absolute;left:0;top:-92px;width:100%;height:620px;border:0;background:#fff;z-index:2}.fallback{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;border:1px solid #d6e2eb;border-radius:14px;background:#fff;z-index:1}.fallback a{color:#084f86;font-size:15px;font-weight:700;text-decoration:none}@media(max-width:430px){.pcna-live-shell{height:142px}.pcna-live-shell iframe{top:-92px;height:555px}}</style>
+<style>html,body{margin:0;padding:0;background:#fff;overflow:hidden}.pcna-live-shell{position:relative;height:100%;overflow:hidden;border-radius:14px;background:#fff}.pcna-live-shell iframe{position:absolute;left:0;top:-92px;width:100%;height:620px;border:0;background:#fff;z-index:2}.fallback{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;border:1px solid #d6e2eb;border-radius:14px;background:#fff;z-index:1}.fallback a{color:#084f86;font-size:15px;font-weight:700;text-decoration:none}</style>
 """,
-        height=150,
+        height=152,
         scrolling=False,
     )
 
@@ -379,22 +379,35 @@ if page == "home":
         """
 <style>
 @media(max-width:430px){
-  .block-container{padding-top:calc(4px + env(safe-area-inset-top))!important;padding-left:10px!important;padding-right:10px!important;padding-bottom:82px!important;}
-  .section-title{font-size:20px!important;margin:1px 0 4px!important;line-height:1.05!important;}
-  .action-grid{gap:6px!important;margin:0!important;}
-  .action-card{padding:8px 10px!important;min-height:88px!important;border-radius:15px!important;}
-  .action-icon{font-size:22px!important;margin-bottom:4px!important;}
-  .action-title{font-size:17px!important;line-height:1.06!important;margin-bottom:3px!important;}
-  .action-copy{font-size:12px!important;line-height:1.15!important;}
-  [data-testid="stImage"]{margin-bottom:-10px!important;}
-  [data-testid="stVerticalBlock"]{gap:.05rem!important;}
+  html,body,[data-testid="stAppViewContainer"],[data-testid="stAppViewContainer"]>.main{min-height:100dvh!important;}
+  [data-testid="stAppViewContainer"]>.main{overflow-y:hidden!important;}
+  .block-container{width:100%!important;max-width:none!important;height:calc(100dvh - 76px)!important;box-sizing:border-box!important;padding:calc(2px + env(safe-area-inset-top)) 10px 6px!important;margin:0!important;overflow:hidden!important;}
+  .block-container [data-testid="stVerticalBlock"]{gap:0!important;}
+  [data-testid="stImage"]{margin:0!important;}
+  [data-testid="stImage"] img{display:block!important;margin:0 auto!important;}
+  iframe[title="streamlit_component"]{display:block!important;margin:2px 0 0!important;}
+  .section-title{font-size:20px!important;margin:5px 0 8px!important;line-height:1.08!important;position:relative!important;z-index:2!important;}
+  .action-grid{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;grid-template-rows:repeat(2,minmax(0,1fr))!important;gap:8px!important;margin:0!important;height:calc(100dvh - 76px - env(safe-area-inset-top) - 295px)!important;min-height:250px!important;max-height:330px!important;}
+  .action-card{box-sizing:border-box!important;padding:10px 12px!important;min-height:0!important;height:100%!important;border-radius:15px!important;overflow:hidden!important;display:flex!important;flex-direction:column!important;justify-content:flex-start!important;}
+  .action-icon{font-size:22px!important;line-height:1!important;margin:0 0 5px!important;flex:0 0 auto!important;}
+  .action-title{font-size:17px!important;line-height:1.08!important;margin:0 0 4px!important;flex:0 0 auto!important;}
+  .action-copy{font-size:12px!important;line-height:1.18!important;margin:0!important;}
+  .bottom-nav{height:76px!important;}
+}
+@media(max-width:390px){
+  .block-container{padding-left:8px!important;padding-right:8px!important;}
+  .section-title{font-size:19px!important;margin:4px 0 7px!important;}
+  .action-grid{gap:7px!important;height:calc(100dvh - 76px - env(safe-area-inset-top) - 286px)!important;min-height:238px!important;}
+  .action-card{padding:9px 10px!important;}
+  .action-title{font-size:16px!important;}
+  .action-copy{font-size:11.5px!important;}
 }
 </style>
 """,
         unsafe_allow_html=True,
     )
 
-approved_pcna_header(118 if page == "home" else 105)
+approved_pcna_header(104 if page == "home" else 105)
 
 if page == "home":
     live_pcna_banner()
