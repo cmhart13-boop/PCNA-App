@@ -25,7 +25,7 @@ from core import (
     search_products,
 )
 from generation import generate_concepts
-from home_reference import render_reference_home
+from home_ui import render_home
 from pcna_brain import (
     PCNA_WORKFLOW_RULES,
     build_creative_pcna_context,
@@ -388,7 +388,7 @@ def render_virtual_projects():
 page = current_page()
 
 if page == "home":
-    render_reference_home()
+    render_home()
 
 elif page == "create":
     page_header("Create", "Choose a workflow", "Four workflows. Everything else stays inside them.")
