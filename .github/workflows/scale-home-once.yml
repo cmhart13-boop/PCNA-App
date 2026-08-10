@@ -1,0 +1,44 @@
+name: Scale PCNA homepage once
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  scale-home:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Scale homepage only
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('app.py')
+          s = p.read_text()
+
+          s = s.replace('def approved_pcna_header():\n    """Render the locked approved PCNA logo asset exactly as stored in GitHub."""\n    left, center, right = st.columns([1.6, 1, 1.6])\n    with center:\n        st.image("IMG_2337.webp", width=105)',
+                        'def approved_pcna_header(width: int = 105):\n    """Render the locked approved PCNA logo asset exactly as stored in GitHub."""\n    left, center, right = st.columns([1.35, 1.3, 1.35])\n    with center:\n        st.image("IMG_2337.webp", width=width)', 1)
+
+          s = s.replace('@media(max-width:430px){.pcna-live-shell{height:168px}.pcna-live-shell iframe{top:-82px;height:590px}}',
+                        '@media(max-width:430px){.pcna-live-shell{height:218px}.pcna-live-shell iframe{top:-72px;height:610px}}', 1)
+          s = s.replace('        height=180,\n        scrolling=False,', '        height=230,\n        scrolling=False,', 1)
+
+          old = 'page = current_page()\n\napproved_pcna_header()\n\nif page == "home":\n'
+          new = '''page = current_page()\n\nif page == "home":\n    st.markdown(\n        """\n<style>\n@media(max-width:430px){\n  .block-container{padding-top:calc(22px + env(safe-area-inset-top))!important;padding-left:14px!important;padding-right:14px!important;}\n  .section-title{font-size:22px!important;margin:8px 0 9px!important;}\n  .action-grid{gap:12px!important;margin-top:4px!important;}\n  .action-card{padding:15px 14px!important;min-height:122px!important;border-radius:18px!important;}\n  .action-icon{font-size:27px!important;margin-bottom:11px!important;}\n  .action-title{font-size:18px!important;line-height:1.15!important;margin-bottom:6px!important;}\n  .action-copy{font-size:13px!important;line-height:1.35!important;}\n}\n</style>\n""",\n        unsafe_allow_html=True,\n    )\n\napproved_pcna_header(145 if page == "home" else 105)\n\nif page == "home":\n'''
+          if old not in s:
+              raise SystemExit('home page marker not found')
+          s = s.replace(old, new, 1)
+
+          p.write_text(s)
+          PY
+          python -m py_compile app.py
+          git config user.name "PCNA App Automation"
+          git config user.email "actions@users.noreply.github.com"
+          git add app.py
+          git commit -m "Scale homepage to fill mobile viewport"
+          git push
