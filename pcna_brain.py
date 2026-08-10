@@ -23,12 +23,15 @@ You are the reasoning layer for a PCNA workflow app. You interpret natural langu
 The application's verified PCNA product, decoration and pricing data are authoritative. Deterministic application code resolves final facts and prices.
 
 SPEC SAMPLE RULES:
+- Always return every item the user requested. Never silently drop an item.
+- Preserve the user's product wording and requested details in the JSON when verification may be needed later.
 - Never invent product names, item numbers, colors, sizes, decoration methods or locations.
 - Product resolution is by verified PCNA product data.
-- Decoration must be resolved from verified PCNA decoration data.
+- Decoration must be resolved from verified PCNA decoration data when available.
 - For laser engraving or deboss, imprint color is N/A.
 - Imprint Size defaults to Max Imprint.
 - Do not add pricing, inventory or MOQ to a spec sample.
+- If an item number cannot be confidently verified, deterministic code may omit only the Item Number line and still complete the written order from user-supplied details.
 
 QUOTE RULES:
 - Never invent product names, item numbers, quantities, colors, sizes, decoration methods, locations or prices.
@@ -66,7 +69,7 @@ def interpret_request(api_key: str, request: str, mode: str) -> dict[str, Any]:
     if mode == "spec":
         schema = {
             "items": [{
-                "product_query": "product name as user said it",
+                "product_query": "product name exactly as user said it",
                 "color": "requested color or empty",
                 "size": "requested size or empty",
                 "decoration_method": "requested method or empty",
@@ -113,10 +116,13 @@ def interpret_request(api_key: str, request: str, mode: str) -> dict[str, Any]:
         }
     response = client.responses.create(
         model="gpt-5",
-        instructions=PCNA_WORKFLOW_RULES + "\nReturn valid JSON only. Do not use markdown.",
+        instructions=PCNA_WORKFLOW_RULES + "\nReturn valid JSON only. Do not use markdown. For spec mode, include every requested item even if you are unsure how it maps to a catalog record.",
         input=f"MODE: {mode}\nUSER REQUEST: {request}\nRETURN THIS SHAPE: {json.dumps(schema)}",
     )
-    return _json_from_text(response.output_text)
+    parsed = _json_from_text(response.output_text)
+    if mode == "spec" and not isinstance(parsed.get("items"), list):
+        parsed["items"] = []
+    return parsed
 
 
 def _norm(s: str) -> str:
@@ -198,7 +204,8 @@ def _resolved_product(raw: dict[str, Any], products: pd.DataFrame, decorations: 
     if not identity:
         return None, query or "Unnamed product"
     item = identity["Item Number"]
-    color = _resolve_color(products, item, str(raw.get("color") or raw.get("requested_color") or ""), allow_verified_default=allow_defaults)
+    requested_color = str(raw.get("color") or raw.get("requested_color") or "").strip()
+    color = _resolve_color(products, item, requested_color, allow_verified_default=allow_defaults)
     dec = _resolve_decoration(
         decorations,
         item,
@@ -227,36 +234,73 @@ def _resolved_product(raw: dict[str, Any], products: pd.DataFrame, decorations: 
     return resolved, None
 
 
+def _spec_item_from_user(raw: dict[str, Any], *, verified_identity: dict[str, Any] | None = None, verified_color: str = "") -> SpecItem:
+    product = (verified_identity or {}).get("Product Name") or str(raw.get("product_query") or "").strip() or "Requested PCNA Product"
+    item_number = (verified_identity or {}).get("Item Number", "")
+    method = str(raw.get("decoration_method", "") or "").strip()
+    imprint = "N/A" if is_no_ink_decoration(method) else str(raw.get("imprint_color", "") or "").strip()
+    return SpecItem(
+        product=product,
+        item_number=item_number,
+        color=verified_color or str(raw.get("color", "") or "").strip(),
+        size=str(raw.get("size", "") or "").strip(),
+        decoration_method=method,
+        decoration_location=str(raw.get("decoration_location", "") or "").strip(),
+        imprint_color=imprint,
+        imprint_size="Max Imprint",
+    )
+
+
 def resolve_spec_request(api_key: str, request: str, products: pd.DataFrame, decorations: pd.DataFrame) -> dict[str, Any]:
     intent = interpret_request(api_key, request, "spec")
+    raw_items = intent.get("items", []) or []
     resolved_items: list[SpecItem] = []
     product_data: list[dict[str, Any]] = []
     unresolved: list[str] = []
-    for raw in intent.get("items", []):
-        resolved, error = _resolved_product(raw, products, decorations)
-        if error or not resolved:
-            unresolved.append(error or "Unknown item")
+
+    for raw in raw_items:
+        if not isinstance(raw, dict):
             continue
-        product_data.append(resolved)
-        resolved_items.append(
-            SpecItem(
-                product=resolved["Product Name"],
-                item_number=resolved["Item Number"],
-                color=resolved["Color"],
-                size=resolved["Size"],
-                decoration_method=resolved["Decoration Method"],
-                decoration_location=resolved["Decoration Location"],
-                imprint_color=resolved["Imprint Color"],
-                imprint_size="Max Imprint",
+        resolved, error = _resolved_product(raw, products, decorations)
+        if resolved:
+            product_data.append(resolved)
+            resolved_items.append(
+                SpecItem(
+                    product=resolved["Product Name"],
+                    item_number=resolved["Item Number"],
+                    color=resolved["Color"] or str(raw.get("color", "") or "").strip(),
+                    size=resolved["Size"],
+                    decoration_method=resolved["Decoration Method"],
+                    decoration_location=resolved["Decoration Location"],
+                    imprint_color=resolved["Imprint Color"],
+                    imprint_size="Max Imprint",
+                )
             )
-        )
+            if not resolved["Color"] and str(raw.get("color", "") or "").strip():
+                unresolved.append(f"{resolved['Product Name']} color: {str(raw.get('color', '')).strip()}")
+            continue
+
+        query = str(raw.get("product_query", "") or "").strip()
+        identity = _best_product(products, query)
+        verified_color = ""
+        if identity:
+            requested_color = str(raw.get("color", "") or "").strip()
+            verified_color = _resolve_color(products, identity["Item Number"], requested_color)
+            unresolved.append(error or f"{identity['Product Name']} requested decoration")
+        else:
+            unresolved.append(error or query or "Unknown item")
+        resolved_items.append(_spec_item_from_user(raw, verified_identity=identity, verified_color=verified_color))
+
+    if not resolved_items:
+        raise ValueError("The request did not contain any spec sample items.")
+
     order = build_spec_order(
         resolved_items,
         po=str(intent.get("po", "")).strip(),
         ship_date=str(intent.get("ship_date", "")).strip(),
         in_hands_date=str(intent.get("in_hands_date", "")).strip(),
         ship_to=str(intent.get("ship_to", "")).strip(),
-    ) if resolved_items else ""
+    )
     return {"order": order, "items": resolved_items, "products": product_data, "unresolved": unresolved, "intent": intent}
 
 
