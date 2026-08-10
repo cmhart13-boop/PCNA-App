@@ -6,6 +6,7 @@ from urllib.parse import quote
 
 import pandas as pd
 import streamlit as st
+import streamlit.components.v1 as components
 
 from core import (
     SpecItem,
@@ -56,6 +57,7 @@ html,body,[data-testid="stAppViewContainer"]{{background:#fff;color:var(--ink);}
 #MainMenu,footer,[data-testid="stToolbar"]{{visibility:hidden!important;height:0!important;}}
 .block-container{{max-width:620px!important;padding:calc(34px + env(safe-area-inset-top)) 15px 104px!important;margin:0 auto!important;}}
 
+.pcna-live-wrap{{margin:0 0 18px;}}
 .page-kicker{{font-size:11px;font-weight:900;letter-spacing:.10em;color:var(--pcna);text-transform:uppercase;margin-top:2px;}}
 .page-title{{font-size:29px;line-height:1.08;font-weight:850;letter-spacing:-.035em;color:var(--pcna);margin:4px 0 9px;}}
 .page-copy{{font-size:15px;line-height:1.48;color:var(--muted);margin:0 0 18px;}}
@@ -160,6 +162,31 @@ def page_header(kicker: str, title: str, copy: str):
     )
 
 
+def live_pcna_banner():
+    st.markdown('<div class="pcna-live-wrap">', unsafe_allow_html=True)
+    components.html(
+        """
+<div class="pcna-live-shell">
+  <div class="fallback">
+    <a href="https://www.pcna.com/en-us" target="_blank" rel="noopener">Open live PCNA.com</a>
+  </div>
+  <iframe src="https://www.pcna.com/en-us" title="Live PCNA.com promotional banner" loading="eager"></iframe>
+</div>
+<style>
+html,body{margin:0;padding:0;background:#fff;overflow:hidden;font-family:Arial,sans-serif}
+.pcna-live-shell{position:relative;height:228px;overflow:hidden;border-radius:14px;background:#fff}
+.pcna-live-shell iframe{position:absolute;left:0;top:-92px;width:100%;height:620px;border:0;background:#fff;z-index:2}
+.fallback{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;border:1px solid #e2e9ef;border-radius:14px;background:#fff;z-index:1}
+.fallback a{color:#084f86;font-size:15px;font-weight:700;text-decoration:none}
+@media(max-width:430px){.pcna-live-shell{height:208px}.pcna-live-shell iframe{top:-82px;height:590px}}
+</style>
+""",
+        height=228,
+        scrolling=False,
+    )
+    st.markdown('</div>', unsafe_allow_html=True)
+
+
 def bottom_nav(page: str):
     group = "create" if page in {"spec", "blank", "quote", "virtual", "package", "concept"} else page
     st.markdown(
@@ -246,6 +273,7 @@ def product_configuration(prefix: str):
 page = current_page()
 
 if page == "home":
+    live_pcna_banner()
     projects = persistent_projects()
     st.markdown(
         f'<span class="data-chip">{st.session_state.data_source}</span><span class="data-chip">{len(projects)} saved</span>',
