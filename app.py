@@ -67,7 +67,7 @@ html,body,[data-testid="stAppViewContainer"]{{background:#fff;color:var(--ink);}
 .page-kicker{{font-size:11px;font-weight:900;letter-spacing:.10em;color:var(--pcna);text-transform:uppercase;margin-top:2px;}}
 .page-title{{font-size:29px;line-height:1.08;font-weight:850;letter-spacing:-.035em;color:var(--pcna);margin:4px 0 9px;}}
 .page-copy{{font-size:15px;line-height:1.48;color:var(--muted);margin:0 0 18px;}}
-.section-title{{font-size:18px;font-weight:850;letter-spacing:-.015em;margin:14px 0 7px;color:var(--pcna);}}
+.section-title{{font-size:18px;font-weight:850;letter-spacing:-.015em;margin:8px 0 6px;color:var(--pcna);}}
 .action-grid{{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:5px 0 8px;}}
 .action-card{{display:block;text-decoration:none!important;border:1.5px solid rgba(8,79,134,.36);border-radius:16px;padding:12px 13px;background:#fff;min-height:96px;box-shadow:0 4px 0 rgba(8,79,134,.10),0 9px 18px rgba(8,79,134,.08);transition:transform .12s ease,box-shadow .12s ease,border-color .12s ease;}}
 .action-card:hover{{border-color:rgba(8,79,134,.58);box-shadow:0 6px 0 rgba(8,79,134,.13),0 14px 28px rgba(8,79,134,.12);}}
@@ -92,7 +92,7 @@ label,[data-testid="stWidgetLabel"],[data-testid="stWidgetLabel"] p{{font-weight
 .nav-item{{display:flex;flex-direction:column;align-items:center;justify-content:center;text-decoration:none!important;color:rgba(255,255,255,.58)!important;font-size:10px;font-weight:800;gap:3px;border-radius:12px;}}
 .nav-icon{{font-size:20px;line-height:1;}}
 .nav-item.active{{color:rgba(255,255,255,.92)!important;background:rgba(255,255,255,.08);}}
-@media(max-width:430px){{.block-container{{padding-top:calc(30px + env(safe-area-inset-top))!important;padding-left:12px!important;padding-right:12px!important;}}.page-title{{font-size:28px;line-height:1.1;}}.section-title{{margin:10px 0 6px;}}.action-grid{{gap:9px;}}.action-card{{padding:10px 11px;min-height:88px;}}}}
+@media(max-width:430px){{.block-container{{padding-top:calc(30px + env(safe-area-inset-top))!important;padding-left:12px!important;padding-right:12px!important;}}.page-title{{font-size:28px;line-height:1.1;}}.section-title{{margin:3px 0 5px;}}.action-grid{{gap:9px;margin-top:2px;}}.action-card{{padding:10px 11px;min-height:88px;}}}}
 @media(max-width:350px){{.action-grid{{grid-template-columns:1fr;}}}}
 </style>
 """,
@@ -164,9 +164,9 @@ def live_pcna_banner():
     components.html(
         """
 <div class="pcna-live-shell"><div class="fallback"><a href="https://www.pcna.com/en-us" target="_blank" rel="noopener">Open live PCNA.com</a></div><iframe src="https://www.pcna.com/en-us" title="Live PCNA.com promotional banner" loading="eager"></iframe></div>
-<style>html,body{margin:0;padding:0;background:#fff;overflow:hidden}.pcna-live-shell{position:relative;height:228px;overflow:hidden;border-radius:14px;background:#fff}.pcna-live-shell iframe{position:absolute;left:0;top:-92px;width:100%;height:620px;border:0;background:#fff;z-index:2}.fallback{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;border:1px solid #d6e2eb;border-radius:14px;background:#fff;z-index:1}.fallback a{color:#084f86;font-size:15px;font-weight:700;text-decoration:none}@media(max-width:430px){.pcna-live-shell{height:188px}.pcna-live-shell iframe{top:-82px;height:590px}}</style>
+<style>html,body{margin:0;padding:0;background:#fff;overflow:hidden}.pcna-live-shell{position:relative;height:228px;overflow:hidden;border-radius:14px;background:#fff}.pcna-live-shell iframe{position:absolute;left:0;top:-92px;width:100%;height:620px;border:0;background:#fff;z-index:2}.fallback{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;border:1px solid #d6e2eb;border-radius:14px;background:#fff;z-index:1}.fallback a{color:#084f86;font-size:15px;font-weight:700;text-decoration:none}@media(max-width:430px){.pcna-live-shell{height:168px}.pcna-live-shell iframe{top:-82px;height:590px}}</style>
 """,
-        height=228,
+        height=180,
         scrolling=False,
     )
 
