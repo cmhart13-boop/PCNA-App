@@ -3,52 +3,43 @@ from __future__ import annotations
 import streamlit as st
 import streamlit.components.v1 as components
 
-# Locked, approved repository asset. Do not replace with generated/recreated branding.
+# Locked approved repository asset. Do not alter or recreate the PCNA logo.
 LOGO_URL = "https://raw.githubusercontent.com/cmhart13-boop/PCNA-App/main/assets/pcna-logo.webp"
 
-# Existing PCNA-hosted photography already used by this app.
-PCNA_TOTE_PHOTO = "https://assets.pcna.com/image/upload/f_auto%2Cq_auto/Mkt_Dept/2026%20Jobs/2026-9854_0309_POW/9854_7901-56_0309_POW_B1.jpg"
-PCNA_JOURNAL_PHOTO = "https://assets.pcna.com/image/upload/f_auto%2Cq_auto/Mkt_Dept/2026%20Jobs/2026-9857_0216_POW/9857_2900-61_0216_POW_B1.jpg"
+# Real photography from PCNA / Polyconcept-owned sources. Each card uses a distinct image.
+PCNA_SPEC_PHOTO = "https://assets.pcna.com/image/upload/f_auto%2Cq_auto/Mkt_Dept/2026%20Jobs/2026-9854_0309_POW/9854_7901-56_0309_POW_B1.jpg"
+PCNA_VIRTUAL_PHOTO = "https://assets.pcna.com/image/upload/f_auto%2Cq_auto/Mkt_Dept/2026%20Jobs/2026-9857_0216_POW/9857_2900-61_0216_POW_B1.jpg"
+PCNA_QUOTE_PHOTO = "https://www.trimarksportswear.com/trimarknew/product/2100hires/12937938_D_on-model-front-uman-logo.jpg"
+PCNA_PROJECT_PHOTO = "https://www.trimarksportswear.com/trimarknew/product/2100hires/12937_358_B_OFF.jpg"
 
 
 def _hero() -> None:
-    """Render the approved PCNA.com-style hero using existing PCNA-hosted imagery."""
+    """Use the existing live PCNA.com homepage integration and crop it to the locked mobile hero ratio."""
     components.html(
-        f"""
-<a class="pcna-hero" href="https://www.pcna.com/en-us" target="_blank" rel="noopener" aria-label="Shop PCNA">
-  <img class="pcna-hero-photo" src="{PCNA_TOTE_PHOTO}" alt="PCNA promotional products">
-  <div class="pcna-hero-overlay"></div>
-  <div class="pcna-hero-copy">
-    <div class="pcna-hero-title">Branded.<br>Merchandise.<br>Delivered.</div>
-    <div class="pcna-hero-sub">Explore thousands of promotional products to elevate your brand.</div>
-    <span class="pcna-hero-cta">SHOP NOW</span>
+        """
+<div class="pcna-live-shell">
+  <div class="pcna-live-fallback">
+    <a href="https://www.pcna.com/en-us" target="_blank" rel="noopener">Open PCNA.com</a>
   </div>
-</a>
+  <iframe src="https://www.pcna.com/en-us" title="Live PCNA.com promotional hero" loading="eager"></iframe>
+</div>
 <style>
-html,body{{margin:0;padding:0;background:#fff;overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}}
-.pcna-hero{{position:relative;display:block;height:244px;border-radius:22px;overflow:hidden;background:#052f68;text-decoration:none;box-shadow:0 4px 14px rgba(0,45,91,.11)}}
-.pcna-hero-photo{{position:absolute;right:0;top:0;width:67%;height:100%;object-fit:cover;object-position:center}}
-.pcna-hero-overlay{{position:absolute;inset:0;background:linear-gradient(90deg,#042d60 0%,#063b74 46%,rgba(6,59,116,.78) 59%,rgba(6,59,116,.12) 100%)}}
-.pcna-hero-copy{{position:absolute;left:26px;top:24px;width:48%;color:#fff}}
-.pcna-hero-title{{font-size:31px;font-weight:900;line-height:1.02;letter-spacing:-1.15px}}
-.pcna-hero-sub{{font-size:14px;line-height:1.38;margin:13px 0 17px;max-width:260px}}
-.pcna-hero-cta{{display:inline-flex;height:42px;padding:0 22px;align-items:center;border:1.8px solid #fff;border-radius:7px;color:#fff;font-size:14px;font-weight:850}}
-@media(max-width:430px){{
-  .pcna-hero{{height:214px;border-radius:18px}}
-  .pcna-hero-copy{{left:20px;top:19px;width:49%}}
-  .pcna-hero-title{{font-size:27px}}
-  .pcna-hero-sub{{font-size:12px;margin:10px 0 14px}}
-  .pcna-hero-cta{{height:37px;padding:0 18px;font-size:12px}}
-}}
-@media(max-width:360px){{
-  .pcna-hero{{height:194px}}
-  .pcna-hero-title{{font-size:23px}}
-  .pcna-hero-sub{{font-size:10.5px}}
-  .pcna-hero-cta{{height:34px}}
-}}
+html,body{margin:0;padding:0;background:#fff;overflow:hidden}
+.pcna-live-shell{position:relative;height:164px;overflow:hidden;border-radius:16px;background:#052f68}
+.pcna-live-shell iframe{position:absolute;z-index:2;left:0;top:-82px;width:100%;height:520px;border:0;background:#052f68}
+.pcna-live-fallback{position:absolute;z-index:1;inset:0;display:flex;align-items:center;justify-content:center;background:#052f68}
+.pcna-live-fallback a{color:#fff;text-decoration:none;font:800 13px -apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;border:1.5px solid #fff;border-radius:7px;padding:10px 18px}
+@media(max-width:430px){
+  .pcna-live-shell{height:150px;border-radius:15px}
+  .pcna-live-shell iframe{top:-74px;height:500px}
+}
+@media(max-width:370px){
+  .pcna-live-shell{height:140px}
+  .pcna-live-shell iframe{top:-70px;height:480px}
+}
 </style>
 """,
-        height=252,
+        height=168,
         scrolling=False,
     )
 
@@ -57,142 +48,102 @@ def render_home() -> None:
     st.markdown(
         f"""
 <style>
-/* Homepage-only visual reset */
+/* Locked homepage layout. Keep the mobile composition compact and reference-driven. */
 [data-testid="stAppViewContainer"] > .main{{overflow-x:hidden!important}}
+[data-testid="stHeader"]{{height:0!important;min-height:0!important}}
 .block-container{{
-  max-width:1020px!important;
-  padding:calc(6px + env(safe-area-inset-top)) 18px calc(102px + env(safe-area-inset-bottom))!important;
+  max-width:620px!important;
+  padding:calc(3px + env(safe-area-inset-top)) 12px calc(78px + env(safe-area-inset-bottom))!important;
   margin:0 auto!important
 }}
-.home-topbar{{
-  height:86px;display:grid;grid-template-columns:64px 1fr 64px;align-items:center;
-  margin:0 7px 9px;background:#fff
-}}
-.home-logo{{display:block;width:178px;max-height:62px;object-fit:contain;justify-self:center}}
-.home-menu,.home-bell{{
-  display:flex;align-items:center;justify-content:center;width:48px;height:48px;
-  color:#052f68!important;text-decoration:none!important
-}}
-.home-menu{{flex-direction:column;gap:5px;justify-self:start}}
-.home-menu span{{display:block;height:4px;width:31px;background:#052f68;border-radius:5px}}
-.home-bell{{justify-self:end}}
-.home-bell svg{{width:31px;height:31px;stroke:#052f68;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}}
 
-.home-section-title{{
-  font-size:34px;font-weight:900;letter-spacing:-.035em;color:#052f68;
-  margin:14px 13px 0;line-height:1
+.home-topbar{{
+  height:56px;display:grid;grid-template-columns:52px 1fr 52px;align-items:center;
+  margin:0 4px 5px;background:#fff
 }}
-.home-title-underline{{
-  height:4px;width:62px;border-radius:4px;background:#24a6e0;
-  margin:9px 0 13px 13px;box-shadow:0 3px 8px rgba(36,166,224,.18)
-}}
-.home-action-grid{{
-  display:grid;grid-template-columns:1fr 1fr;gap:22px;
-  margin:0 4px 12px
-}}
+.home-logo{{display:block;width:136px;max-height:46px;object-fit:contain;justify-self:center}}
+.home-menu,.home-bell{{display:flex;align-items:center;justify-content:center;width:42px;height:42px;color:#052f68!important;text-decoration:none!important}}
+.home-menu{{flex-direction:column;gap:4px;justify-self:start}}
+.home-menu span{{display:block;height:3px;width:27px;background:#052f68;border-radius:5px}}
+.home-bell{{justify-self:end}}
+.home-bell svg{{width:25px;height:25px;stroke:#052f68;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}}
+
+.home-section-title{{font-size:22px;font-weight:900;letter-spacing:-.03em;color:#052f68;margin:4px 9px 0;line-height:1.05}}
+.home-title-underline{{height:3px;width:36px;border-radius:4px;background:#24a6e0;margin:5px 0 8px 9px}}
+
+.home-action-grid{{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 1px 5px}}
 .home-action-card{{
-  position:relative;display:block;height:352px;overflow:hidden;text-decoration:none!important;
-  border:1px solid rgba(17,100,174,.12);border-radius:22px;background:#fff;padding:23px 21px;
-  box-sizing:border-box;box-shadow:0 0 10px rgba(38,151,226,.22),0 8px 17px rgba(0,55,110,.09);
+  position:relative;display:block;height:148px;overflow:hidden;text-decoration:none!important;
+  border:1px solid rgba(17,100,174,.12);border-radius:14px;background:#fff;padding:10px 10px;
+  box-sizing:border-box;box-shadow:0 0 6px rgba(38,151,226,.18),0 4px 9px rgba(0,55,110,.07);
   -webkit-tap-highlight-color:transparent
 }}
 .home-action-card:active{{transform:translateY(1px)}}
 .home-card-icon{{
-  position:relative;z-index:4;width:53px;height:53px;border-radius:50%;background:#074d91;color:#fff;
-  display:flex;align-items:center;justify-content:center;margin-bottom:19px
+  position:relative;z-index:4;width:34px;height:34px;border-radius:50%;background:#074d91;color:#fff;
+  display:flex;align-items:center;justify-content:center;margin-bottom:7px
 }}
-.home-card-icon svg{{width:31px;height:31px;stroke:#fff;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}}
-.home-card-icon.money{{font-size:37px;font-weight:450;line-height:1}}
-.home-card-title{{
-  position:relative;z-index:4;color:#052f68;font-size:29px;line-height:1.02;font-weight:900;
-  letter-spacing:-.035em;max-width:53%
-}}
-.home-card-copy{{
-  position:relative;z-index:4;color:#173b63;font-size:17px;line-height:1.52;margin-top:18px;max-width:52%
-}}
-.home-card-photo{{
-  position:absolute;z-index:1;right:-3%;bottom:0;width:55%;height:78%;
-  object-fit:cover;object-position:center;background:#fff
-}}
-.home-card-photo.spec{{object-position:60% 50%}}
-.home-card-photo.virtual{{object-position:58% 48%;width:58%;height:76%}}
-.home-card-photo.quote{{object-position:42% 52%;width:57%;height:72%;filter:saturate(.88)}}
-.home-card-photo.projects{{object-position:62% 52%;width:54%;height:80%;filter:saturate(.75) brightness(.9)}}
-.home-card-wash{{
-  position:absolute;z-index:2;inset:0;
-  background:linear-gradient(90deg,#fff 0%,#fff 45%,rgba(255,255,255,.94) 52%,rgba(255,255,255,.52) 65%,rgba(255,255,255,.03) 82%);
-  pointer-events:none
-}}
-.home-arrow{{
-  position:absolute;z-index:5;right:18px;bottom:18px;width:53px;height:53px;border-radius:50%;
-  background:#074d91;color:#fff;display:flex;align-items:center;justify-content:center;
-  box-shadow:0 2px 6px rgba(0,43,90,.13)
-}}
-.home-arrow svg{{width:29px;height:29px;stroke:#fff;fill:none;stroke-width:2.25;stroke-linecap:round;stroke-linejoin:round}}
+.home-card-icon svg{{width:20px;height:20px;stroke:#fff;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}}
+.home-card-icon.money{{font-size:23px;font-weight:450;line-height:1}}
+.home-card-title{{position:relative;z-index:4;color:#052f68;font-size:15.5px;line-height:1.03;font-weight:900;letter-spacing:-.025em;max-width:57%}}
+.home-card-copy{{position:relative;z-index:4;color:#173b63;font-size:9px;line-height:1.35;margin-top:6px;max-width:57%}}
+.home-card-photo{{position:absolute;z-index:1;right:0;bottom:0;width:48%;height:78%;object-fit:cover;background:#fff}}
+.home-card-photo.spec{{object-position:58% 50%;height:84%;width:51%}}
+.home-card-photo.virtual{{object-position:58% 50%;height:78%;width:50%}}
+.home-card-photo.quote{{object-position:51% 45%;height:76%;width:47%}}
+.home-card-photo.projects{{object-position:50% 47%;height:77%;width:47%;object-fit:contain}}
+.home-arrow{{position:absolute;z-index:5;right:7px;bottom:7px;width:31px;height:31px;border-radius:50%;background:#074d91;color:#fff;display:flex;align-items:center;justify-content:center}}
+.home-arrow svg{{width:18px;height:18px;stroke:#fff;fill:none;stroke-width:2.25;stroke-linecap:round;stroke-linejoin:round}}
 
-/* Suppress the generic Streamlit nav on Home and render the approved 5-item reference nav. */
+/* The generic app nav is hidden only on Home; this is the five-item locked reference nav. */
 .bottom-nav{{display:none!important}}
 .home-bottom-nav{{
-  position:fixed;left:50%;transform:translateX(-50%);
-  bottom:max(9px,env(safe-area-inset-bottom));width:min(960px,calc(100% - 36px));height:84px;
-  border-radius:44px;background:#064b91;box-shadow:0 8px 24px rgba(0,42,89,.17);
-  display:grid;grid-template-columns:repeat(5,1fr);z-index:10000;padding:6px 18px;box-sizing:border-box
+  position:fixed;left:50%;transform:translateX(-50%);bottom:max(6px,env(safe-area-inset-bottom));
+  width:min(596px,calc(100% - 20px));height:62px;border-radius:32px;background:#064b91;
+  box-shadow:0 5px 15px rgba(0,42,89,.14);display:grid;grid-template-columns:repeat(5,1fr);
+  z-index:10000;padding:4px 8px;box-sizing:border-box
 }}
-.home-nav-item{{
-  position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;
-  text-decoration:none!important;color:#fff!important;font-size:13px;font-weight:600;gap:3px
-}}
-.home-nav-icon{{width:28px;height:28px;display:flex;align-items:center;justify-content:center}}
-.home-nav-icon svg{{width:27px;height:27px;stroke:#fff;fill:none;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}}
-.home-nav-item.active .home-nav-icon svg{{fill:#fff}}
-.home-nav-item.active:after{{
-  content:"";position:absolute;bottom:0;width:44px;height:4px;background:#fff;border-radius:5px
+.home-nav-item{{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;text-decoration:none!important;color:#fff!important;font-size:9px;font-weight:600;gap:1px}}
+.home-nav-icon{{width:21px;height:21px;display:flex;align-items:center;justify-content:center}}
+.home-nav-icon svg{{width:20px;height:20px;stroke:#fff;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}}
+.home-nav-item.active:after{{content:"";position:absolute;bottom:0;width:31px;height:3px;background:#fff;border-radius:5px}}
+
+@media(max-width:390px){{
+  .block-container{{padding-left:10px!important;padding-right:10px!important;padding-bottom:calc(73px + env(safe-area-inset-bottom))!important}}
+  .home-topbar{{height:52px;grid-template-columns:48px 1fr 48px;margin-bottom:4px}}
+  .home-logo{{width:126px;max-height:43px}}
+  .home-menu,.home-bell{{width:39px;height:39px}}
+  .home-menu span{{width:25px}}
+  .home-bell svg{{width:23px;height:23px}}
+  .home-section-title{{font-size:20px;margin-top:3px}}
+  .home-title-underline{{width:34px;margin-bottom:7px}}
+  .home-action-grid{{gap:7px}}
+  .home-action-card{{height:142px;padding:9px 9px;border-radius:13px}}
+  .home-card-icon{{width:32px;height:32px;margin-bottom:6px}}
+  .home-card-icon svg{{width:19px;height:19px}}
+  .home-card-title{{font-size:14.5px}}
+  .home-card-copy{{font-size:8.5px;line-height:1.32;margin-top:5px}}
+  .home-arrow{{width:29px;height:29px;right:6px;bottom:6px}}
+  .home-bottom-nav{{height:58px;border-radius:30px}}
 }}
 
-@media(max-width:700px){{
-  .block-container{{max-width:620px!important;padding-left:12px!important;padding-right:12px!important}}
-  .home-topbar{{height:68px;grid-template-columns:54px 1fr 54px;margin:0 4px 7px}}
-  .home-logo{{width:145px;max-height:52px}}
-  .home-menu,.home-bell{{width:44px;height:44px}}
-  .home-menu span{{width:29px;height:3.5px}}
-  .home-bell svg{{width:27px;height:27px}}
-  .home-section-title{{font-size:27px;margin:7px 10px 0}}
-  .home-title-underline{{height:3px;width:46px;margin:7px 0 10px 10px}}
-  .home-action-grid{{gap:12px;margin:0 2px 8px}}
-  .home-action-card{{height:246px;border-radius:18px;padding:15px 13px}}
-  .home-card-icon{{width:43px;height:43px;margin-bottom:11px}}
-  .home-card-icon svg{{width:25px;height:25px}}
-  .home-card-icon.money{{font-size:29px}}
-  .home-card-title{{font-size:20px;max-width:56%}}
-  .home-card-copy{{font-size:12px;line-height:1.46;margin-top:10px;max-width:55%}}
-  .home-arrow{{right:10px;bottom:10px;width:42px;height:42px}}
-  .home-arrow svg{{width:23px;height:23px}}
-  .home-bottom-nav{{width:calc(100% - 24px);height:72px;border-radius:38px;padding:5px 10px}}
-  .home-nav-item{{font-size:10px;gap:2px}}
-  .home-nav-icon{{width:24px;height:24px}}
-  .home-nav-icon svg{{width:23px;height:23px}}
-  .home-nav-item.active:after{{width:36px;height:3px}}
+@media(max-width:360px){{
+  .home-action-grid{{gap:6px}}
+  .home-action-card{{height:136px;padding:8px}}
+  .home-card-icon{{width:30px;height:30px;margin-bottom:5px}}
+  .home-card-title{{font-size:13.5px}}
+  .home-card-copy{{font-size:8px}}
+  .home-arrow{{width:27px;height:27px}}
+  .home-bottom-nav{{height:56px}}
 }}
-@media(max-width:430px){{
-  .block-container{{
-    padding-top:calc(3px + env(safe-area-inset-top))!important;
-    padding-bottom:calc(91px + env(safe-area-inset-bottom))!important
-  }}
-  .home-action-card{{height:236px}}
-  .home-card-title{{font-size:19px}}
-  .home-card-copy{{font-size:11.5px}}
-}}
-@media(max-width:370px){{
-  .home-action-grid{{gap:8px}}
-  .home-action-card{{height:222px;padding:12px 10px;border-radius:16px}}
-  .home-card-icon{{width:38px;height:38px;margin-bottom:8px}}
+
+@media(min-width:431px){{
+  .home-topbar{{height:64px}}
+  .home-logo{{width:148px;max-height:50px}}
+  .home-section-title{{font-size:24px}}
+  .home-action-card{{height:166px}}
   .home-card-title{{font-size:17px}}
-  .home-card-copy{{font-size:10.4px;margin-top:8px}}
-  .home-arrow{{width:36px;height:36px;right:8px;bottom:8px}}
-  .home-bottom-nav{{height:66px}}
-}}
-@media(min-width:701px){{
-  .home-action-grid{{gap:20px}}
+  .home-card-copy{{font-size:10px}}
 }}
 </style>
 
@@ -213,14 +164,12 @@ def render_home() -> None:
         f"""
 <div class="home-section-title">What do you need?</div>
 <div class="home-title-underline"></div>
-
 <div class="home-action-grid">
   <a class="home-action-card" href="?page=spec" aria-label="Spec Sample Order">
     <div class="home-card-icon"><svg viewBox="0 0 24 24"><path d="m5 12 4 4 10-10"></path></svg></div>
     <div class="home-card-title">Spec Sample<br>Order</div>
     <div class="home-card-copy">Tell Nova what you need and build the verified PCNA order.</div>
-    <img class="home-card-photo spec" src="{PCNA_TOTE_PHOTO}" alt="PCNA promotional product">
-    <div class="home-card-wash"></div>
+    <img class="home-card-photo spec" src="{PCNA_SPEC_PHOTO}" alt="PCNA promotional product photography">
     <div class="home-arrow"><svg viewBox="0 0 24 24"><path d="M5 12h13"></path><path d="m14 7 5 5-5 5"></path></svg></div>
   </a>
 
@@ -228,8 +177,7 @@ def render_home() -> None:
     <div class="home-card-icon"><svg viewBox="0 0 24 24"><path d="m12 4 7 8-7 8-7-8z"></path></svg></div>
     <div class="home-card-title">Virtuals /<br>Designs</div>
     <div class="home-card-copy">Ask Nova for product, kit or packaging virtuals and keep them in Projects.</div>
-    <img class="home-card-photo virtual" src="{PCNA_JOURNAL_PHOTO}" alt="PCNA product design photography">
-    <div class="home-card-wash"></div>
+    <img class="home-card-photo virtual" src="{PCNA_VIRTUAL_PHOTO}" alt="PCNA product design photography">
     <div class="home-arrow"><svg viewBox="0 0 24 24"><path d="M5 12h13"></path><path d="m14 7 5 5-5 5"></path></svg></div>
   </a>
 
@@ -237,8 +185,7 @@ def render_home() -> None:
     <div class="home-card-icon money">$</div>
     <div class="home-card-title">Quote<br>Request</div>
     <div class="home-card-copy">Quote a verified PCNA product at the requested quantity.</div>
-    <img class="home-card-photo quote" src="{PCNA_TOTE_PHOTO}" alt="PCNA merchandise for quote request">
-    <div class="home-card-wash"></div>
+    <img class="home-card-photo quote" src="{PCNA_QUOTE_PHOTO}" alt="PCNA merchandise photography">
     <div class="home-arrow"><svg viewBox="0 0 24 24"><path d="M5 12h13"></path><path d="m14 7 5 5-5 5"></path></svg></div>
   </a>
 
@@ -246,8 +193,7 @@ def render_home() -> None:
     <div class="home-card-icon"><svg viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="14" rx="1"></rect></svg></div>
     <div class="home-card-title">Projects</div>
     <div class="home-card-copy">View and manage your saved projects, orders and virtuals in one place.</div>
-    <img class="home-card-photo projects" src="{PCNA_JOURNAL_PHOTO}" alt="PCNA project product photography">
-    <div class="home-card-wash"></div>
+    <img class="home-card-photo projects" src="{PCNA_PROJECT_PHOTO}" alt="PCNA project product photography">
     <div class="home-arrow"><svg viewBox="0 0 24 24"><path d="M5 12h13"></path><path d="m14 7 5 5-5 5"></path></svg></div>
   </a>
 </div>
