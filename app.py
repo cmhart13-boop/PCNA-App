@@ -160,20 +160,20 @@ def page_header(kicker: str, title: str, copy: str):
     st.markdown(f'<div class="page-kicker">{kicker}</div><div class="page-title">{title}</div><div class="page-copy">{copy}</div>', unsafe_allow_html=True)
 
 
-def approved_pcna_header():
+def approved_pcna_header(width: int = 105):
     """Render the locked approved PCNA logo asset exactly as stored in GitHub."""
-    left, center, right = st.columns([1.6, 1, 1.6])
+    left, center, right = st.columns([1.35, 1.3, 1.35])
     with center:
-        st.image("IMG_2337.webp", width=105)
+        st.image("IMG_2337.webp", width=width)
 
 
 def live_pcna_banner():
     components.html(
         """
 <div class="pcna-live-shell"><div class="fallback"><a href="https://www.pcna.com/en-us" target="_blank" rel="noopener">Open live PCNA.com</a></div><iframe src="https://www.pcna.com/en-us" title="Live PCNA.com promotional banner" loading="eager"></iframe></div>
-<style>html,body{margin:0;padding:0;background:#fff;overflow:hidden}.pcna-live-shell{position:relative;height:228px;overflow:hidden;border-radius:14px;background:#fff}.pcna-live-shell iframe{position:absolute;left:0;top:-92px;width:100%;height:620px;border:0;background:#fff;z-index:2}.fallback{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;border:1px solid #d6e2eb;border-radius:14px;background:#fff;z-index:1}.fallback a{color:#084f86;font-size:15px;font-weight:700;text-decoration:none}@media(max-width:430px){.pcna-live-shell{height:168px}.pcna-live-shell iframe{top:-82px;height:590px}}</style>
+<style>html,body{margin:0;padding:0;background:#fff;overflow:hidden}.pcna-live-shell{position:relative;height:228px;overflow:hidden;border-radius:14px;background:#fff}.pcna-live-shell iframe{position:absolute;left:0;top:-92px;width:100%;height:620px;border:0;background:#fff;z-index:2}.fallback{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;border:1px solid #d6e2eb;border-radius:14px;background:#fff;z-index:1}.fallback a{color:#084f86;font-size:15px;font-weight:700;text-decoration:none}@media(max-width:430px){.pcna-live-shell{height:218px}.pcna-live-shell iframe{top:-72px;height:610px}}</style>
 """,
-        height=180,
+        height=230,
         scrolling=False,
     )
 
@@ -374,7 +374,25 @@ def render_project(project: dict, expanded: bool = False):
 
 page = current_page()
 
-approved_pcna_header()
+if page == "home":
+    st.markdown(
+        """
+<style>
+@media(max-width:430px){
+  .block-container{padding-top:calc(22px + env(safe-area-inset-top))!important;padding-left:14px!important;padding-right:14px!important;}
+  .section-title{font-size:22px!important;margin:8px 0 9px!important;}
+  .action-grid{gap:12px!important;margin-top:4px!important;}
+  .action-card{padding:15px 14px!important;min-height:122px!important;border-radius:18px!important;}
+  .action-icon{font-size:27px!important;margin-bottom:11px!important;}
+  .action-title{font-size:18px!important;line-height:1.15!important;margin-bottom:6px!important;}
+  .action-copy{font-size:13px!important;line-height:1.35!important;}
+}
+</style>
+""",
+        unsafe_allow_html=True,
+    )
+
+approved_pcna_header(145 if page == "home" else 105)
 
 if page == "home":
     live_pcna_banner()
