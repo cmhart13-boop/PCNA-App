@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import pcna_home_patch  # noqa: F401 - applies the approved mobile homepage treatment
+
 import base64
 import mimetypes
 from typing import Iterable
