@@ -2,9 +2,11 @@ name: Apply PCNA reference homepage
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
     paths:
-      - '.github/workflows/apply-pcna-reference-home.yml'
+      - scripts/apply_reference_home.py
+      - .github/workflows/apply-pcna-reference-home.yml
   workflow_dispatch:
 
 permissions:
@@ -14,146 +16,22 @@ jobs:
   apply-layout:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
         with:
           ref: main
-      - name: Apply exact reference layout structure
-        shell: python
-        run: |
-          from pathlib import Path
-          import re
-
-          path = Path('app.py')
-          text = path.read_text()
-
-          # Keep the supplied, approved PCNA logo asset and build the screenshot-style mobile shell.
-          marker = 'def live_pcna_banner():'
-          if 'def home_header():' not in text:
-              insert = '''def home_header():
-    st.markdown(
-        """
-<div class="home-topbar">
-  <div class="home-menu" aria-label="Menu"><span></span><span></span><span></span></div>
-  <img class="home-logo" src="https://raw.githubusercontent.com/cmhart13-boop/PCNA-App/main/assets/pcna-logo.webp" alt="PCNA">
-  <div class="home-bell" aria-label="Notifications">♧</div>
-</div>
-""",
-        unsafe_allow_html=True,
-    )
-
-
-def home_hero():
-    st.markdown(
-        """
-<a class="home-hero" href="https://www.pcna.com/en-us" target="_blank" rel="noopener">
-  <div class="hero-copy">
-    <div class="hero-title">Branded.<br>Merchandise.<br>Delivered.</div>
-    <div class="hero-sub">Explore thousands of promotional<br>products to elevate your brand.</div>
-    <div class="hero-btn">SHOP NOW</div>
-  </div>
-  <div class="hero-art" aria-hidden="true">
-    <div class="hero-bag">▥</div><div class="hero-mug">▣</div><div class="hero-shirt">▾</div><div class="hero-cap">⌒</div>
-  </div>
-</a>
-""",
-        unsafe_allow_html=True,
-    )
-
-
-'''
-              text = text.replace(marker, insert + marker)
-
-          # Replace homepage only; all workflows remain intact.
-          home_pattern = re.compile(r'if page == "home":.*?\nelif page == "create":', re.S)
-          new_home = '''if page == "home":
-    home_header()
-    home_hero()
-    st.markdown('<div class="home-section-title">What do you need?</div><div class="home-title-underline"></div>', unsafe_allow_html=True)
-    st.markdown(
-        f"""
-<div class="home-action-grid">
-<a class="home-action-card" href="{nav_link('spec')}">
-  <div class="home-card-icon">✓</div><div class="home-card-title">Spec Sample<br>Order</div>
-  <div class="home-card-copy">Tell Nova what you need<br>and build the verified<br>PCNA order.</div>
-  <div class="home-product-art home-backpack">▥</div><div class="home-arrow">→</div>
-</a>
-<a class="home-action-card" href="{nav_link('virtual')}">
-  <div class="home-card-icon">◇</div><div class="home-card-title">Virtuals /<br>Designs</div>
-  <div class="home-card-copy">Ask Nova for product,<br>kit or packaging<br>virtuals and keep<br>them in Projects.</div>
-  <div class="home-product-art home-laptop">▱</div><div class="home-arrow">→</div>
-</a>
-<a class="home-action-card" href="{nav_link('quote')}">
-  <div class="home-card-icon">$</div><div class="home-card-title">Quote<br>Request</div>
-  <div class="home-card-copy">Quote a verified<br>PCNA product at<br>the requested<br>quantity.</div>
-  <div class="home-product-art home-quote-art">▤</div><div class="home-arrow">→</div>
-</a>
-<a class="home-action-card" href="{virtual_projects_link()}">
-  <div class="home-card-icon">□</div><div class="home-card-title">Projects</div>
-  <div class="home-card-copy">View and manage your<br>saved projects, orders<br>and virtuals in one<br>place.</div>
-  <div class="home-product-art home-journal">▰</div><div class="home-arrow">→</div>
-</a>
-</div>
-""",
-        unsafe_allow_html=True,
-    )
-
-elif page == "create":'''
-          text, count = home_pattern.subn(new_home, text, count=1)
-          if count != 1:
-              raise SystemExit('Could not locate homepage block')
-
-          # Replace the bottom navigation with the five-item reference navigation.
-          nav_pattern = re.compile(r'def bottom_nav\(page: str\):.*?\n\n\ndef persistent_projects\(\):', re.S)
-          new_nav = '''def bottom_nav(page: str):
-    group = page
-    if page == "virtual":
-        group = "projects" if st.query_params.get("view", "new") == "projects" else "virtual"
-    st.markdown(
-        f"""
-<div class="bottom-nav">
-<a class="nav-item {'active' if group=='home' else ''}" href="{nav_link('home')}"><span class="nav-icon">⌂</span><span>Home</span></a>
-<a class="nav-item {'active' if group=='projects' else ''}" href="{virtual_projects_link()}"><span class="nav-icon">□</span><span>Projects</span></a>
-<a class="nav-item {'active' if group=='search' else ''}" href="{nav_link('search')}"><span class="nav-icon">◇</span><span>Products</span></a>
-<a class="nav-item {'active' if group=='assistant' else ''}" href="{nav_link('assistant')}"><span class="nav-icon">◯</span><span>Messages</span></a>
-<a class="nav-item {'active' if group=='data' else ''}" href="{nav_link('data')}"><span class="nav-icon">♙</span><span>Account</span></a>
-</div>
-""",
-        unsafe_allow_html=True,
-    )
-
-
-def persistent_projects():'''
-          text, count = nav_pattern.subn(new_nav, text, count=1)
-          if count != 1:
-              raise SystemExit('Could not locate bottom nav function')
-
-          # Add reference-specific styling after the base CSS so only the homepage is visually transformed.
-          css_anchor = '</style>\n""",\n    unsafe_allow_html=True,\n)'
-          home_css = '''
-/* Screenshot-matched PCNA mobile homepage */
-.home-topbar{height:74px;display:grid;grid-template-columns:72px 1fr 72px;align-items:center;margin:-12px 2px 12px}.home-logo{display:block;width:145px;max-height:54px;object-fit:contain;justify-self:center}.home-menu{width:31px;height:28px;display:flex;flex-direction:column;justify-content:space-between;align-self:center;margin-left:9px}.home-menu span{height:4px;width:31px;background:#043f79;border-radius:4px}.home-bell{justify-self:end;margin-right:8px;color:#043f79;font-size:33px;line-height:1;transform:rotate(180deg)}
-.home-hero{display:block;position:relative;height:244px;border-radius:18px;overflow:hidden;text-decoration:none!important;background:linear-gradient(124deg,#032b5b 0%,#063f80 56%,#07559d 100%);box-shadow:0 5px 14px rgba(0,45,91,.16);margin:0 1px 17px}.home-hero:before{content:"";position:absolute;inset:0;background:linear-gradient(132deg,transparent 0 48%,rgba(60,158,224,.17) 48% 62%,transparent 62%)}.hero-copy{position:absolute;z-index:2;left:28px;top:23px;color:#fff}.hero-title{font-size:32px;line-height:1.02;font-weight:900;letter-spacing:-.035em}.hero-sub{font-size:13px;line-height:1.45;margin-top:12px}.hero-btn{display:inline-flex;height:40px;min-width:116px;border:1.5px solid #fff;border-radius:6px;align-items:center;justify-content:center;margin-top:14px;font-size:14px;font-weight:900}.hero-art{position:absolute;right:8px;bottom:17px;width:50%;height:82%;color:#fff}.hero-bag,.hero-mug,.hero-shirt,.hero-cap{position:absolute;font-weight:900;text-shadow:0 8px 16px rgba(0,0,0,.25)}.hero-bag{font-size:102px;left:-10px;top:8px;color:#8d969e}.hero-mug{font-size:78px;left:82px;bottom:0;color:#d6dde3}.hero-shirt{font-size:110px;right:0;top:0;color:#071d3c}.hero-cap{font-size:75px;right:8px;bottom:-5px;color:#aab0b5}
-.home-section-title{font-size:25px;font-weight:900;letter-spacing:-.025em;color:#052f68;margin:3px 11px 0}.home-title-underline{height:3px;width:42px;border-radius:2px;background:#24a6e0;margin:5px 0 9px 11px;box-shadow:0 4px 8px rgba(36,166,224,.25)}
-.home-action-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:0 2px 10px}.home-action-card{position:relative;display:block;height:238px;overflow:hidden;text-decoration:none!important;border:1px solid rgba(9,80,146,.16);border-radius:16px;background:#fff;padding:16px 14px;box-sizing:border-box;box-shadow:0 0 8px rgba(21,136,220,.24),0 7px 14px rgba(0,55,110,.10)}.home-card-icon{width:44px;height:44px;border-radius:50%;background:#064b91;color:white;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:800;margin-bottom:13px}.home-card-title{position:relative;z-index:2;color:#052f68;font-size:21px;line-height:1.02;font-weight:900;letter-spacing:-.025em}.home-card-copy{position:relative;z-index:2;color:#173b63;font-size:12.5px;line-height:1.48;margin-top:11px}.home-product-art{position:absolute;right:4px;bottom:11px;font-size:98px;line-height:1;color:#152639;opacity:.92;transform:rotate(-2deg)}.home-backpack{font-size:124px;color:#133e70;right:-5px;bottom:2px}.home-laptop{font-size:112px;color:#1b2026;right:-7px;bottom:23px}.home-quote-art{font-size:108px;color:#111;right:1px;bottom:12px}.home-journal{font-size:110px;color:#24272a;right:-2px;bottom:12px;transform:rotate(-9deg)}.home-arrow{position:absolute;z-index:3;right:10px;bottom:10px;width:42px;height:42px;border-radius:50%;background:#064b91;color:#fff;display:flex;align-items:center;justify-content:center;font-size:29px;font-weight:500}
-.bottom-nav{height:78px!important;width:min(590px,calc(100% - 24px))!important;bottom:9px!important;border:0!important;border-radius:38px!important;background:linear-gradient(118deg,#053c78,#075399)!important;box-shadow:0 8px 24px rgba(0,42,89,.16)!important;padding:6px 14px max(6px,env(safe-area-inset-bottom))!important;grid-template-columns:repeat(5,1fr)!important}.nav-item{color:#fff!important;font-size:11px!important;opacity:.95}.nav-icon{font-size:23px!important}.nav-item.active{color:#fff!important;background:transparent!important;position:relative}.nav-item.active:after{content:"";position:absolute;bottom:0;width:40px;height:3px;background:white;border-radius:4px}
-@media(max-width:430px){.block-container{padding-top:calc(18px + env(safe-area-inset-top))!important;padding-left:12px!important;padding-right:12px!important;padding-bottom:104px!important}.home-topbar{height:68px}.home-logo{width:140px}.home-hero{height:236px}.hero-title{font-size:30px}.home-action-card{height:230px}.home-card-title{font-size:20px}.home-card-copy{font-size:12px}.home-product-art{opacity:.84}}
-'''
-          if '/* Screenshot-matched PCNA mobile homepage */' not in text:
-              text = text.replace(css_anchor, home_css + '\n' + css_anchor, 1)
-
-          path.write_text(text)
-      - name: Validate Python
+      - name: Apply approved homepage layout
+        run: python scripts/apply_reference_home.py
+      - name: Validate app
         run: python -m py_compile app.py
-      - name: Commit homepage update
+      - name: Commit app update
         run: |
           if git diff --quiet; then
-            echo "No changes needed"
+            echo "No homepage changes required"
             exit 0
           fi
           git config user.name "PCNA App Automation"
           git config user.email "actions@users.noreply.github.com"
           git add app.py
-          git commit -m "Match PCNA app homepage to approved reference layout"
+          git commit -m "Match PCNA homepage to approved reference"
           git push origin main
-
-# Triggered by approved homepage implementation request.
