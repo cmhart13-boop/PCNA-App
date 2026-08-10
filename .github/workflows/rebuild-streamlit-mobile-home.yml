@@ -20,6 +20,16 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Repair generator quoting
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('scripts/rebuild_streamlit_mobile_home.py')
+          s = p.read_text()
+          s = s.replace("    html = f'''<!doctype html>", '    html = f\"\"\"<!doctype html>')
+          s = s.replace("</html>'''\n    components.html", '</html>\"\"\"\n    components.html')
+          p.write_text(s)
+          PY
       - name: Rebuild mobile home source
         run: python scripts/rebuild_streamlit_mobile_home.py
       - name: Compile
