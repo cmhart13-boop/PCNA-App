@@ -88,7 +88,7 @@ html,body,[data-testid="stAppViewContainer"]{{background:#fff;color:var(--ink);}
 [data-testid="stFileUploaderDropzone"]{{border-radius:14px!important;padding:14px 10px!important;border-color:#b8cad8!important;background:#fbfdff!important;}}
 [data-testid="stExpander"]{{border:1px solid var(--line)!important;border-radius:14px!important;overflow:hidden;margin:8px 0;}}
 label,[data-testid="stWidgetLabel"],[data-testid="stWidgetLabel"] p{{font-weight:800!important;color:var(--pcna)!important;}}
-.bottom-nav{{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:min(620px,100%);height:76px;background:var(--pcna);backdrop-filter:blur(16px);border-top:1px solid rgba(255,255,255,.10);display:grid;grid-template-columns:repeat(4,1fr);z-index:9999;padding:7px 7px max(7px,env(safe-area-inset-bottom));box-sizing:border-box;}}
+.bottom-nav{{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:min(620px,100%);height:76px;background:#003b5c;backdrop-filter:blur(16px);border-top:1px solid rgba(255,255,255,.10);display:grid;grid-template-columns:repeat(4,1fr);z-index:9999;padding:7px 7px max(7px,env(safe-area-inset-bottom));box-sizing:border-box;}}
 .nav-item{{display:flex;flex-direction:column;align-items:center;justify-content:center;text-decoration:none!important;color:rgba(255,255,255,.58)!important;font-size:10px;font-weight:800;gap:3px;border-radius:12px;}}
 .nav-icon{{font-size:20px;line-height:1;}}
 .nav-item.active{{color:rgba(255,255,255,.92)!important;background:rgba(255,255,255,.08);}}
@@ -158,6 +158,13 @@ def projects_link() -> str:
 
 def page_header(kicker: str, title: str, copy: str):
     st.markdown(f'<div class="page-kicker">{kicker}</div><div class="page-title">{title}</div><div class="page-copy">{copy}</div>', unsafe_allow_html=True)
+
+
+def approved_pcna_header():
+    """Render the locked approved PCNA logo asset exactly as stored in GitHub."""
+    left, center, right = st.columns([1, 1.45, 1])
+    with center:
+        st.image("assets/pcna-logo.webp", use_container_width=True)
 
 
 def live_pcna_banner():
@@ -366,6 +373,8 @@ def render_project(project: dict, expanded: bool = False):
 
 
 page = current_page()
+
+approved_pcna_header()
 
 if page == "home":
     live_pcna_banner()
