@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - 'scripts/repair_home_from_screenshot.py'
+      - 'scripts/fix_repair_script.py'
       - '.github/workflows/repair-home-from-screenshot.yml'
 
 permissions:
@@ -21,6 +22,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Fix repair script quoting
+        run: python scripts/fix_repair_script.py
       - name: Repair home
         run: python scripts/repair_home_from_screenshot.py
       - name: Compile
