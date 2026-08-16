@@ -57,8 +57,8 @@ PANEL = "#f7fafc"
 NAV_BLUE = "#003b5c"
 PCNA_HERO_URL = (
     "https://assets.pcna.com/image/upload/f_auto,q_auto/"
-    "Mkt_Dept/2026%20Jobs/2026-0810_Web_Messaging/0810_Web_PCNA_Hero_m.gif"
-    "?v=202608161651"
+    "Mkt_Dept/2026%20Jobs/2026-0810_Web_Messaging/0810_Web_PCNA_Hero.gif"
+    "?v=202608161659"
 )
 
 st.markdown(
