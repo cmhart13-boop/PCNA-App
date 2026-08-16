@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import base64
 import json
 import os
 from pathlib import Path
@@ -54,403 +55,50 @@ MUTED = "#66798a"
 LINE = "#d6e2eb"
 PANEL = "#f7fafc"
 NAV_BLUE = "#003b5c"
+PCNA_HERO_URL = (
+    "https://assets.pcna.com/image/upload/f_auto,q_auto/"
+    "Mkt_Dept/2026%20Jobs/2026-0810_Web_Messaging/0810_Web_PCNA_Hero_m.gif"
+    "?v=202608161651"
+)
 
 st.markdown(
     f"""
 <style>
 :root {{
-  --pcna: {PCNA_BLUE};
-  --ink: {INK};
-  --muted: {MUTED};
-  --line: {LINE};
-  --panel: {PANEL};
-  --nav-blue: {NAV_BLUE};
-  --nav-height: 76px;
-  --page-max: 620px;
-  --page-side: 12px;
-  --home-gap: 10px;
+  --pcna:{PCNA_BLUE}; --ink:{INK}; --muted:{MUTED}; --line:{LINE}; --panel:{PANEL};
+  --nav-blue:{NAV_BLUE}; --nav-height:76px; --page-max:620px; --page-side:12px; --home-gap:10px;
 }}
-
-html,
-body,
-[data-testid="stAppViewContainer"],
-[data-testid="stMain"] {{
-  background: #fff;
-  color: var(--ink);
-  width: 100%;
-  margin: 0;
-  padding: 0;
-  overflow-x: hidden;
-}}
-
-[data-testid="stAppViewContainer"] > .main {{
-  width: 100%;
-  overflow-x: hidden;
-}}
-
-[data-testid="stHeader"] {{
-  height: 0 !important;
-  min-height: 0 !important;
-  background: transparent !important;
-}}
-
-[data-testid="stSidebar"] {{ display: none; }}
-#MainMenu,
-footer,
-[data-testid="stToolbar"] {{
-  visibility: hidden !important;
-  height: 0 !important;
-}}
-
-.block-container,
-[data-testid="stMainBlockContainer"],
-[data-testid="stAppViewBlockContainer"] {{
-  width: 100% !important;
-  max-width: var(--page-max) !important;
-  box-sizing: border-box !important;
-  margin: 0 auto !important;
-  padding: calc(16px + env(safe-area-inset-top)) 15px calc(96px + env(safe-area-inset-bottom)) !important;
-}}
-
-.block-container > [data-testid="stVerticalBlock"] {{
-  gap: 0 !important;
-}}
-
-[data-testid="stElementContainer"] {{
-  margin: 0;
-}}
-
-.page-kicker {{
-  font-size: 11px;
-  font-weight: 900;
-  letter-spacing: .10em;
-  color: var(--pcna);
-  text-transform: uppercase;
-  margin-top: 2px;
-}}
-.page-title {{
-  font-size: 29px;
-  line-height: 1.08;
-  font-weight: 850;
-  letter-spacing: -.035em;
-  color: var(--pcna);
-  margin: 4px 0 9px;
-}}
-.page-copy {{
-  font-size: 15px;
-  line-height: 1.48;
-  color: var(--muted);
-  margin: 0 0 18px;
-}}
-.section-title {{
-  font-size: 18px;
-  line-height: 1.1;
-  font-weight: 850;
-  letter-spacing: -.015em;
-  margin: 8px 0 6px;
-  color: var(--pcna);
-}}
-
-.action-grid {{
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  margin: 5px 0 8px;
-}}
-.action-card {{
-  display: block;
-  text-decoration: none !important;
-  border: 1.5px solid rgba(8,79,134,.36);
-  border-radius: 16px;
-  padding: 12px 13px;
-  background: #fff;
-  min-height: 96px;
-  box-shadow: 0 4px 0 rgba(8,79,134,.10),0 9px 18px rgba(8,79,134,.08);
-  transition: transform .12s ease,box-shadow .12s ease,border-color .12s ease;
-}}
-.action-card:hover {{
-  border-color: rgba(8,79,134,.58);
-  box-shadow: 0 6px 0 rgba(8,79,134,.13),0 14px 28px rgba(8,79,134,.12);
-}}
-.action-card:active {{
-  transform: translateY(3px);
-  box-shadow: 0 2px 0 rgba(8,79,134,.12),0 7px 14px rgba(8,79,134,.08);
-}}
-.action-icon {{
-  font-size: 21px;
-  line-height: 1;
-  margin-bottom: 8px;
-  color: var(--pcna);
-}}
-.action-title {{
-  font-size: 15px;
-  font-weight: 850;
-  color: var(--pcna);
-  line-height: 1.12;
-  margin-bottom: 4px;
-}}
-.action-copy {{
-  font-size: 11px;
-  color: var(--muted);
-  line-height: 1.25;
-}}
-
-.info-card {{
-  border: 1px solid var(--line);
-  border-radius: 16px;
-  padding: 14px;
-  background: #fff;
-  margin: 8px 0;
-  box-shadow: 0 4px 14px rgba(8,79,134,.05);
-}}
-.info-card-title {{ font-size: 15px; font-weight: 850; color: var(--pcna); }}
-.info-card-meta {{ font-size: 12px; color: var(--muted); margin-top: 3px; }}
-.data-chip {{
-  display: inline-block;
-  padding: 5px 8px;
-  border-radius: 999px;
-  background: #eef5fa;
-  color: var(--pcna);
-  font-size: 11px;
-  font-weight: 850;
-  margin-right: 5px;
-}}
-.order-box {{
-  white-space: pre-wrap;
-  border: 1px solid var(--line);
-  background: #fbfcfd;
-  border-radius: 15px;
-  padding: 14px;
-  font-family: ui-monospace,SFMono-Regular,Menlo,monospace;
-  font-size: 12px;
-  line-height: 1.5;
-  overflow-wrap: anywhere;
-}}
-
-.stButton > button,
-.stDownloadButton > button,
-[data-testid="stLinkButton"] a {{
-  min-height: 48px !important;
-  border-radius: 13px !important;
-  font-weight: 800 !important;
-  font-size: 15px !important;
-  width: 100% !important;
-}}
-.stTextInput input,
-.stNumberInput input,
-.stTextArea textarea,
-[data-baseweb="select"] > div {{
-  min-height: 50px !important;
-  border-radius: 12px !important;
-  font-size: 16px !important;
-  background: #fff !important;
-  border-color: #b8cad8 !important;
-  color: var(--ink) !important;
-}}
-.stTextInput input:focus,
-.stNumberInput input:focus,
-.stTextArea textarea:focus {{
-  border-color: var(--pcna) !important;
-  box-shadow: 0 0 0 1px var(--pcna) !important;
-}}
-[data-baseweb="select"] > div:focus-within {{
-  border-color: var(--pcna) !important;
-  box-shadow: 0 0 0 1px var(--pcna) !important;
-}}
-.stTextArea textarea {{ min-height: 120px !important; }}
-[data-testid="stFileUploaderDropzone"] {{
-  border-radius: 14px !important;
-  padding: 14px 10px !important;
-  border-color: #b8cad8 !important;
-  background: #fbfdff !important;
-}}
-[data-testid="stExpander"] {{
-  border: 1px solid var(--line) !important;
-  border-radius: 14px !important;
-  overflow: hidden;
-  margin: 8px 0;
-}}
-label,
-[data-testid="stWidgetLabel"],
-[data-testid="stWidgetLabel"] p {{
-  font-weight: 800 !important;
-  color: var(--pcna) !important;
-}}
-
-.bottom-nav {{
-  position: fixed;
-  left: 50%;
-  transform: translateX(-50%);
-  bottom: 0;
-  width: min(var(--page-max),100%);
-  height: var(--nav-height);
-  background: var(--nav-blue);
-  backdrop-filter: blur(16px);
-  border-top: 1px solid rgba(255,255,255,.10);
-  display: grid;
-  grid-template-columns: repeat(4,1fr);
-  z-index: 9999;
-  padding: 7px 7px max(7px,env(safe-area-inset-bottom));
-  box-sizing: border-box;
-}}
-.nav-item {{
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-decoration: none !important;
-  color: rgba(255,255,255,.58) !important;
-  font-size: 10px;
-  font-weight: 800;
-  gap: 3px;
-  border-radius: 12px;
-}}
-.nav-icon {{ font-size: 20px; line-height: 1; }}
-.nav-item.active {{
-  color: rgba(255,255,255,.92) !important;
-  background: rgba(255,255,255,.08);
-}}
-
-/* HOME: normal document flow. No viewport-height parent locks and no scroll lock. */
-.block-container:has(.home-action-grid),
-[data-testid="stMainBlockContainer"]:has(.home-action-grid),
-[data-testid="stAppViewBlockContainer"]:has(.home-action-grid) {{
-  height: auto !important;
-  min-height: 0 !important;
-  padding: calc(6px + env(safe-area-inset-top)) var(--page-side) calc(88px + env(safe-area-inset-bottom)) !important;
-  overflow: visible !important;
-}}
-
-.block-container:has(.home-action-grid) > [data-testid="stVerticalBlock"] {{
-  display: block !important;
-  height: auto !important;
-  min-height: 0 !important;
-  overflow: visible !important;
-}}
-
-.block-container:has(.home-action-grid) [data-testid="stElementContainer"] {{
-  height: auto !important;
-  min-height: 0 !important;
-}}
-
-.block-container:has(.home-action-grid) [data-testid="stImage"] {{
-  margin: 0 0 4px !important;
-  padding: 0 !important;
-}}
-.block-container:has(.home-action-grid) [data-testid="stImage"] img {{
-  display: block !important;
-  margin: 0 auto !important;
-  width: auto !important;
-  max-width: 100% !important;
-  height: auto !important;
-  object-fit: contain !important;
-}}
-
-.block-container:has(.home-action-grid) [data-testid="stElementContainer"]:has(iframe[title="streamlit_component"]) {{
-  margin: 0 !important;
-  padding: 0 !important;
-  height: auto !important;
-  min-height: 0 !important;
-}}
-.block-container:has(.home-action-grid) iframe[title="streamlit_component"] {{
-  display: block !important;
-  width: 100% !important;
-  height: clamp(120px, 16.5dvh, 148px) !important;
-  min-height: 0 !important;
-  margin: 0 !important;
-}}
-
-.home-heading {{
-  font-size: clamp(19px, 2.4dvh, 22px);
-  line-height: 1.08;
-  font-weight: 850;
-  letter-spacing: -.015em;
-  color: var(--pcna);
-  margin: 5px 0 7px;
-}}
-
-.home-action-grid {{
-  display: grid;
-  grid-template-columns: repeat(2,minmax(0,1fr));
-  grid-template-rows: repeat(2,clamp(142px,18.5dvh,166px));
-  gap: var(--home-gap);
-  width: 100%;
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}}
-
-.home-action-card {{
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  width: 100%;
-  min-width: 0;
-  height: 100%;
-  box-sizing: border-box;
-  padding: clamp(12px,1.7dvh,15px) 13px;
-  border: 1.5px solid rgba(8,79,134,.36);
-  border-radius: 15px;
-  background: #fff;
-  text-decoration: none !important;
-  box-shadow: 0 4px 0 rgba(8,79,134,.10),0 9px 18px rgba(8,79,134,.08);
-  overflow: hidden;
-}}
-.home-action-card:hover {{
-  border-color: rgba(8,79,134,.58);
-  box-shadow: 0 6px 0 rgba(8,79,134,.13),0 14px 28px rgba(8,79,134,.12);
-}}
-.home-action-card:active {{ transform: translateY(2px); }}
-.home-action-card .action-icon {{
-  font-size: clamp(22px,2.8dvh,26px);
-  line-height: 1;
-  margin: 0 0 8px;
-}}
-.home-action-card .action-title {{
-  font-size: clamp(15.5px,2dvh,18px);
-  line-height: 1.08;
-  margin: 0 0 5px;
-}}
-.home-action-card .action-copy {{
-  font-size: clamp(11px,1.35dvh,12.5px);
-  line-height: 1.22;
-  margin: 0;
-}}
-
-@media (max-width: 430px) {{
-  .block-container,
-  [data-testid="stMainBlockContainer"],
-  [data-testid="stAppViewBlockContainer"] {{
-    padding-left: var(--page-side) !important;
-    padding-right: var(--page-side) !important;
-  }}
-  .page-title {{ font-size: 28px; line-height: 1.1; }}
-  .section-title {{ margin: 3px 0 5px; }}
-  .action-grid {{ gap: 9px; margin-top: 2px; }}
-  .action-card {{ padding: 10px 11px; min-height: 88px; }}
-}}
-
-@media (max-width: 350px) {{
-  .action-grid {{ grid-template-columns: 1fr; }}
-  .home-action-grid {{
-    grid-template-columns: repeat(2,minmax(0,1fr));
-    gap: 8px;
-  }}
-  .home-action-card {{ padding-left: 9px; padding-right: 9px; }}
-  .home-action-card .action-title {{ font-size: 14px; }}
-  .home-action-card .action-copy {{ font-size: 10px; }}
-}}
-
-@media (max-height: 690px) {{
-  .block-container:has(.home-action-grid) iframe[title="streamlit_component"] {{
-    height: 112px !important;
-  }}
-  .home-action-grid {{
-    grid-template-rows: repeat(2,136px);
-  }}
-  .home-action-card {{ padding-top: 10px; padding-bottom: 10px; }}
-  .home-action-card .action-copy {{ font-size: 10.5px; line-height: 1.18; }}
-}}
+*{{box-sizing:border-box}}
+html,body,[data-testid="stAppViewContainer"],[data-testid="stMain"]{{background:#fff;color:var(--ink);width:100%;margin:0;padding:0;overflow-x:hidden}}
+[data-testid="stAppViewContainer"]>.main{{width:100%;overflow-x:hidden}}
+[data-testid="stHeader"]{{height:0!important;min-height:0!important;background:transparent!important}}
+[data-testid="stSidebar"]{{display:none!important}}
+#MainMenu,footer,[data-testid="stToolbar"],[data-testid="stStatusWidget"],[data-testid="stAppDeployButton"],[data-testid="stDeployButton"],
+[class*="viewerBadge"],[class*="ViewerBadge"],a[href*="streamlit.io/cloud"]{{display:none!important;visibility:hidden!important;height:0!important}}
+.block-container,[data-testid="stMainBlockContainer"],[data-testid="stAppViewBlockContainer"]{{width:100%!important;max-width:var(--page-max)!important;box-sizing:border-box!important;margin:0 auto!important;padding:calc(16px + env(safe-area-inset-top)) 15px calc(96px + env(safe-area-inset-bottom))!important}}
+.block-container>[data-testid="stVerticalBlock"]{{gap:0!important}}
+[data-testid="stElementContainer"]{{margin:0}}
+.page-kicker{{font-size:11px;font-weight:900;letter-spacing:.10em;color:var(--pcna);text-transform:uppercase;margin-top:2px}}
+.page-title{{font-size:29px;line-height:1.08;font-weight:850;letter-spacing:-.035em;color:var(--pcna);margin:4px 0 9px}}
+.page-copy{{font-size:15px;line-height:1.48;color:var(--muted);margin:0 0 18px}}
+.section-title{{font-size:18px;line-height:1.1;font-weight:850;letter-spacing:-.015em;margin:8px 0 6px;color:var(--pcna)}}
+.action-grid{{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:5px 0 8px}}
+.action-card{{display:block;text-decoration:none!important;border:1.5px solid rgba(8,79,134,.36);border-radius:16px;padding:12px 13px;background:#fff;min-height:96px;box-shadow:0 4px 0 rgba(8,79,134,.10),0 9px 18px rgba(8,79,134,.08)}}
+.action-title{{font-size:15px;font-weight:850;color:var(--pcna);line-height:1.12;margin-bottom:4px}}
+.action-copy{{font-size:11px;color:var(--muted);line-height:1.25}}
+.info-card{{border:1px solid var(--line);border-radius:16px;padding:14px;background:#fff;margin:8px 0;box-shadow:0 4px 14px rgba(8,79,134,.05)}}
+.info-card-title{{font-size:15px;font-weight:850;color:var(--pcna)}} .info-card-meta{{font-size:12px;color:var(--muted);margin-top:3px}}
+.data-chip{{display:inline-block;padding:5px 8px;border-radius:999px;background:#eef5fa;color:var(--pcna);font-size:11px;font-weight:850;margin-right:5px}}
+.order-box{{white-space:pre-wrap;border:1px solid var(--line);background:#fbfcfd;border-radius:15px;padding:14px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;line-height:1.5;overflow-wrap:anywhere}}
+.stButton>button,.stDownloadButton>button,[data-testid="stLinkButton"] a{{min-height:48px!important;border-radius:13px!important;font-weight:800!important;font-size:15px!important;width:100%!important}}
+.stTextInput input,.stNumberInput input,.stTextArea textarea,[data-baseweb="select"]>div{{min-height:50px!important;border-radius:12px!important;font-size:16px!important;background:#fff!important;border-color:#b8cad8!important;color:var(--ink)!important}}
+.stTextArea textarea{{min-height:120px!important}}
+[data-testid="stFileUploaderDropzone"]{{border-radius:14px!important;padding:14px 10px!important;border-color:#b8cad8!important;background:#fbfdff!important}}
+[data-testid="stExpander"]{{border:1px solid var(--line)!important;border-radius:14px!important;overflow:hidden;margin:8px 0}}
+label,[data-testid="stWidgetLabel"],[data-testid="stWidgetLabel"] p{{font-weight:800!important;color:var(--pcna)!important}}
+.bottom-nav{{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:min(var(--page-max),100%);height:var(--nav-height);background:var(--nav-blue);border-top:1px solid rgba(255,255,255,.10);display:grid;grid-template-columns:repeat(4,1fr);z-index:9999;padding:7px 7px max(7px,env(safe-area-inset-bottom));box-sizing:border-box}}
+.nav-item{{display:flex;flex-direction:column;align-items:center;justify-content:center;text-decoration:none!important;color:rgba(255,255,255,.62)!important;font-size:12.5px;font-weight:800;gap:3px;border-radius:12px}}
+.nav-icon{{font-size:20px;line-height:1}} .nav-item.active{{color:rgba(255,255,255,.96)!important;background:rgba(255,255,255,.08)}}
 </style>
 """,
     unsafe_allow_html=True,
@@ -517,30 +165,8 @@ def page_header(kicker: str, title: str, copy: str):
     st.markdown(f'<div class="page-kicker">{kicker}</div><div class="page-title">{title}</div><div class="page-copy">{copy}</div>', unsafe_allow_html=True)
 
 
-def approved_pcna_header(width: int = 105):
-    """Render the locked approved PCNA logo asset exactly as stored in GitHub."""
+def approved_pcna_header(width: int = 158):
     st.image("IMG_2337.webp", width=width)
-
-
-def live_pcna_banner():
-    components.html(
-        """
-<div class="pcna-live-shell">
-  <div class="pcna-fallback">Loading PCNA.com…</div>
-  <iframe src="https://www.pcna.com/en-us" title="Live PCNA.com hero banner" loading="eager"></iframe>
-  <a class="pcna-hero-link" href="https://www.pcna.com/en-us" target="_blank" rel="noopener noreferrer" aria-label="Open PCNA.com"></a>
-</div>
-<style>
-html,body{margin:0;padding:0;background:#fff;overflow:hidden}
-.pcna-live-shell{position:relative;width:100%;height:100%;overflow:hidden;border-radius:14px;background:#fff;border:1px solid #d6e2eb;box-sizing:border-box}
-.pcna-live-shell iframe{position:absolute;left:0;top:-92px;width:100%;height:620px;border:0;background:#fff;z-index:2}
-.pcna-fallback{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#084f86;font:700 14px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#fff;z-index:1}
-.pcna-hero-link{position:absolute;inset:0;z-index:3;display:block;cursor:pointer}
-</style>
-""",
-        height=148,
-        scrolling=False,
-    )
 
 
 def bottom_nav(page: str):
@@ -556,6 +182,76 @@ def bottom_nav(page: str):
 """,
         unsafe_allow_html=True,
     )
+
+
+def asset_data(path_name: str) -> str:
+    path = Path(path_name)
+    if not path.exists():
+        return ""
+    suffix = path.suffix.lower()
+    mime = "image/webp" if suffix == ".webp" else "image/png" if suffix == ".png" else "image/jpeg"
+    return f"data:{mime};base64," + base64.b64encode(path.read_bytes()).decode("ascii")
+
+
+def render_streamlit_mobile_home():
+    # Direct rendering only. No runtime interception, no iframe crop, no hidden duplicate hero content.
+    logo = asset_data("IMG_2337.webp")
+    st.markdown(
+        f'''
+<div class="pcna-home">
+  <div class="pcna-head">
+    <span class="pcna-head-icon">☰</span>
+    <img src="{logo}" class="pcna-head-logo" alt="PCNA">
+    <span class="pcna-head-icon pcna-head-bell">◇</span>
+  </div>
+  <a class="pcna-hero" href="https://www.pcna.com/en-us" target="_blank" rel="noopener noreferrer" aria-label="Open PCNA.com">
+    <img src="{PCNA_HERO_URL}" class="pcna-hero-img" alt="PCNA hero banner">
+  </a>
+  <div class="pcna-section-title">What do you need?<span></span></div>
+  <div class="pcna-grid">
+    <a class="pcna-card" href="?page=spec"><div class="pcna-card-icon">✓</div><div class="pcna-card-title">Spec Sample<br>Order</div><div class="pcna-card-sub">Tell Nova what you need and build the verified PCNA order.</div><div class="card-art backpack" aria-hidden="true"><div></div></div><div class="pcna-arrow">→</div></a>
+    <a class="pcna-card" href="?page=virtual"><div class="pcna-card-icon">◇</div><div class="pcna-card-title">Virtuals /<br>Designs</div><div class="pcna-card-sub">Ask Nova for product, kit or packaging virtuals and keep them in Projects.</div><div class="card-art laptop" aria-hidden="true"><div class="screen">NORTHPOINT<br><small>SOLUTIONS</small></div></div><div class="pcna-arrow">→</div></a>
+    <a class="pcna-card" href="?page=quote"><div class="pcna-card-icon">$</div><div class="pcna-card-title">Quote<br>Request</div><div class="pcna-card-sub">Quote a verified PCNA product at the requested quantity.</div><div class="card-art quote-sheet" aria-hidden="true"><div class="qline"></div><div class="qline short"></div><div class="qbars"></div></div><div class="pcna-arrow">→</div></a>
+    <a class="pcna-card" href="?page=projects"><div class="pcna-card-icon">□</div><div class="pcna-card-title">Projects</div><div class="pcna-card-sub">View and manage your saved projects, orders and virtuals in one place.</div><div class="card-art notebook" aria-hidden="true"><div class="elastic"></div></div><div class="pcna-arrow">→</div></a>
+  </div>
+</div>
+<nav class="pcna-mobile-nav">
+  <a class="active" href="?page=home"><b>⌂</b><span>Home</span></a><a href="?page=projects"><b>▱</b><span>Projects</span></a><a href="?page=search"><b>◇</b><span>Products</span></a><a href="?page=virtual"><b>◯</b><span>Messages</span></a><a href="?page=create"><b>♙</b><span>Account</span></a>
+</nav>
+<style>
+:root{{--pcna-navy:#063f80;--pcna-blue:#075ca8;--cyan:#27afe2}}
+[data-testid="stAppViewContainer"]>.main{{overflow-y:auto!important}}
+.block-container:has(.pcna-home){{max-width:620px!important;padding:calc(4px + env(safe-area-inset-top)) 12px calc(78px + env(safe-area-inset-bottom))!important}}
+.block-container:has(.pcna-home)>[data-testid="stVerticalBlock"]{{gap:0!important}}
+.block-container:has(.pcna-home) [data-testid="stElementContainer"]{{margin:0!important}}
+.pcna-home{{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;color:#082f66}}
+.pcna-head{{height:54px;display:grid;grid-template-columns:44px 1fr 44px;align-items:center;margin:0 0 6px;overflow:visible}}
+.pcna-head-logo{{height:60px;max-width:235px;width:auto;object-fit:contain;justify-self:center}}
+.pcna-head-icon{{font-size:29px;line-height:1;text-align:center;color:#063f80;font-weight:700;position:relative;z-index:2}} .pcna-head-bell{{font-size:26px}}
+.pcna-hero{{position:relative;display:block;height:188px;border-radius:17px;overflow:hidden;text-decoration:none!important;background:#063f80;box-shadow:0 5px 18px rgba(8,65,120,.18)}}
+.pcna-hero-img{{display:block;width:100%;height:100%;object-fit:cover;object-position:center}}
+.pcna-section-title{{font-size:clamp(25px,6.4vw,35px);font-weight:900;line-height:1;color:#082f66;margin:12px 0 10px;letter-spacing:-.03em}}
+.pcna-section-title span{{display:block;width:62px;height:4px;border-radius:99px;background:var(--cyan);margin-top:7px}}
+.pcna-grid{{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(2,210px);gap:10px}}
+.pcna-card{{position:relative;overflow:hidden;border:1px solid #cfe0ef;border-radius:17px;background:white;box-shadow:0 4px 16px rgba(9,75,135,.15);text-decoration:none!important;color:#082f66;padding:13px 12px}}
+.pcna-card-icon{{width:40px;height:40px;border-radius:50%;background:#075ba7;color:white;display:flex;align-items:center;justify-content:center;font-size:25px;font-weight:800;position:relative;z-index:4}}
+.pcna-card-title{{font-size:clamp(20px,5.2vw,27px);font-weight:900;line-height:1;letter-spacing:-.03em;margin:9px 0 8px;position:relative;z-index:4;max-width:58%}}
+.pcna-card-sub{{font-size:clamp(10px,2.65vw,14px);line-height:1.25;color:#29496c;max-width:56%;position:relative;z-index:4}}
+.pcna-arrow{{position:absolute;right:10px;bottom:10px;width:40px;height:40px;border-radius:50%;background:#075aa7;color:white;display:flex;align-items:center;justify-content:center;font-size:27px;font-weight:800;z-index:5}}
+.card-art{{position:absolute;right:0;bottom:0;width:57%;height:83%;z-index:2}}
+.backpack{{right:-2%;bottom:-2%}} .backpack>div{{position:absolute;right:8%;bottom:0;width:72%;height:92%;border-radius:20px 20px 10px 10px;background:linear-gradient(145deg,#0d4b91,#062f66);box-shadow:inset -8px 0 14px rgba(0,0,0,.18)}}
+.backpack>div:before{{content:"";position:absolute;left:20%;right:20%;top:-8%;height:17%;border:5px solid #0b3b76;border-bottom:0;border-radius:18px 18px 0 0}} .backpack>div:after{{content:"";position:absolute;left:14%;right:14%;top:34%;height:37%;border:2px solid rgba(255,255,255,.15);border-radius:10px}}
+.laptop{{right:-1%;bottom:5%;height:70%}} .laptop:before{{content:"";position:absolute;right:5%;bottom:16%;width:88%;height:64%;border:7px solid #1f2831;border-radius:6px;background:#162130;box-sizing:border-box}} .laptop:after{{content:"";position:absolute;right:-2%;bottom:7%;width:100%;height:9%;background:#9ca5ad;transform:skewX(-10deg);border-radius:2px}}
+.laptop .screen{{position:absolute;right:15%;bottom:34%;width:66%;text-align:center;color:white;font-weight:800;font-size:9px;z-index:3}} .laptop small{{font-size:5px;letter-spacing:.12em}}
+.quote-sheet{{right:3%;bottom:5%;width:49%;height:78%;background:#f6f8fb;border:6px solid #30363d;border-radius:9px;transform:rotate(3deg);box-shadow:0 5px 12px rgba(0,0,0,.15)}} .quote-sheet:before{{content:"QUOTE SUMMARY";position:absolute;top:8%;left:10%;font-size:7px;font-weight:900;color:#26394f}}
+.qline{{position:absolute;left:10%;right:10%;top:28%;height:3px;background:#b9c9d8;box-shadow:0 14px 0 #b9c9d8,0 28px 0 #b9c9d8,0 42px 0 #b9c9d8}} .qline.short{{right:35%;top:35%}} .qbars{{position:absolute;left:13%;bottom:10%;width:55%;height:24%;background:linear-gradient(to right,transparent 0 8%,#5f86ad 8% 18%,transparent 18% 28%,#5f86ad 28% 43%,transparent 43% 54%,#5f86ad 54% 70%,transparent 70% 79%,#5f86ad 79% 94%)}}
+.notebook{{right:5%;bottom:3%;width:48%;height:80%;border-radius:8px;background:linear-gradient(145deg,#3a3d40,#181a1c);transform:rotate(7deg);box-shadow:0 5px 12px rgba(0,0,0,.2)}} .notebook:before{{content:"P";position:absolute;left:43%;top:40%;font-size:28px;color:#24272a;font-weight:900;text-shadow:0 1px 0 #555}} .notebook .elastic{{position:absolute;right:13%;top:0;bottom:0;width:7%;background:#08090a}}
+.pcna-mobile-nav{{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:min(620px,100%);height:calc(68px + env(safe-area-inset-bottom));padding:4px 8px env(safe-area-inset-bottom);box-sizing:border-box;border-radius:30px 30px 0 0;background:linear-gradient(90deg,#075ca8,#00326d);display:grid;grid-template-columns:repeat(5,1fr);z-index:99999}}
+.pcna-mobile-nav a{{display:flex;flex-direction:column;align-items:center;justify-content:center;color:rgba(255,255,255,.82)!important;text-decoration:none!important;font-size:12.5px;font-weight:700;gap:2px}} .pcna-mobile-nav b{{font-size:24px;line-height:1}} .pcna-mobile-nav .active{{color:white!important;font-weight:900}}
+@media(max-width:430px){{.block-container:has(.pcna-home){{padding-left:10px!important;padding-right:10px!important;padding-top:calc(2px + env(safe-area-inset-top))!important}} .pcna-head{{height:50px;margin-bottom:5px}} .pcna-head-logo{{height:60px}} .pcna-hero{{height:176px}} .pcna-grid{{grid-template-rows:repeat(2,198px);gap:9px}} .pcna-card{{padding:11px 10px}} .pcna-card-icon{{width:36px;height:36px;font-size:22px}}}}
+@media(max-height:760px){{.pcna-head{{height:44px}} .pcna-head-logo{{height:58px}} .pcna-hero{{height:154px}} .pcna-section-title{{font-size:24px;margin:8px 0 7px}} .pcna-grid{{grid-template-rows:repeat(2,170px);gap:7px}} .pcna-card-title{{font-size:18px;margin:6px 0 5px}} .pcna-card-sub{{font-size:9.5px}} .pcna-card-icon{{width:32px;height:32px;font-size:20px}}}}
+</style>
+''', unsafe_allow_html=True)
 
 
 def product_picker(prefix: str):
@@ -583,7 +279,6 @@ def product_configuration(prefix: str):
     size = st.text_input("Size (if applicable)", key=f"{prefix}_size", placeholder="Medium")
     dec = decorations_for_item(st.session_state.decorations, item)
     if dec.empty:
-        st.warning("No decoration data is available for this item in the active dataset.")
         method = st.text_input("Decoration Method", key=f"{prefix}_method")
         location = st.text_input("Decoration Location", key=f"{prefix}_location")
     else:
@@ -598,34 +293,30 @@ def product_configuration(prefix: str):
     return {**identity, "Color": color, "Size": size, "Decoration Method": method, "Decoration Location": location, "Imprint Color": imprint_color}
 
 
-def project_selector(prefix: str, suggested_name: str = "", suggested_customer: str = "") -> tuple[str, str]:
+def project_selector(prefix: str, suggested_name: str = "") -> tuple[str, str, int | None]:
     projects = list_projects()
-    options = ["Create New Project"] + [f"{p['project']} · {p['customer']}" for p in projects]
+    options = ["＋ New Project"] + [p["project"] for p in projects]
     selected = st.selectbox("Project", options, key=f"{prefix}_project_choice")
-    if selected == "Create New Project":
-        name = st.text_input("Project Name", value=suggested_name, key=f"{prefix}_project_name", placeholder="Ford Employee Kit")
-        customer = st.text_input("Customer / Account", value=suggested_customer, key=f"{prefix}_customer", placeholder="Ford")
-        return name, customer
-    p = projects[options.index(selected) - 1]
-    return p["project"], p["customer"]
+    if selected == "＋ New Project":
+        name = st.text_input("Project", value=suggested_name, key=f"{prefix}_project_name", placeholder="Ford Employee Kit")
+        return name.strip(), "Unassigned", None
+    project = projects[options.index(selected) - 1]
+    return project["project"], project.get("customer") or "Unassigned", int(project["id"])
 
 
-def ensure_project(name: str, customer: str) -> int:
+def ensure_project(name: str, customer: str, existing_id: int | None = None) -> int:
+    if existing_id:
+        return int(existing_id)
     return get_or_create_project(name or "Untitled Project", customer or "Unassigned")
 
 
 def copy_button(text: str, key: str):
     safe = json.dumps(text)
-    components.html(
-        f"""<button id="copy-{key}" style="width:100%;min-height:44px;border:1px solid #b8cad8;border-radius:12px;background:white;color:#084f86;font-weight:800;font-size:14px;">Copy</button>
-<script>document.getElementById('copy-{key}').onclick=async()=>{{await navigator.clipboard.writeText({safe});document.getElementById('copy-{key}').innerText='Copied';}};</script>""",
-        height=52,
-    )
+    components.html(f"""<button id="copy-{key}" style="width:100%;min-height:44px;border:1px solid #b8cad8;border-radius:12px;background:white;color:#084f86;font-weight:800;font-size:14px;">Copy</button><script>document.getElementById('copy-{key}').onclick=async()=>{{await navigator.clipboard.writeText({safe});document.getElementById('copy-{key}').innerText='Copied';}};</script>""", height=52)
 
 
 def quote_products(products: list[dict]) -> tuple[list[dict], float]:
-    lines: list[dict] = []
-    extended_total = 0.0
+    lines, total = [], 0.0
     for product in products:
         item = str(product.get("Item Number", ""))
         quantity = int(product.get("Quantity") or 0)
@@ -638,30 +329,17 @@ def quote_products(products: list[dict]) -> tuple[list[dict], float]:
             lines.append({**product, "Pricing Available": False})
             continue
         extended = float(tier["Unit Price"]) * quantity
-        extended_total += extended
+        total += extended
         lines.append({**product, **tier, "Extended": extended, "Pricing Available": True})
-    return lines, extended_total
+    return lines, total
 
 
-def quote_text(project_name: str, customer: str, quote_lines: list[dict], total: float) -> str:
-    out = ["PCNA QUOTE", "", f"Project: {project_name}", f"Customer: {customer}", ""]
+def quote_text(project_name: str, quote_lines: list[dict], total: float) -> str:
+    out = ["PCNA QUOTE", "", f"Project: {project_name}", ""]
     for i, line in enumerate(quote_lines, 1):
-        out.extend([
-            f"ITEM {i}",
-            f"Product: {line.get('Product Name','')}",
-            f"Item Number: {line.get('Item Number','')}",
-            f"Quantity: {line.get('Quantity','')}",
-            f"Color: {line.get('Color','')}",
-            f"Size: {line.get('Size','')}",
-            f"Decoration Method: {line.get('Decoration Method','')}",
-            f"Decoration Location: {line.get('Decoration Location','')}",
-        ])
+        out.extend([f"ITEM {i}", f"Product: {line.get('Product Name','')}", f"Item Number: {line.get('Item Number','')}", f"Quantity: {line.get('Quantity','')}", f"Color: {line.get('Color','')}", f"Size: {line.get('Size','')}", f"Decoration Method: {line.get('Decoration Method','')}", f"Decoration Location: {line.get('Decoration Location','')}"])
         if line.get("Pricing Available"):
-            out.extend([
-                f"Unit Price: ${float(line.get('Unit Price',0)):,.2f}",
-                f"Extended: ${float(line.get('Extended',0)):,.2f}",
-                f"Schedule: {line.get('Schedule','')}",
-            ])
+            out.extend([f"Unit Price: ${float(line.get('Unit Price',0)):,.2f}", f"Extended: ${float(line.get('Extended',0)):,.2f}", f"Schedule: {line.get('Schedule','')}"])
         else:
             out.append("Pricing: Could not be verified from active decorated pricing data")
         out.append("")
@@ -692,16 +370,9 @@ def render_products(products: list[dict]):
 def render_project(project: dict, expanded: bool = False):
     artifacts = list_artifacts(project["id"])
     files = list_project_files(project["id"])
-    with st.expander(f"{project['project']} · {project['customer']}", expanded=expanded):
-        st.caption(
-            f"Updated {project['updated_at'][:10]} · {project.get('virtual_count',0)} virtuals · "
-            f"{project.get('quote_count',0)} quotes · {project.get('spec_count',0)} spec samples"
-        )
-        grouped = {
-            "virtual": ("Virtuals / Designs", []),
-            "quote": ("Quotes", []),
-            "spec_sample": ("Spec Sample Orders", []),
-        }
+    with st.expander(project["project"], expanded=expanded):
+        st.caption(f"Updated {project['updated_at'][:10]} · {project.get('virtual_count',0)} virtuals · {project.get('quote_count',0)} quotes · {project.get('spec_count',0)} spec samples")
+        grouped = {"virtual": ("Virtuals / Designs", []), "quote": ("Quotes", []), "spec_sample": ("Spec Sample Orders", [])}
         for artifact in artifacts:
             if artifact["artifact_type"] in grouped:
                 grouped[artifact["artifact_type"]][1].append(artifact)
@@ -719,14 +390,9 @@ def render_project(project: dict, expanded: bool = False):
                     if kind == "virtual":
                         products = data.get("Verified Products", []) or data.get("products", [])
                         render_products(products)
-                        matching = [f for f in files if f.name.startswith(f"virtual_{artifact['id']}_")]
-                        for image in matching:
+                        for image in [f for f in files if f.name.startswith(f"virtual_{artifact['id']}_")]:
                             st.image(image.read_bytes(), use_container_width=True)
                             st.download_button("Download Virtual", image.read_bytes(), file_name=image.name, key=f"pimg_{project['id']}_{artifact['id']}_{image.name}", use_container_width=True)
-                        if st.button("Quote These Products", key=f"pquote_{artifact['id']}", use_container_width=True, disabled=not products):
-                            st.session_state.quote_handoff = {"products": products, "project_id": project["id"], "project": project["project"], "customer": project["customer"], "source_artifact_id": artifact["id"]}
-                            st.query_params["page"] = "quote"
-                            st.rerun()
                     elif artifact.get("ai_output"):
                         st.markdown(f'<div class="order-box">{artifact["ai_output"]}</div>', unsafe_allow_html=True)
                         copy_button(artifact["ai_output"], f"artifact-{artifact['id']}")
@@ -737,161 +403,58 @@ def render_project(project: dict, expanded: bool = False):
             st.rerun()
 
 
-def render_streamlit_mobile_home():
-    # Compact native Streamlit mobile home matching the approved screenshot structure.
-    import base64
+def inline_quote_from_spec(pending: dict, project_name: str, customer: str, project_id: int | None):
+    products = pending.get("products", []) or []
+    with st.expander("＋ Add Quote", expanded=False):
+        if not products:
+            st.warning("A quote can only be added after the products are verified.")
+            return
+        loaded = []
+        for i, product in enumerate(products):
+            qty = int(st.number_input(f"Quantity · {product.get('Product Name','Item')}", min_value=1, value=int(product.get("Quantity") or 100), step=1, key=f"spec_quote_qty_{i}"))
+            loaded.append({**product, "Quantity": qty})
+        if st.button("Generate Quote", key="spec_generate_quote", type="primary", use_container_width=True):
+            lines, total = quote_products(loaded)
+            text = quote_text(project_name or "Spec Project", lines, total)
+            st.session_state.spec_inline_quote = {"lines": lines, "text": text, "total": total}
+        inline = st.session_state.get("spec_inline_quote")
+        if inline:
+            st.markdown(f'<div class="order-box">{inline["text"]}</div>', unsafe_allow_html=True)
+            if st.button("＋ Add Quote to Project", key="spec_save_quote", use_container_width=True, disabled=not project_name.strip()):
+                pid = ensure_project(project_name, customer, project_id)
+                save_artifact(pid, "quote", "Quote", original_prompt=pending.get("request", "Spec Sample Order"), ai_output=inline["text"], structured_data={"products": inline.get("lines", []), "source": "spec_sample"})
+                st.success("Quote added to Project.")
 
-    def asset(path_name: str) -> str:
-        path = Path(path_name)
-        if not path.exists():
-            return ""
-        suffix = path.suffix.lower()
-        mime = "image/webp" if suffix == ".webp" else "image/png" if suffix == ".png" else "image/jpeg"
-        return f"data:{mime};base64," + base64.b64encode(path.read_bytes()).decode("ascii")
 
-    logo = asset("assets/pcna-logo.webp") or asset("IMG_2337.webp")
-
-    st.markdown(
-        f'''
-<div class="pcna-home">
-  <div class="pcna-head">
-    <span class="pcna-head-icon">☰</span>
-    <img src="{logo}" class="pcna-head-logo" alt="PCNA">
-    <span class="pcna-head-icon pcna-head-bell">◇</span>
-  </div>
-
-  <a class="pcna-hero" href="https://www.pcna.com/en-us" target="_blank" rel="noopener noreferrer">
-    <div class="pcna-hero-copy">
-      <div class="pcna-hero-title">Branded.<br>Merchandise.<br>Delivered.</div>
-      <div class="pcna-hero-sub">Explore thousands of promotional products to elevate your brand.</div>
-      <span class="pcna-shop">SHOP NOW</span>
-    </div>
-    <div class="hero-products" aria-hidden="true">
-      <div class="hero-bag"></div><div class="hero-tumbler"></div><div class="hero-shirt">PCNA</div><div class="hero-cap">PCNA</div>
-    </div>
-  </a>
-
-  <div class="pcna-section-title">What do you need?<span></span></div>
-
-  <div class="pcna-grid">
-    <a class="pcna-card" href="?page=spec">
-      <div class="pcna-card-icon">✓</div>
-      <div class="pcna-card-title">Spec Sample<br>Order</div>
-      <div class="pcna-card-sub">Tell Nova what you need and build the verified PCNA order.</div>
-      <div class="card-art backpack" aria-hidden="true"><div></div></div>
-      <div class="pcna-arrow">→</div>
-    </a>
-    <a class="pcna-card" href="?page=virtual">
-      <div class="pcna-card-icon">◇</div>
-      <div class="pcna-card-title">Virtuals /<br>Designs</div>
-      <div class="pcna-card-sub">Ask Nova for product, kit or packaging virtuals and keep them in Projects.</div>
-      <div class="card-art laptop" aria-hidden="true"><div class="screen">NORTHPOINT<br><small>SOLUTIONS</small></div></div>
-      <div class="pcna-arrow">→</div>
-    </a>
-    <a class="pcna-card" href="?page=quote">
-      <div class="pcna-card-icon">$</div>
-      <div class="pcna-card-title">Quote<br>Request</div>
-      <div class="pcna-card-sub">Quote a verified PCNA product at the requested quantity.</div>
-      <div class="card-art quote-sheet" aria-hidden="true"><div class="qline"></div><div class="qline short"></div><div class="qbars"></div></div>
-      <div class="pcna-arrow">→</div>
-    </a>
-    <a class="pcna-card" href="?page=projects">
-      <div class="pcna-card-icon">□</div>
-      <div class="pcna-card-title">Projects</div>
-      <div class="pcna-card-sub">View and manage your saved projects, orders and virtuals in one place.</div>
-      <div class="card-art notebook" aria-hidden="true"><div class="elastic"></div></div>
-      <div class="pcna-arrow">→</div>
-    </a>
-  </div>
-</div>
-
-<nav class="pcna-mobile-nav">
-  <a class="active" href="?page=home"><b>⌂</b><span>Home</span></a>
-  <a href="?page=projects"><b>▱</b><span>Projects</span></a>
-  <a href="?page=search"><b>◇</b><span>Products</span></a>
-  <a href="?page=virtual"><b>◯</b><span>Messages</span></a>
-  <a href="?page=create"><b>♙</b><span>Account</span></a>
-</nav>
-
-<style>
-:root{{--pcna-navy:#063f80;--pcna-blue:#075ca8;--cyan:#27afe2}}
-[data-testid="stAppViewContainer"]>.main{{overflow-y:auto!important}}
-.block-container:has(.pcna-home){{max-width:620px!important;padding:calc(4px + env(safe-area-inset-top)) 12px calc(78px + env(safe-area-inset-bottom))!important}}
-.block-container:has(.pcna-home)>[data-testid="stVerticalBlock"]{{gap:0!important}}
-.block-container:has(.pcna-home) [data-testid="stElementContainer"]{{margin:0!important}}
-.pcna-home{{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;color:#082f66}}
-.pcna-head{{height:54px;display:grid;grid-template-columns:44px 1fr 44px;align-items:center;margin:0 0 6px}}
-.pcna-head-logo{{height:38px;max-width:150px;object-fit:contain;justify-self:center}}
-.pcna-head-icon{{font-size:29px;line-height:1;text-align:center;color:#063f80;font-weight:700}}
-.pcna-head-bell{{font-size:26px}}
-.pcna-hero{{position:relative;display:block;height:188px;border-radius:17px;overflow:hidden;text-decoration:none!important;background:linear-gradient(135deg,#032f67 0%,#07589e 58%,#0b6db2 100%);box-shadow:0 5px 18px rgba(8,65,120,.18)}}
-.pcna-hero:before{{content:"";position:absolute;inset:0;background:linear-gradient(115deg,rgba(0,28,72,.92) 0 45%,rgba(0,35,82,.12) 72%)}}
-.pcna-hero-copy{{position:absolute;z-index:3;left:18px;top:18px;width:48%;color:white}}
-.pcna-hero-title{{font-size:clamp(28px,7.2vw,40px);font-weight:900;line-height:.98;letter-spacing:-.035em}}
-.pcna-hero-sub{{font-size:clamp(11px,2.85vw,15px);line-height:1.25;margin:10px 0 12px}}
-.pcna-shop{{display:inline-block;border:2px solid white;border-radius:7px;padding:8px 16px;font-size:12px;font-weight:900;color:white}}
-.hero-products{{position:absolute;right:9px;bottom:5px;width:53%;height:90%;z-index:2}}
-.hero-bag{{position:absolute;left:2%;bottom:2%;width:42%;height:80%;border-radius:16px 16px 12px 12px;background:linear-gradient(145deg,#747d86,#414a54);box-shadow:inset -8px 0 16px rgba(0,0,0,.18)}}
-.hero-bag:before{{content:"";position:absolute;left:22%;right:22%;top:-12%;height:18%;border:6px solid #525b64;border-bottom:0;border-radius:20px 20px 0 0}}
-.hero-bag:after{{content:"";position:absolute;left:13%;right:13%;top:33%;height:35%;border-radius:10px;border:2px solid rgba(255,255,255,.12)}}
-.hero-tumbler{{position:absolute;left:43%;bottom:0;width:22%;height:62%;border-radius:10px 10px 18px 18px;background:linear-gradient(90deg,#123e70,#0b5597 60%,#073868);box-shadow:inset -6px 0 10px rgba(0,0,0,.18)}}
-.hero-tumbler:after{{content:"PCNA";position:absolute;color:white;font-weight:900;font-size:10px;top:43%;left:13%}}
-.hero-shirt{{position:absolute;right:1%;top:4%;width:40%;height:48%;clip-path:polygon(20% 0,38% 10%,62% 10%,80% 0,100% 19%,83% 38%,83% 100%,17% 100%,17% 38%,0 19%);background:#102f58;color:white;font-size:10px;font-weight:900;text-align:center;padding-top:29%}}
-.hero-cap{{position:absolute;right:5%;bottom:0;width:34%;height:29%;border-radius:50% 50% 38% 38%;background:#a9afb4;color:#063f80;font-size:9px;font-weight:900;text-align:center;padding-top:11%}}
-.pcna-section-title{{font-size:clamp(25px,6.4vw,35px);font-weight:900;line-height:1;color:#082f66;margin:12px 0 10px;letter-spacing:-.03em}}
-.pcna-section-title span{{display:block;width:62px;height:4px;border-radius:99px;background:var(--cyan);margin-top:7px}}
-.pcna-grid{{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(2,210px);gap:10px}}
-.pcna-card{{position:relative;overflow:hidden;border:1px solid #cfe0ef;border-radius:17px;background:white;box-shadow:0 4px 16px rgba(9,75,135,.15);text-decoration:none!important;color:#082f66;padding:13px 12px}}
-.pcna-card-icon{{width:40px;height:40px;border-radius:50%;background:#075ba7;color:white;display:flex;align-items:center;justify-content:center;font-size:25px;font-weight:800;position:relative;z-index:4}}
-.pcna-card-title{{font-size:clamp(20px,5.2vw,27px);font-weight:900;line-height:1;letter-spacing:-.03em;margin:9px 0 8px;position:relative;z-index:4;max-width:58%}}
-.pcna-card-sub{{font-size:clamp(10px,2.65vw,14px);line-height:1.25;color:#29496c;max-width:56%;position:relative;z-index:4}}
-.pcna-arrow{{position:absolute;right:10px;bottom:10px;width:40px;height:40px;border-radius:50%;background:#075aa7;color:white;display:flex;align-items:center;justify-content:center;font-size:27px;font-weight:800;z-index:5}}
-.card-art{{position:absolute;right:0;bottom:0;width:57%;height:83%;z-index:2}}
-.backpack{{right:-2%;bottom:-2%}}
-.backpack>div{{position:absolute;right:8%;bottom:0;width:72%;height:92%;border-radius:20px 20px 10px 10px;background:linear-gradient(145deg,#0d4b91,#062f66);box-shadow:inset -8px 0 14px rgba(0,0,0,.18)}}
-.backpack>div:before{{content:"";position:absolute;left:20%;right:20%;top:-8%;height:17%;border:5px solid #0b3b76;border-bottom:0;border-radius:18px 18px 0 0}}
-.backpack>div:after{{content:"";position:absolute;left:14%;right:14%;top:34%;height:37%;border:2px solid rgba(255,255,255,.15);border-radius:10px}}
-.laptop{{right:-1%;bottom:5%;height:70%}}
-.laptop:before{{content:"";position:absolute;right:5%;bottom:16%;width:88%;height:64%;border:7px solid #1f2831;border-radius:6px;background:#162130;box-sizing:border-box}}
-.laptop:after{{content:"";position:absolute;right:-2%;bottom:7%;width:100%;height:9%;background:#9ca5ad;transform:skewX(-10deg);border-radius:2px}}
-.laptop .screen{{position:absolute;right:15%;bottom:34%;width:66%;text-align:center;color:white;font-weight:800;font-size:9px;z-index:3}}
-.laptop small{{font-size:5px;letter-spacing:.12em}}
-.quote-sheet{{right:3%;bottom:5%;width:49%;height:78%;background:#f6f8fb;border:6px solid #30363d;border-radius:9px;transform:rotate(3deg);box-shadow:0 5px 12px rgba(0,0,0,.15)}}
-.quote-sheet:before{{content:"QUOTE SUMMARY";position:absolute;top:8%;left:10%;font-size:7px;font-weight:900;color:#26394f}}
-.qline{{position:absolute;left:10%;right:10%;top:28%;height:3px;background:#b9c9d8;box-shadow:0 14px 0 #b9c9d8,0 28px 0 #b9c9d8,0 42px 0 #b9c9d8}}
-.qline.short{{right:35%;top:35%}}
-.qbars{{position:absolute;left:13%;bottom:10%;width:55%;height:24%;background:linear-gradient(to right,transparent 0 8%,#5f86ad 8% 18%,transparent 18% 28%,#5f86ad 28% 43%,transparent 43% 54%,#5f86ad 54% 70%,transparent 70% 79%,#5f86ad 79% 94%)}}
-.notebook{{right:5%;bottom:3%;width:48%;height:80%;border-radius:8px;background:linear-gradient(145deg,#3a3d40,#181a1c);transform:rotate(7deg);box-shadow:0 5px 12px rgba(0,0,0,.2)}}
-.notebook:before{{content:"P";position:absolute;left:43%;top:40%;font-size:28px;color:#24272a;font-weight:900;text-shadow:0 1px 0 #555}}
-.notebook .elastic{{position:absolute;right:13%;top:0;bottom:0;width:7%;background:#08090a}}
-.pcna-mobile-nav{{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:min(620px,100%);height:calc(68px + env(safe-area-inset-bottom));padding:4px 8px env(safe-area-inset-bottom);box-sizing:border-box;border-radius:30px 30px 0 0;background:linear-gradient(90deg,#075ca8,#00326d);display:grid;grid-template-columns:repeat(5,1fr);z-index:99999}}
-.pcna-mobile-nav a{{display:flex;flex-direction:column;align-items:center;justify-content:center;color:rgba(255,255,255,.82)!important;text-decoration:none!important;font-size:10px;gap:2px}}
-.pcna-mobile-nav b{{font-size:24px;line-height:1}}
-.pcna-mobile-nav .active{{color:white!important;font-weight:800}}
-@media(max-width:430px){{
-  .block-container:has(.pcna-home){{padding-left:10px!important;padding-right:10px!important;padding-top:calc(2px + env(safe-area-inset-top))!important}}
-  .pcna-head{{height:50px;margin-bottom:5px}} .pcna-head-logo{{height:34px}}
-  .pcna-hero{{height:176px}}
-  .pcna-grid{{grid-template-rows:repeat(2,198px);gap:9px}}
-  .pcna-card{{padding:11px 10px}}
-  .pcna-card-icon{{width:36px;height:36px;font-size:22px}}
-}}
-@media(max-height:760px){{
-  .pcna-head{{height:44px}} .pcna-head-logo{{height:31px}} .pcna-hero{{height:154px}}
-  .pcna-section-title{{font-size:24px;margin:8px 0 7px}}
-  .pcna-grid{{grid-template-rows:repeat(2,170px);gap:7px}}
-  .pcna-card-title{{font-size:18px;margin:6px 0 5px}} .pcna-card-sub{{font-size:9.5px}}
-  .pcna-card-icon{{width:32px;height:32px;font-size:20px}}
-}}
-</style>
-''',
-        unsafe_allow_html=True,
-    )
+def inline_virtual_from_spec(pending: dict, project_name: str, customer: str, project_id: int | None):
+    products = pending.get("products", []) or []
+    with st.expander("＋ Add Virtuals", expanded=False):
+        if not products:
+            st.warning("Virtuals can only be added after the products are verified.")
+            return
+        direction = st.text_area("Virtual direction", key="spec_virtual_direction", placeholder="Show the Dade Polo with the customer logo on left chest...", height=100)
+        artwork = st.file_uploader("Artwork / reference files", key="spec_virtual_art", accept_multiple_files=True, type=["png", "jpg", "jpeg", "webp", "pdf", "svg", "eps", "ai"])
+        count = int(st.number_input("Number of virtuals", min_value=1, max_value=5, value=1, step=1, key="spec_virtual_count"))
+        if st.button("Generate Virtuals", key="spec_generate_virtuals", type="primary", use_container_width=True, disabled=not direction.strip() or not api_key() or not project_name.strip()):
+            pid = ensure_project(project_name, customer, project_id)
+            payload = {"Request": direction, "Artwork": [f.name for f in artwork], "Requested Concepts": count, "Verified Products": products, "Generation": "PCNA-trained Nova", "Source": "spec_sample"}
+            artifact_id = save_artifact(pid, "virtual", "Virtual / Design", original_prompt=direction, structured_data=payload)
+            for upload in artwork:
+                save_upload(pid, f"source_{artifact_id}_{upload.name}", upload.getvalue())
+            context = {"selected_products": products, "verified_products": products, "perfectly_packaged": False, "requested_concepts": count}
+            prompt = creative_generation_prompt(direction, context)
+            progress = st.progress(0, text=f"Nova is creating 0 of {count}...")
+            for i in range(count):
+                progress.progress(i / count, text=f"Nova is creating {i+1} of {count}...")
+                image = generate_concepts(api_key=api_key(), prompt=prompt, uploads=artwork, count=1)[0]
+                save_upload(pid, f"virtual_{artifact_id}_{i+1:02d}.png", image)
+            progress.progress(1.0, text=f"Nova completed {count} of {count}.")
+            st.success(f"{count} virtual{'s' if count != 1 else ''} added to {project_name}.")
 
 
 page = current_page()
 if page != "home":
-    approved_pcna_header(105)
+    approved_pcna_header()
 
 if page == "home":
     render_streamlit_mobile_home()
@@ -899,35 +462,21 @@ if page == "home":
 
 elif page == "create":
     page_header("Create", "Choose a workflow", "Three AI creation workflows, with Projects as the shared workspace.")
-    st.markdown(
-        f"""
-<div class="action-grid">
-<a class="action-card" href="{nav_link('spec')}"><div class="action-title">Spec Sample Order</div><div class="action-copy">Plain-English request → verified order.</div></a>
-<a class="action-card" href="{nav_link('virtual')}"><div class="action-title">Virtuals / Design</div><div class="action-copy">Product, kit and packaging creative projects.</div></a>
-<a class="action-card" href="{nav_link('quote')}"><div class="action-title">Quote Request</div><div class="action-copy">Plain-English request → decorated PCNA quote.</div></a>
-<a class="action-card" href="{projects_link()}"><div class="action-title">Projects</div><div class="action-copy">All saved virtuals, quotes and spec samples together.</div></a>
-</div>
-""",
-        unsafe_allow_html=True,
-    )
+    st.markdown(f"""<div class="action-grid"><a class="action-card" href="{nav_link('spec')}"><div class="action-title">Spec Sample Order</div><div class="action-copy">Plain-English request → verified order.</div></a><a class="action-card" href="{nav_link('virtual')}"><div class="action-title">Virtuals / Design</div><div class="action-copy">Product, kit and packaging creative projects.</div></a><a class="action-card" href="{nav_link('quote')}"><div class="action-title">Quote Request</div><div class="action-copy">Plain-English request → decorated PCNA quote.</div></a><a class="action-card" href="{projects_link()}"><div class="action-title">Projects</div><div class="action-copy">All saved virtuals, quotes and spec samples together.</div></a></div>""", unsafe_allow_html=True)
 
 elif page == "search":
     page_header("Verified Catalog", "Find a product", "Search the active PCNA catalog.")
     identity = product_picker("search")
     if identity:
         item = identity["Item Number"]
-        st.markdown(f'<div class="section-title">{identity["Product Name"]}</div>', unsafe_allow_html=True)
-        st.markdown(f'<span class="data-chip">Item {item}</span><span class="data-chip">{identity.get("Brand","") or "PCNA"}</span>', unsafe_allow_html=True)
+        st.markdown(f'<div class="section-title">{identity["Product Name"]}</div><span class="data-chip">Item {item}</span><span class="data-chip">{identity.get("Brand","") or "PCNA"}</span>', unsafe_allow_html=True)
         with st.expander("Colors", expanded=True):
             st.write(" · ".join(colors_for_item(st.session_state.products, item)) or "No color data available.")
         with st.expander("Decoration options", expanded=True):
             d = decorations_for_item(st.session_state.decorations, item)
-            if d.empty:
-                st.info("No decoration data in the active dataset.")
-            else:
-                for _, row in d.head(40).iterrows():
-                    st.markdown(f"**{row['Decoration Method']}**  \n{row['Decoration Location']} · max {imprint_size(row)}")
-                    st.divider()
+            for _, row in d.head(40).iterrows():
+                st.markdown(f"**{row['Decoration Method']}**  \n{row['Decoration Location']} · max {imprint_size(row)}")
+                st.divider()
 
 elif page == "spec":
     page_header("Orders", "Spec Sample Order", "Tell Nova the request in plain English. Verified product and decoration data are resolved before the order is built.")
@@ -938,6 +487,7 @@ elif page == "spec":
         try:
             result = resolve_spec_request(api_key(), natural, st.session_state.products, st.session_state.decorations)
             st.session_state.pending_spec = {"request": natural, **result}
+            st.session_state.pop("spec_inline_quote", None)
         except Exception:
             st.error("Nova could not complete the request. Please retry.")
     pending = st.session_state.get("pending_spec")
@@ -947,13 +497,16 @@ elif page == "spec":
         if pending.get("order"):
             st.markdown(f'<div class="order-box">{pending["order"]}</div>', unsafe_allow_html=True)
             copy_button(pending["order"], "spec")
-            project_name, customer = project_selector("specsave")
-            if st.button("Save to Projects", type="primary", use_container_width=True, disabled=not project_name.strip()):
-                pid = ensure_project(project_name, customer)
+            project_name, customer, project_id = project_selector("specsave")
+            if st.button("＋ Add to Project", type="primary", use_container_width=True, disabled=not project_name.strip()):
+                pid = ensure_project(project_name, customer, project_id)
                 save_artifact(pid, "spec_sample", "Spec Sample Order", original_prompt=pending["request"], ai_output=pending["order"], structured_data={"products": pending.get("products", []), "intent": pending.get("intent", {})})
-                st.success("Spec sample saved to Projects.")
+                st.success("Spec sample added to Project.")
+            inline_quote_from_spec(pending, project_name, customer, project_id)
+            inline_virtual_from_spec(pending, project_name, customer, project_id)
             if st.button("Create New Request", use_container_width=True):
                 st.session_state.pop("pending_spec", None)
+                st.session_state.pop("spec_inline_quote", None)
                 st.rerun()
     with st.expander("Manual build"):
         po = st.text_input("PO#")
@@ -975,81 +528,47 @@ elif page == "spec":
 
 elif page == "quote":
     page_header("Pricing", "Quote Request", "Tell Nova what to quote. Product facts are verified first, then decorated pricing is calculated from active PCNA pricing data.")
-    handoff = st.session_state.get("quote_handoff")
-    if handoff:
-        st.info(f"Products loaded from {handoff.get('project','Project')}.")
-        loaded = []
-        for i, product in enumerate(handoff.get("products", [])):
-            qty = int(st.number_input(f"Quantity · {product.get('Product Name','Item')}", min_value=1, value=int(product.get("Quantity") or 100), step=1, key=f"handoff_qty_{i}"))
-            loaded.append({**product, "Quantity": qty})
-        if st.button("Calculate Quote", type="primary", use_container_width=True, disabled=not loaded):
-            lines, total = quote_products(loaded)
-            text = quote_text(handoff.get("project", "Project"), handoff.get("customer", "Unassigned"), lines, total)
-            st.session_state.pending_quote = {"request": "Quote These Products from Virtual", "products": loaded, "lines": lines, "text": text, "project_id": handoff.get("project_id"), "project": handoff.get("project"), "customer": handoff.get("customer")}
-    else:
-        natural = st.text_area("Tell Nova what to quote", placeholder="Quote 100 Dade Polos in black with embroidery left chest and 100 Stanley 30 oz Quenchers in Polar with laser left of handle.", height=150)
-        if not api_key():
-            st.info("Add OPENAI_API_KEY in Streamlit Secrets to enable Nova requests.")
-        if st.button("Generate Quote", type="primary", use_container_width=True, disabled=not natural.strip() or not api_key()):
-            try:
-                result = resolve_quote_request(api_key(), natural, st.session_state.products, st.session_state.decorations)
-                if result.get("unresolved"):
-                    st.warning("Could not confidently verify: " + ", ".join(result["unresolved"]))
-                lines, total = quote_products(result.get("products", []))
-                intent = result.get("intent", {})
-                project_name = str(intent.get("project_name", "")).strip() or "Quote Project"
-                customer = str(intent.get("customer", "")).strip() or "Unassigned"
-                text = quote_text(project_name, customer, lines, total)
-                st.session_state.pending_quote = {"request": natural, "products": result.get("products", []), "lines": lines, "text": text, "project": project_name, "customer": customer}
-            except Exception:
-                st.error("Nova could not complete the quote request. Please retry.")
+    natural = st.text_area("Tell Nova what to quote", placeholder="Quote 100 Dade Polos in black with embroidery left chest.", height=150)
+    if st.button("Generate Quote", type="primary", use_container_width=True, disabled=not natural.strip() or not api_key()):
+        try:
+            result = resolve_quote_request(api_key(), natural, st.session_state.products, st.session_state.decorations)
+            lines, total = quote_products(result.get("products", []))
+            project_name = str(result.get("intent", {}).get("project_name", "")).strip() or "Quote Project"
+            st.session_state.pending_quote = {"request": natural, "products": result.get("products", []), "lines": lines, "text": quote_text(project_name, lines, total), "project": project_name, "unresolved": result.get("unresolved", [])}
+        except Exception:
+            st.error("Nova could not complete the quote request. Please retry.")
     pending = st.session_state.get("pending_quote")
     if pending:
+        if pending.get("unresolved"):
+            st.warning("Could not confidently verify: " + ", ".join(pending["unresolved"]))
         st.markdown(f'<div class="order-box">{pending["text"]}</div>', unsafe_allow_html=True)
         copy_button(pending["text"], "quote")
-        if pending.get("project_id"):
-            pid = int(pending["project_id"])
-            st.caption(f"Will save to: {pending.get('project')} · {pending.get('customer')}")
-        else:
-            project_name, customer = project_selector("quotesave", pending.get("project", ""), pending.get("customer", ""))
-            pid = ensure_project(project_name, customer) if project_name.strip() else 0
-        if st.button("Save to Projects", type="primary", use_container_width=True, disabled=not pid):
-            save_artifact(pid, "quote", "Quote", original_prompt=pending["request"], ai_output=pending["text"], structured_data={"products": pending.get("lines", []), "source_artifact_id": handoff.get("source_artifact_id") if handoff else None})
-            st.success("Quote saved to Projects.")
+        project_name, customer, project_id = project_selector("quotesave", pending.get("project", ""))
+        if st.button("＋ Add to Project", type="primary", use_container_width=True, disabled=not project_name.strip()):
+            pid = ensure_project(project_name, customer, project_id)
+            save_artifact(pid, "quote", "Quote", original_prompt=pending["request"], ai_output=pending["text"], structured_data={"products": pending.get("lines", [])})
+            st.success("Quote added to Project.")
         if st.button("Create New Quote", use_container_width=True):
             st.session_state.pop("pending_quote", None)
-            st.session_state.pop("quote_handoff", None)
             st.rerun()
 
 elif page == "virtual":
     page_header("Creative", "Virtuals / Design", "Tell Nova what you want created. Verified products, artwork and design instructions stay attached to the Project.")
-    project_name, customer = project_selector("virtual")
-    request = st.text_area("What would you like Nova to create?", placeholder="Create a Ford employee gift concept using a Dade Polo, Stanley Quencher and Pedova Journal in a Perfectly Packaged box.", height=170)
+    project_name, customer, project_id = project_selector("virtual")
+    request = st.text_area("What would you like Nova to create?", placeholder="Create a Ford employee gift concept using a Dade Polo, Stanley Quencher and Pedova Journal.", height=170)
     artwork = st.file_uploader("Artwork / reference files", accept_multiple_files=True, type=["png", "jpg", "jpeg", "webp", "pdf", "svg", "eps", "ai"])
-    if not api_key():
-        st.info("Add OPENAI_API_KEY in Streamlit Secrets to enable Nova generation.")
     if st.button("Generate Virtual", type="primary", use_container_width=True, disabled=not request.strip() or not api_key() or not project_name.strip()):
         try:
             context = build_creative_pcna_context(api_key(), request, st.session_state.products, st.session_state.decorations)
-            selected_products = context.get("selected_products", [])
+            products = context.get("selected_products", [])
             if context.get("unresolved"):
                 st.warning("Could not confidently verify: " + ", ".join(context["unresolved"]))
-            if not selected_products:
+            if not products:
                 st.error("Nova could not confidently resolve verified PCNA products for this request.")
             else:
-                intent = context.get("intent", {})
-                resolved_customer = customer.strip() or str(intent.get("customer", "")).strip() or "Unassigned"
-                resolved_project = project_name.strip() or str(intent.get("project_name", "")).strip() or "Virtual Project"
-                pid = ensure_project(resolved_project, resolved_customer)
+                pid = ensure_project(project_name, customer, project_id)
                 count = context.get("requested_concepts", 5)
-                payload = {
-                    "Request": request,
-                    "Artwork": [f.name for f in artwork],
-                    "Requested Concepts": count,
-                    "Verified Products": selected_products,
-                    "Perfectly Packaged": context.get("perfectly_packaged", False),
-                    "Generation": "PCNA-trained Nova",
-                }
+                payload = {"Request": request, "Artwork": [f.name for f in artwork], "Requested Concepts": count, "Verified Products": products, "Perfectly Packaged": context.get("perfectly_packaged", False), "Generation": "PCNA-trained Nova"}
                 artifact_id = save_artifact(pid, "virtual", "Virtual / Design", original_prompt=request, structured_data=payload)
                 for upload in artwork:
                     save_upload(pid, f"source_{artifact_id}_{upload.name}", upload.getvalue())
@@ -1057,47 +576,35 @@ elif page == "virtual":
                 progress = st.progress(0, text=f"Nova is creating 0 of {count}...")
                 for i in range(count):
                     progress.progress(i / count, text=f"Nova is creating {i+1} of {count}...")
-                    new_image = generate_concepts(api_key=api_key(), prompt=prompt, uploads=artwork, count=1)[0]
-                    save_upload(pid, f"virtual_{artifact_id}_{i+1:02d}.png", new_image)
+                    image = generate_concepts(api_key=api_key(), prompt=prompt, uploads=artwork, count=1)[0]
+                    save_upload(pid, f"virtual_{artifact_id}_{i+1:02d}.png", image)
                 progress.progress(1.0, text=f"Nova completed {count} of {count}.")
-                st.session_state.last_virtual = {"project_id": pid, "artifact_id": artifact_id, "project": resolved_project, "customer": resolved_customer, "products": selected_products}
-                st.success(f"{count} virtuals generated and saved to {resolved_project}.")
+                st.session_state.last_virtual = {"project_id": pid, "artifact_id": artifact_id, "project": project_name, "products": products}
+                st.success(f"{count} virtuals generated and saved to {project_name}.")
         except Exception:
             st.error("Nova could not complete the virtual request. Please retry.")
     last = st.session_state.get("last_virtual")
     if last:
-        project = get_project(last["project_id"])
-        if project:
-            st.markdown('<div class="section-title">Completed Virtual</div>', unsafe_allow_html=True)
-            render_products(last.get("products", []))
-            for f in list_project_files(last["project_id"]):
-                if f.name.startswith(f"virtual_{last['artifact_id']}_"):
-                    st.image(f.read_bytes(), use_container_width=True)
-            if st.button("Quote These Products", type="primary", use_container_width=True, disabled=not last.get("products")):
-                st.session_state.quote_handoff = {"products": last["products"], "project_id": last["project_id"], "project": last["project"], "customer": last["customer"], "source_artifact_id": last["artifact_id"]}
-                st.query_params["page"] = "quote"
-                st.rerun()
-            if st.button("Create New Virtual", use_container_width=True):
-                st.session_state.pop("last_virtual", None)
-                st.rerun()
+        render_products(last.get("products", []))
+        for f in list_project_files(last["project_id"]):
+            if f.name.startswith(f"virtual_{last['artifact_id']}_"):
+                st.image(f.read_bytes(), use_container_width=True)
 
 elif page == "projects":
-    page_header("Workspace", "Projects", "Virtuals, quotes and spec sample orders stay together by customer and project.")
+    page_header("Workspace", "Projects", "Virtuals, quotes and spec sample orders stay together by project.")
     projects = list_projects()
-    search = st.text_input("Search Projects", placeholder="Project or customer")
+    search = st.text_input("Search Projects", placeholder="Project")
     sort = st.selectbox("Sort", ["Recently Modified", "Project Name"])
     if search:
         q = search.lower().strip()
-        projects = [p for p in projects if q in f"{p['project']} {p['customer']}".lower()]
+        projects = [p for p in projects if q in p["project"].lower()]
     if sort == "Project Name":
         projects = sorted(projects, key=lambda p: p["project"].lower())
-    with st.expander("Create New Project"):
-        name = st.text_input("New Project Name", key="new_project_name")
-        customer = st.text_input("Customer / Account", key="new_project_customer")
+    with st.expander("＋ Create New Project"):
+        name = st.text_input("Project", key="new_project_name", placeholder="Ford Employee Kit")
         notes = st.text_area("Notes", key="new_project_notes")
         if st.button("Create Project", type="primary", use_container_width=True, disabled=not name.strip()):
-            pid = create_project(name, customer, notes)
-            st.success("Project created.")
+            pid = create_project(name, "Unassigned", notes)
             st.session_state.open_project = pid
             st.rerun()
     if not projects:
@@ -1124,21 +631,15 @@ elif page == "assistant":
             try:
                 low = prompt.lower()
                 if "spec" in low and "sample" in low:
-                    result = resolve_spec_request(key, prompt, st.session_state.products, st.session_state.decorations)
-                    reply = result["order"] or "I could not confidently resolve the requested PCNA products/decorations."
+                    reply = resolve_spec_request(key, prompt, st.session_state.products, st.session_state.decorations)["order"]
                 elif "quote" in low:
                     result = resolve_quote_request(key, prompt, st.session_state.products, st.session_state.decorations)
                     lines, total = quote_products(result.get("products", []))
-                    reply = quote_text("Quote Project", "Unassigned", lines, total)
+                    reply = quote_text("Quote Project", lines, total)
                 else:
                     context = build_creative_pcna_context(key, prompt, st.session_state.products, st.session_state.decorations)
                     from openai import OpenAI
-                    client = OpenAI(api_key=key)
-                    response = client.responses.create(
-                        model="gpt-5",
-                        instructions=PCNA_WORKFLOW_RULES + "\nAnswer concisely. For PCNA facts, use only VERIFIED PCNA CONTEXT supplied in the request.",
-                        input=f"USER REQUEST:\n{prompt}\n\nVERIFIED PCNA CONTEXT:\n{json.dumps(context, ensure_ascii=False)}",
-                    )
+                    response = OpenAI(api_key=key).responses.create(model="gpt-5", instructions=PCNA_WORKFLOW_RULES + "\nAnswer concisely. Use only VERIFIED PCNA CONTEXT for PCNA facts.", input=f"USER REQUEST:\n{prompt}\n\nVERIFIED PCNA CONTEXT:\n{json.dumps(context, ensure_ascii=False)}")
                     reply = response.output_text
             except Exception:
                 reply = "PCNA Nova could not complete the request. Please retry."
