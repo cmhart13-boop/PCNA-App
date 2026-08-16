@@ -57,8 +57,8 @@ PANEL = "#f7fafc"
 NAV_BLUE = "#003b5c"
 PCNA_HERO_URL = (
     "https://assets.pcna.com/image/upload/f_auto,q_auto/"
-    "Mkt_Dept/2026%20Jobs/2026-0810_Web_Messaging/0810_Web_PCNA_Hero.gif"
-    "?v=202608161659"
+    "Mkt_Dept/2026%20Jobs/2026-0810_Web_Messaging/0810_Web_PCNA_Hero_m.gif"
+    "?v=202608161802"
 )
 
 st.markdown(
@@ -200,9 +200,9 @@ def render_streamlit_mobile_home():
         f'''
 <div class="pcna-home">
   <div class="pcna-head">
-    <span class="pcna-head-icon">☰</span>
-    <img src="{logo}" class="pcna-head-logo" alt="PCNA">
-    <span class="pcna-head-icon pcna-head-bell">◇</span>
+    <a href="https://www.pcna.com/en-us" target="_blank" rel="noopener noreferrer" aria-label="Open PCNA.com">
+      <img src="{logo}" class="pcna-head-logo" alt="PCNA">
+    </a>
   </div>
   <a class="pcna-hero" href="https://www.pcna.com/en-us" target="_blank" rel="noopener noreferrer" aria-label="Open PCNA.com">
     <img src="{PCNA_HERO_URL}" class="pcna-hero-img" alt="PCNA hero banner">
@@ -225,11 +225,11 @@ def render_streamlit_mobile_home():
 .block-container:has(.pcna-home)>[data-testid="stVerticalBlock"]{{gap:0!important}}
 .block-container:has(.pcna-home) [data-testid="stElementContainer"]{{margin:0!important}}
 .pcna-home{{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;color:#082f66}}
-.pcna-head{{height:54px;display:grid;grid-template-columns:44px 1fr 44px;align-items:center;margin:0 0 6px;overflow:visible}}
-.pcna-head-logo{{height:60px;max-width:235px;width:auto;object-fit:contain;justify-self:center}}
-.pcna-head-icon{{font-size:29px;line-height:1;text-align:center;color:#063f80;font-weight:700;position:relative;z-index:2}} .pcna-head-bell{{font-size:26px}}
-.pcna-hero{{position:relative;display:block;height:188px;border-radius:17px;overflow:hidden;text-decoration:none!important;background:#063f80;box-shadow:0 5px 18px rgba(8,65,120,.18)}}
-.pcna-hero-img{{display:block;width:100%;height:100%;object-fit:cover;object-position:center}}
+.pcna-head{{height:64px;display:flex;align-items:center;justify-content:flex-start;margin:0 0 6px;overflow:visible;padding-left:2px}}
+.pcna-head a{{display:inline-flex;align-items:center;text-decoration:none!important}}
+.pcna-head-logo{{display:block;height:60px;max-width:235px;width:auto;object-fit:contain}}
+.pcna-hero{{position:relative;display:block;width:100%;height:188px;border-radius:17px;overflow:hidden;text-decoration:none!important;background:#063f80;box-shadow:0 5px 18px rgba(8,65,120,.18)}}
+.pcna-hero-img{{position:absolute;inset:0;display:block;width:100%!important;height:100%!important;max-width:none!important;object-fit:cover!important;object-position:center center!important;margin:0!important;padding:0!important}}
 .pcna-section-title{{font-size:clamp(25px,6.4vw,35px);font-weight:900;line-height:1;color:#082f66;margin:12px 0 10px;letter-spacing:-.03em}}
 .pcna-section-title span{{display:block;width:62px;height:4px;border-radius:99px;background:var(--cyan);margin-top:7px}}
 .pcna-grid{{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(2,210px);gap:10px}}
@@ -248,8 +248,8 @@ def render_streamlit_mobile_home():
 .notebook{{right:5%;bottom:3%;width:48%;height:80%;border-radius:8px;background:linear-gradient(145deg,#3a3d40,#181a1c);transform:rotate(7deg);box-shadow:0 5px 12px rgba(0,0,0,.2)}} .notebook:before{{content:"P";position:absolute;left:43%;top:40%;font-size:28px;color:#24272a;font-weight:900;text-shadow:0 1px 0 #555}} .notebook .elastic{{position:absolute;right:13%;top:0;bottom:0;width:7%;background:#08090a}}
 .pcna-mobile-nav{{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:min(620px,100%);height:calc(68px + env(safe-area-inset-bottom));padding:4px 8px env(safe-area-inset-bottom);box-sizing:border-box;border-radius:30px 30px 0 0;background:linear-gradient(90deg,#075ca8,#00326d);display:grid;grid-template-columns:repeat(5,1fr);z-index:99999}}
 .pcna-mobile-nav a{{display:flex;flex-direction:column;align-items:center;justify-content:center;color:rgba(255,255,255,.82)!important;text-decoration:none!important;font-size:12.5px;font-weight:700;gap:2px}} .pcna-mobile-nav b{{font-size:24px;line-height:1}} .pcna-mobile-nav .active{{color:white!important;font-weight:900}}
-@media(max-width:430px){{.block-container:has(.pcna-home){{padding-left:10px!important;padding-right:10px!important;padding-top:calc(2px + env(safe-area-inset-top))!important}} .pcna-head{{height:50px;margin-bottom:5px}} .pcna-head-logo{{height:60px}} .pcna-hero{{height:176px}} .pcna-grid{{grid-template-rows:repeat(2,198px);gap:9px}} .pcna-card{{padding:11px 10px}} .pcna-card-icon{{width:36px;height:36px;font-size:22px}}}}
-@media(max-height:760px){{.pcna-head{{height:44px}} .pcna-head-logo{{height:58px}} .pcna-hero{{height:154px}} .pcna-section-title{{font-size:24px;margin:8px 0 7px}} .pcna-grid{{grid-template-rows:repeat(2,170px);gap:7px}} .pcna-card-title{{font-size:18px;margin:6px 0 5px}} .pcna-card-sub{{font-size:9.5px}} .pcna-card-icon{{width:32px;height:32px;font-size:20px}}}}
+@media(max-width:430px){{.block-container:has(.pcna-home){{padding-left:10px!important;padding-right:10px!important;padding-top:calc(2px + env(safe-area-inset-top))!important}} .pcna-head{{height:62px;margin-bottom:5px}} .pcna-head-logo{{height:58px}} .pcna-hero{{height:176px}} .pcna-grid{{grid-template-rows:repeat(2,198px);gap:9px}} .pcna-card{{padding:11px 10px}} .pcna-card-icon{{width:36px;height:36px;font-size:22px}}}}
+@media(max-height:760px){{.pcna-head{{height:58px}} .pcna-head-logo{{height:54px}} .pcna-hero{{height:154px}} .pcna-section-title{{font-size:24px;margin:8px 0 7px}} .pcna-grid{{grid-template-rows:repeat(2,170px);gap:7px}} .pcna-card-title{{font-size:18px;margin:6px 0 5px}} .pcna-card-sub{{font-size:9.5px}} .pcna-card-icon{{width:32px;height:32px;font-size:20px}}}}
 </style>
 ''', unsafe_allow_html=True)
 
