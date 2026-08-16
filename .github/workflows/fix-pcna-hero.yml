@@ -1,0 +1,61 @@
+name: Clean PCNA hero banner
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/fix-pcna-hero.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  rebuild-hero:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Replace hero source cleanly
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('app.py')
+          s = p.read_text()
+          old = 'Mkt_Dept/2026%20Jobs/2026-0810_Web_Messaging/0810_Web_PCNA_Hero_m.gif'
+          new = 'Mkt_Dept/2026%20Jobs/2026-0810_Web_Messaging/0810_Web_PCNA_Hero.gif'
+          if old not in s:
+              raise SystemExit('Expected mobile hero source not found; refusing an ambiguous edit')
+          s = s.replace(old, new, 1)
+          s = s.replace('?v=202608161651', '?v=202608161659', 1)
+          # The home hero must contain exactly one visual element: the PCNA hero image.
+          start = s.index('def render_streamlit_mobile_home():')
+          end = s.index('\ndef product_picker', start)
+          home = s[start:end]
+          forbidden = ['pcna-hero-copy', 'hero-products', 'New & Trending', 'Fresh Arrivals', 'SHOP NOW', '<iframe']
+          found = [token for token in forbidden if token in home]
+          if found:
+              raise SystemExit(f'Forbidden split-hero content still present: {found}')
+          required = [f'<img src="{{PCNA_HERO_URL}}" class="pcna-hero-img"', '.pcna-hero-img{{display:block;width:100%;height:100%;object-fit:cover;object-position:center}}']
+          missing = [token for token in required if token not in home]
+          if missing:
+              raise SystemExit(f'Hero is not a single full-bleed image: {missing}')
+          p.write_text(s)
+          PY
+      - name: Compile
+        run: python -m py_compile app.py core.py starter_data.py storage.py pcna_brain.py generation.py
+      - name: Verify hero source
+        run: |
+          grep -F '0810_Web_PCNA_Hero.gif' app.py
+          ! grep -F '0810_Web_PCNA_Hero_m.gif' app.py
+      - name: Commit clean hero
+        run: |
+          git config user.name "PCNA App Automation"
+          git config user.email "actions@users.noreply.github.com"
+          git add app.py
+          git commit -m "Use full-width PCNA dynamic hero banner"
+          git push origin HEAD:main
