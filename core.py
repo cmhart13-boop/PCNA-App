@@ -70,8 +70,6 @@ def search_products(products: pd.DataFrame, query: str, limit: int = 30) -> pd.D
     brand = products["Brand"].str.lower()
     combined = name + " " + brand + " " + item
 
-    # Natural-language requests often append color, size and decoration to the product name.
-    # Ignore those workflow words for product identity, while strongly rewarding distinctive name tokens.
     stop = {
         "a","an","the","me","make","need","want","with","in","on","and","for","of","to",
         "spec","sample","order","quote","virtual","virtuals","design","designs","product","item",
@@ -96,11 +94,9 @@ def search_products(products: pd.DataFrame, query: str, limit: int = 30) -> pd.D
         for token in tokens:
             token_hits += combined.str.contains(token, regex=False, na=False).astype(int)
             name_hits += name.str.contains(token, regex=False, na=False).astype(int)
-        # All meaningful product tokens matching is the strongest natural-language signal.
         score += token_hits * 35 + name_hits * 55
         score += token_hits.eq(len(tokens)).astype(int) * 220
 
-    # Locked aliases for known PCNA product shorthand used by the field team.
     qnorm = " ".join(raw_tokens)
     aliases = {
         "dade polo": "TM16398",
@@ -272,12 +268,10 @@ def build_spec_order(
     return "\n".join(lines)
 
 
-# Presentation/runtime patch loaded before app.py defines the pages. This keeps the
-# approved card grid intact while correcting the home branding and workflow ergonomics.
 _PCNA_HERO_URL = (
     "https://assets.pcna.com/image/upload/f_auto,q_auto/"
     "Mkt_Dept/2026%20Jobs/2026-0810_Web_Messaging/0810_Web_PCNA_Hero_m.gif"
-    "?v=202608161633"
+    "?v=202608161638"
 )
 _original_markdown = st.markdown
 _original_button = st.button
@@ -286,30 +280,24 @@ _original_text_input = st.text_input
 
 def _pcna_home_markdown(body, *args, **kwargs):
     if isinstance(body, str) and '<div class="pcna-home">' in body and '<a class="pcna-hero"' in body:
-        pattern = re.compile(
-            r'(<a class="pcna-hero"[^>]*>).*?(</a>\s*<div class="pcna-section-title">)',
-            re.DOTALL,
-        )
-        replacement = (
-            r'\1<img class="pcna-hero-live" src="'
-            + _PCNA_HERO_URL
-            + r'" alt="PCNA current hero banner">\2'
-        )
-        body = pattern.sub(replacement, body, count=1)
-        body += """
+        # Do not depend on fragile HTML replacement. The authored hero children are force-hidden
+        # and the anchor itself becomes the single full-bleed animated PCNA creative.
+        body += f"""
 <style>
-/* Full-bleed animated PCNA hero only: no iframe crop, no split copy, no fake CSS products. */
-.pcna-home .pcna-hero:before{display:none!important}
-.pcna-home .pcna-hero-copy,.pcna-home .hero-products{display:none!important}
-.pcna-home .pcna-hero-live{position:absolute;inset:0;width:100%;height:100%;display:block;object-fit:cover}
-/* Approved PCNA logo, at least 50% larger than the prior 38px treatment. */
-.pcna-home .pcna-head-logo{height:60px!important;max-width:235px!important;width:auto!important}
-.pcna-home .pcna-head{overflow:visible!important}
-/* Bottom nav labels +25% for mobile readability. */
-.pcna-mobile-nav a{font-size:12.5px!important}
-/* Hide Streamlit hosting/deploy chrome. */
+.pcna-home .pcna-hero{{
+  background-image:url('{_PCNA_HERO_URL}')!important;
+  background-size:cover!important;
+  background-position:center center!important;
+  background-repeat:no-repeat!important;
+  background-color:#063f80!important;
+}}
+.pcna-home .pcna-hero:before{{display:none!important;content:none!important}}
+.pcna-home .pcna-hero > *{{display:none!important;visibility:hidden!important}}
+.pcna-home .pcna-head-logo{{height:60px!important;max-width:235px!important;width:auto!important}}
+.pcna-home .pcna-head{{overflow:visible!important}}
+.pcna-mobile-nav a{{font-size:12.5px!important}}
 [data-testid="stStatusWidget"],[data-testid="stAppDeployButton"],[data-testid="stDeployButton"],
-[class*="viewerBadge"],[class*="ViewerBadge"],a[href*="streamlit.io/cloud"]{display:none!important;visibility:hidden!important}
+[class*="viewerBadge"],[class*="ViewerBadge"],a[href*="streamlit.io/cloud"]{{display:none!important;visibility:hidden!important}}
 </style>
 """
     elif isinstance(body, str) and "<style>" in body:
@@ -325,8 +313,6 @@ def _pcna_home_markdown(body, *args, **kwargs):
 
 def _project_text_input(label, *args, **kwargs):
     key = str(kwargs.get("key", ""))
-    # Remove the repetitive Customer/Account field from project attachment flows.
-    # Keep project naming as the single visible project concept and preserve a safe backend value.
     if key in {"specsave_customer", "quotesave_customer", "virtual_customer"}:
         if key not in st.session_state:
             st.session_state[key] = "Unassigned"
@@ -335,11 +321,9 @@ def _project_text_input(label, *args, **kwargs):
 
 
 def _workflow_button(label, *args, **kwargs):
-    # Rename the existing save action without touching its application logic.
     if label == "Save to Projects":
         return _original_button("＋ Add to Project", *args, **kwargs)
 
-    # On completed spec orders, place linked next-step actions directly beneath the result.
     if label == "Create New Request" and st.session_state.get("pending_spec"):
         pending = st.session_state.get("pending_spec", {})
         products = pending.get("products", []) or []
