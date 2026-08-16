@@ -55,11 +55,7 @@ MUTED = "#66798a"
 LINE = "#d6e2eb"
 PANEL = "#f7fafc"
 NAV_BLUE = "#003b5c"
-PCNA_HERO_URL = (
-    "https://assets.pcna.com/image/upload/f_auto,q_auto/"
-    "Mkt_Dept/2026%20Jobs/2026-0810_Web_Messaging/0810_Web_PCNA_Hero_m.gif"
-    "?v=202608161802"
-)
+PCNA_HERO_URL = "https://assets.pcna.com/image/upload/f_auto,q_auto/Mkt_Dept/2026%20Jobs/2026-0817_Web_Messaging/0817_Web_PCNA_Hero_m.gif?app_sync=202608161830"
 
 st.markdown(
     f"""
@@ -204,7 +200,7 @@ def render_streamlit_mobile_home():
       <img src="{logo}" class="pcna-head-logo" alt="PCNA">
     </a>
   </div>
-  <a class="pcna-hero" href="https://www.pcna.com/en-us" target="_blank" rel="noopener noreferrer" aria-label="Open PCNA.com">
+  <a class="pcna-hero" href="https://www.pcna.com/executive-gifts?pageType=homepage_banner&location=a_spot&campaign=hero-giftsthatimpressus&type=coolers&business=pcna&country=us&segment=n/a" target="_blank" rel="noopener noreferrer" aria-label="Open PCNA.com">
     <img src="{PCNA_HERO_URL}" class="pcna-hero-img" alt="PCNA hero banner">
   </a>
   <div class="pcna-section-title">What do you need?<span></span></div>
