@@ -2,8 +2,10 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from typing import Iterable, Optional
+import re
 
 import pandas as pd
+import streamlit as st
 
 
 PRODUCT_REQUIRED = {"Product Name", "Item Number", "Default Item Color"}
@@ -238,3 +240,39 @@ def build_spec_order(
         ])
     lines.append(f"Ship To: {ship_to}")
     return "\n".join(lines)
+
+
+# Home-only presentation patch. The app's four workflow cards and their layout remain
+# exactly as authored in app.py; this intercepts only the home hero markup and swaps
+# the fake CSS illustration for PCNA's current hosted animated mobile hero creative.
+_PCNA_HERO_URL = (
+    "https://assets.pcna.com/image/upload/f_auto,q_auto/"
+    "Mkt_Dept/2026%20Jobs/2026-0810_Web_Messaging/0810_Web_PCNA_Hero_m.gif"
+    "?v=202608161618"
+)
+_original_markdown = st.markdown
+
+
+def _pcna_home_markdown(body, *args, **kwargs):
+    if isinstance(body, str) and '<div class="pcna-home">' in body and '<a class="pcna-hero"' in body:
+        pattern = re.compile(
+            r'(<a class="pcna-hero"[^>]*>).*?(</a>\s*<div class="pcna-section-title">)',
+            re.DOTALL,
+        )
+        replacement = (
+            r'\1<img class="pcna-hero-live" src="'
+            + _PCNA_HERO_URL
+            + r'" alt="PCNA current hero banner">\2'
+        )
+        body = pattern.sub(replacement, body, count=1)
+        body += """
+<style>
+.pcna-home .pcna-hero:before{display:none!important}
+.pcna-home .pcna-hero-copy,.pcna-home .hero-products{display:none!important}
+.pcna-home .pcna-hero-live{position:absolute;inset:0;width:100%;height:100%;display:block;object-fit:cover}
+</style>
+"""
+    return _original_markdown(body, *args, **kwargs)
+
+
+st.markdown = _pcna_home_markdown
