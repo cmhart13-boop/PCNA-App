@@ -60,36 +60,66 @@ def prepare_pricing(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def search_products(products: pd.DataFrame, query: str, limit: int = 30) -> pd.DataFrame:
+    """Rank verified PCNA products robustly even when the query contains decoration/request words."""
     q = _clean_text(query).lower()
     if not q:
         return products.iloc[0:0].copy()
+
     item = products["Item Number"].str.lower()
     name = products["Product Name"].str.lower()
     brand = products["Brand"].str.lower()
+    combined = name + " " + brand + " " + item
+
+    # Natural-language requests often append color, size and decoration to the product name.
+    # Ignore those workflow words for product identity, while strongly rewarding distinctive name tokens.
+    stop = {
+        "a","an","the","me","make","need","want","with","in","on","and","for","of","to",
+        "spec","sample","order","quote","virtual","virtuals","design","designs","product","item",
+        "black","white","navy","blue","red","grey","gray","medium","small","large","xl","xxl",
+        "embroidery","embroidered","embroider","laser","engraving","engraved","deboss","dtf","transfer",
+        "left","right","chest","sleeve","front","back","handle","imprint","logo","color","colour",
+        "size","oz","ounce","ounces","qty","quantity"
+    }
+    raw_tokens = re.findall(r"[a-z0-9]+", q.replace("-", " "))
+    tokens = [t for t in raw_tokens if len(t) > 1 and t not in stop]
+
     exact_item = item.eq(q)
     starts_item = item.str.startswith(q, na=False)
     phrase_name = name.str.contains(q, regex=False, na=False)
     phrase_brand = brand.str.contains(q, regex=False, na=False)
-    tokens = [t for t in q.replace("-", " ").split() if t]
+
+    score = exact_item.astype(int) * 1000 + starts_item.astype(int) * 500 + phrase_name.astype(int) * 250 + phrase_brand.astype(int) * 20
+
     if tokens:
-        token_name = pd.Series(True, index=products.index)
-        token_any = pd.Series(True, index=products.index)
-        combined = name + " " + brand + " " + item
+        token_hits = pd.Series(0, index=products.index, dtype="int64")
+        name_hits = pd.Series(0, index=products.index, dtype="int64")
         for token in tokens:
-            token_name &= name.str.contains(token, regex=False, na=False)
-            token_any &= combined.str.contains(token, regex=False, na=False)
-    else:
-        token_name = pd.Series(False, index=products.index)
-        token_any = pd.Series(False, index=products.index)
-    score = (
-        exact_item.astype(int) * 100
-        + starts_item.astype(int) * 50
-        + phrase_name.astype(int) * 30
-        + token_name.astype(int) * 24
-        + token_any.astype(int) * 12
-        + phrase_brand.astype(int) * 5
-    )
+            token_hits += combined.str.contains(token, regex=False, na=False).astype(int)
+            name_hits += name.str.contains(token, regex=False, na=False).astype(int)
+        # All meaningful product tokens matching is the strongest natural-language signal.
+        score += token_hits * 35 + name_hits * 55
+        score += token_hits.eq(len(tokens)).astype(int) * 220
+
+    # Locked aliases for known PCNA product shorthand used by the field team.
+    qnorm = " ".join(raw_tokens)
+    aliases = {
+        "dade polo": "TM16398",
+        "dade": "TM16398",
+        "bodie tee": "TM17879",
+        "stanley 30": "1603-02",
+        "stanley quencher 30": "1603-02",
+        "pedova journal": "2700-02",
+        "pinnacle 40": "1603-15",
+        "hercules tote": "SM-7427",
+        "hydro flask 20": "1601-95",
+    }
+    for alias, sku in aliases.items():
+        if alias in qnorm:
+            score += item.eq(sku.lower()).astype(int) * 5000
+
     out = products.loc[score.gt(0)].copy()
+    if out.empty:
+        return out
     out["_score"] = score[score.gt(0)]
     out = out.sort_values(["_score", "Product Name", "Item Number"], ascending=[False, True, True])
     return out.drop(columns="_score").head(limit).reset_index(drop=True)
@@ -242,15 +272,16 @@ def build_spec_order(
     return "\n".join(lines)
 
 
-# Home-only presentation patch. The app's four workflow cards and their layout remain
-# exactly as authored in app.py; this intercepts only the home hero markup and swaps
-# the fake CSS illustration for PCNA's current hosted animated mobile hero creative.
+# Presentation/runtime patch loaded before app.py defines the pages. This keeps the
+# approved card grid intact while correcting the home branding and workflow ergonomics.
 _PCNA_HERO_URL = (
     "https://assets.pcna.com/image/upload/f_auto,q_auto/"
     "Mkt_Dept/2026%20Jobs/2026-0810_Web_Messaging/0810_Web_PCNA_Hero_m.gif"
-    "?v=202608161618"
+    "?v=202608161633"
 )
 _original_markdown = st.markdown
+_original_button = st.button
+_original_text_input = st.text_input
 
 
 def _pcna_home_markdown(body, *args, **kwargs):
@@ -267,12 +298,86 @@ def _pcna_home_markdown(body, *args, **kwargs):
         body = pattern.sub(replacement, body, count=1)
         body += """
 <style>
+/* Full-bleed animated PCNA hero only: no iframe crop, no split copy, no fake CSS products. */
 .pcna-home .pcna-hero:before{display:none!important}
 .pcna-home .pcna-hero-copy,.pcna-home .hero-products{display:none!important}
 .pcna-home .pcna-hero-live{position:absolute;inset:0;width:100%;height:100%;display:block;object-fit:cover}
+/* Approved PCNA logo, at least 50% larger than the prior 38px treatment. */
+.pcna-home .pcna-head-logo{height:60px!important;max-width:235px!important;width:auto!important}
+.pcna-home .pcna-head{overflow:visible!important}
+/* Bottom nav labels +25% for mobile readability. */
+.pcna-mobile-nav a{font-size:12.5px!important}
+/* Hide Streamlit hosting/deploy chrome. */
+[data-testid="stStatusWidget"],[data-testid="stAppDeployButton"],[data-testid="stDeployButton"],
+[class*="viewerBadge"],[class*="ViewerBadge"],a[href*="streamlit.io/cloud"]{display:none!important;visibility:hidden!important}
+</style>
+"""
+    elif isinstance(body, str) and "<style>" in body:
+        body += """
+<style>
+[data-testid="stStatusWidget"],[data-testid="stAppDeployButton"],[data-testid="stDeployButton"],
+[class*="viewerBadge"],[class*="ViewerBadge"],a[href*="streamlit.io/cloud"]{display:none!important;visibility:hidden!important}
+.bottom-nav .nav-item{font-size:12.5px!important}
 </style>
 """
     return _original_markdown(body, *args, **kwargs)
 
 
+def _project_text_input(label, *args, **kwargs):
+    key = str(kwargs.get("key", ""))
+    # Remove the repetitive Customer/Account field from project attachment flows.
+    # Keep project naming as the single visible project concept and preserve a safe backend value.
+    if key in {"specsave_customer", "quotesave_customer", "virtual_customer"}:
+        if key not in st.session_state:
+            st.session_state[key] = "Unassigned"
+        return st.session_state[key]
+    return _original_text_input(label, *args, **kwargs)
+
+
+def _workflow_button(label, *args, **kwargs):
+    # Rename the existing save action without touching its application logic.
+    if label == "Save to Projects":
+        return _original_button("＋ Add to Project", *args, **kwargs)
+
+    # On completed spec orders, place linked next-step actions directly beneath the result.
+    if label == "Create New Request" and st.session_state.get("pending_spec"):
+        pending = st.session_state.get("pending_spec", {})
+        products = pending.get("products", []) or []
+
+        if _original_button("＋ Add Quote", key="spec_add_quote", use_container_width=True, disabled=not products):
+            project_name = str(st.session_state.get("specsave_project_name", "") or "Spec Project").strip()
+            customer = str(st.session_state.get("specsave_customer", "") or "Unassigned").strip()
+            st.session_state.quote_handoff = {
+                "products": products,
+                "project": project_name,
+                "customer": customer,
+                "source": "spec_sample",
+            }
+            st.query_params["page"] = "quote"
+            st.rerun()
+
+        with st.expander("＋ Add Virtuals", expanded=False):
+            st.caption("Keep this spec order in context and continue into the Virtuals workspace.")
+            direction = st.text_area(
+                "Virtual direction",
+                key="spec_virtual_direction",
+                placeholder="Show this Dade Polo with the customer logo on left chest...",
+                height=90,
+            )
+            if _original_button("Open Virtual Builder", key="spec_open_virtual", use_container_width=True):
+                st.session_state.virtual_handoff = {
+                    "products": products,
+                    "request": direction,
+                    "source": "spec_sample",
+                }
+                st.query_params["page"] = "virtual"
+                st.rerun()
+
+        return _original_button(label, *args, **kwargs)
+
+    return _original_button(label, *args, **kwargs)
+
+
 st.markdown = _pcna_home_markdown
+st.text_input = _project_text_input
+st.button = _workflow_button
