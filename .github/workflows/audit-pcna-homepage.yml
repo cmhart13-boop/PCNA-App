@@ -23,13 +23,13 @@ jobs:
       - name: Read live PCNA A-spot and replace only app hero
         run: |
           python - <<'PY'
-          import html, re, requests
+          import html, re
           from pathlib import Path
+          from urllib.request import Request, urlopen
 
-          headers = {'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 Version/18.0 Mobile/15E148 Safari/604.1'}
-          page = requests.get('https://www.pcna.com/', headers=headers, timeout=30)
-          page.raise_for_status()
-          text = page.text
+          req = Request('https://www.pcna.com/', headers={'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 Version/18.0 Mobile/15E148 Safari/604.1'})
+          with urlopen(req, timeout=30) as response:
+              text = response.read().decode('utf-8', errors='replace')
 
           block = re.search(r'data-test-containerkey="HomepageHeroContainerSch"(?P<body>.*?)(?:<!-- B SPOTS -->)', text, re.S)
           if not block:
@@ -50,30 +50,33 @@ jobs:
           p = Path('app.py')
           s = p.read_text()
 
-          # Replace the dedicated PCNA_HERO_URL constant, not arbitrary markup.
-          s, n = re.subn(
+          # Support either the prior multiline constant or an already-synced single-line constant.
+          patterns = [
               r'PCNA_HERO_URL = \(\n\s*"https://assets\.pcna\.com/image/upload/f_auto,q_auto/"\n\s*"[^"]+"\n\s*"\?v=[^"]+"\n\)',
-              'PCNA_HERO_URL = "' + hero_url + '?app_sync=202608161830"',
-              s,
-              count=1,
-          )
-          if n != 1:
-              raise SystemExit(f'Expected one PCNA_HERO_URL constant, replaced {n}')
+              r'PCNA_HERO_URL = "https://assets\.pcna\.com/image/upload/[^"]+"',
+          ]
+          replaced = 0
+          replacement = 'PCNA_HERO_URL = "' + hero_url + '?app_sync=202608161830"'
+          for pattern in patterns:
+              s, n = re.subn(pattern, replacement, s, count=1)
+              if n:
+                  replaced += n
+                  break
+          if replaced != 1:
+              raise SystemExit(f'Expected one PCNA_HERO_URL constant, replaced {replaced}')
 
           start = s.index('def render_streamlit_mobile_home():')
           end = s.index('\ndef product_picker', start)
           home = s[start:end]
 
-          # Replace only the hero anchor destination. Header logo remains its own PCNA.com link.
           hero_anchor = re.compile(r'<a class="pcna-hero" href="[^"]+" target="_blank" rel="noopener noreferrer" aria-label="Open PCNA\.com">')
           home, n = hero_anchor.subn('<a class="pcna-hero" href="' + hero_href + '" target="_blank" rel="noopener noreferrer" aria-label="Open PCNA.com">', home, count=1)
           if n != 1:
               raise SystemExit(f'Expected one hero anchor, replaced {n}')
           s = s[:start] + home + s[end:]
-
           p.write_text(s)
 
-          # Hard assertions: hero is one image and has no app-added copy/layers.
+          # Hard assertions: the banner itself is exactly one changing PCNA image and nothing else.
           s = p.read_text()
           start = s.index('def render_streamlit_mobile_home():')
           end = s.index('\ndef product_picker', start)
@@ -90,7 +93,7 @@ jobs:
               raise SystemExit(f'Forbidden app-added hero content remains: {bad}')
           if hero_url not in s:
               raise SystemExit('App is not using the exact live PCNA mobile hero')
-          print('VERIFIED: exact live PCNA mobile A-spot hero, one image only')
+          print('VERIFIED: exact live PCNA rotating retail-brand A-spot, one image only')
           PY
       - name: Compile application
         run: python -m py_compile app.py core.py starter_data.py storage.py pcna_brain.py generation.py
