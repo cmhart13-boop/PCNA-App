@@ -5,7 +5,6 @@ from typing import Iterable, Optional
 import re
 
 import pandas as pd
-import streamlit as st
 
 
 PRODUCT_REQUIRED = {"Product Name", "Item Number", "Default Item Color"}
@@ -60,7 +59,7 @@ def prepare_pricing(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def search_products(products: pd.DataFrame, query: str, limit: int = 30) -> pd.DataFrame:
-    """Rank verified PCNA products robustly even when the query contains decoration/request words."""
+    """Rank only verified catalog rows while tolerating natural-language request wording."""
     q = _clean_text(query).lower()
     if not q:
         return products.iloc[0:0].copy()
@@ -71,12 +70,12 @@ def search_products(products: pd.DataFrame, query: str, limit: int = 30) -> pd.D
     combined = name + " " + brand + " " + item
 
     stop = {
-        "a","an","the","me","make","need","want","with","in","on","and","for","of","to",
-        "spec","sample","order","quote","virtual","virtuals","design","designs","product","item",
-        "black","white","navy","blue","red","grey","gray","medium","small","large","xl","xxl",
-        "embroidery","embroidered","embroider","laser","engraving","engraved","deboss","dtf","transfer",
-        "left","right","chest","sleeve","front","back","handle","imprint","logo","color","colour",
-        "size","oz","ounce","ounces","qty","quantity"
+        "a", "an", "the", "me", "make", "need", "want", "with", "in", "on", "and", "for", "of", "to",
+        "spec", "sample", "order", "quote", "virtual", "virtuals", "design", "designs", "product", "item",
+        "black", "white", "navy", "blue", "red", "grey", "gray", "medium", "small", "large", "xl", "xxl",
+        "embroidery", "embroidered", "embroider", "laser", "engraving", "engraved", "deboss", "dtf", "transfer",
+        "left", "right", "chest", "sleeve", "front", "back", "handle", "imprint", "logo", "color", "colour",
+        "size", "oz", "ounce", "ounces", "qty", "quantity",
     }
     raw_tokens = re.findall(r"[a-z0-9]+", q.replace("-", " "))
     tokens = [t for t in raw_tokens if len(t) > 1 and t not in stop]
@@ -85,7 +84,6 @@ def search_products(products: pd.DataFrame, query: str, limit: int = 30) -> pd.D
     starts_item = item.str.startswith(q, na=False)
     phrase_name = name.str.contains(q, regex=False, na=False)
     phrase_brand = brand.str.contains(q, regex=False, na=False)
-
     score = exact_item.astype(int) * 1000 + starts_item.astype(int) * 500 + phrase_name.astype(int) * 250 + phrase_brand.astype(int) * 20
 
     if tokens:
@@ -97,6 +95,7 @@ def search_products(products: pd.DataFrame, query: str, limit: int = 30) -> pd.D
         score += token_hits * 35 + name_hits * 55
         score += token_hits.eq(len(tokens)).astype(int) * 220
 
+    # These are verified aliases, not invented SKUs. They pin common field shorthand to known catalog rows.
     qnorm = " ".join(raw_tokens)
     aliases = {
         "dade polo": "TM16398",
@@ -166,9 +165,11 @@ def pricing_schedules(pricing: pd.DataFrame, item_number: str, *, currency: str 
     needle = "Decorated" if decorated else "Blank"
     rows = rows[rows["Decorated or Blank"].str.contains(needle, case=False, regex=False, na=False)]
     schedules = [s for s in rows["Decorated or Blank"].map(_clean_text).unique().tolist() if s]
+
     def rank(s: str):
         sl = s.lower()
         return (0 if "list" in sl else 1, 0 if sl.endswith("_1") else 1, sl)
+
     return sorted(schedules, key=rank)
 
 
@@ -248,10 +249,7 @@ def build_spec_order(
         "",
     ]
     for i, item in enumerate(items, 1):
-        lines.extend([
-            f"ITEM {i}",
-            f"Product: {item.product}",
-        ])
+        lines.extend([f"ITEM {i}", f"Product: {item.product}"])
         if item.item_number.strip():
             lines.append(f"Item Number: {item.item_number.strip()}")
         lines.append(f"Item Color: {item.color}")
@@ -266,102 +264,3 @@ def build_spec_order(
         ])
     lines.append(f"Ship To: {ship_to}")
     return "\n".join(lines)
-
-
-_PCNA_HERO_URL = (
-    "https://assets.pcna.com/image/upload/f_auto,q_auto/"
-    "Mkt_Dept/2026%20Jobs/2026-0810_Web_Messaging/0810_Web_PCNA_Hero_m.gif"
-    "?v=202608161638"
-)
-_original_markdown = st.markdown
-_original_button = st.button
-_original_text_input = st.text_input
-
-
-def _pcna_home_markdown(body, *args, **kwargs):
-    if isinstance(body, str) and '<div class="pcna-home">' in body and '<a class="pcna-hero"' in body:
-        # Do not depend on fragile HTML replacement. The authored hero children are force-hidden
-        # and the anchor itself becomes the single full-bleed animated PCNA creative.
-        body += f"""
-<style>
-.pcna-home .pcna-hero{{
-  background-image:url('{_PCNA_HERO_URL}')!important;
-  background-size:cover!important;
-  background-position:center center!important;
-  background-repeat:no-repeat!important;
-  background-color:#063f80!important;
-}}
-.pcna-home .pcna-hero:before{{display:none!important;content:none!important}}
-.pcna-home .pcna-hero > *{{display:none!important;visibility:hidden!important}}
-.pcna-home .pcna-head-logo{{height:60px!important;max-width:235px!important;width:auto!important}}
-.pcna-home .pcna-head{{overflow:visible!important}}
-.pcna-mobile-nav a{{font-size:12.5px!important}}
-[data-testid="stStatusWidget"],[data-testid="stAppDeployButton"],[data-testid="stDeployButton"],
-[class*="viewerBadge"],[class*="ViewerBadge"],a[href*="streamlit.io/cloud"]{{display:none!important;visibility:hidden!important}}
-</style>
-"""
-    elif isinstance(body, str) and "<style>" in body:
-        body += """
-<style>
-[data-testid="stStatusWidget"],[data-testid="stAppDeployButton"],[data-testid="stDeployButton"],
-[class*="viewerBadge"],[class*="ViewerBadge"],a[href*="streamlit.io/cloud"]{display:none!important;visibility:hidden!important}
-.bottom-nav .nav-item{font-size:12.5px!important}
-</style>
-"""
-    return _original_markdown(body, *args, **kwargs)
-
-
-def _project_text_input(label, *args, **kwargs):
-    key = str(kwargs.get("key", ""))
-    if key in {"specsave_customer", "quotesave_customer", "virtual_customer"}:
-        if key not in st.session_state:
-            st.session_state[key] = "Unassigned"
-        return st.session_state[key]
-    return _original_text_input(label, *args, **kwargs)
-
-
-def _workflow_button(label, *args, **kwargs):
-    if label == "Save to Projects":
-        return _original_button("＋ Add to Project", *args, **kwargs)
-
-    if label == "Create New Request" and st.session_state.get("pending_spec"):
-        pending = st.session_state.get("pending_spec", {})
-        products = pending.get("products", []) or []
-
-        if _original_button("＋ Add Quote", key="spec_add_quote", use_container_width=True, disabled=not products):
-            project_name = str(st.session_state.get("specsave_project_name", "") or "Spec Project").strip()
-            customer = str(st.session_state.get("specsave_customer", "") or "Unassigned").strip()
-            st.session_state.quote_handoff = {
-                "products": products,
-                "project": project_name,
-                "customer": customer,
-                "source": "spec_sample",
-            }
-            st.query_params["page"] = "quote"
-            st.rerun()
-
-        with st.expander("＋ Add Virtuals", expanded=False):
-            st.caption("Keep this spec order in context and continue into the Virtuals workspace.")
-            direction = st.text_area(
-                "Virtual direction",
-                key="spec_virtual_direction",
-                placeholder="Show this Dade Polo with the customer logo on left chest...",
-                height=90,
-            )
-            if _original_button("Open Virtual Builder", key="spec_open_virtual", use_container_width=True):
-                st.session_state.virtual_handoff = {
-                    "products": products,
-                    "request": direction,
-                    "source": "spec_sample",
-                }
-                st.query_params["page"] = "virtual"
-                st.rerun()
-
-        return _original_button(label, *args, **kwargs)
-
-    return _original_button(label, *args, **kwargs)
-
-
-st.markdown = _pcna_home_markdown
-st.text_input = _project_text_input
-st.button = _workflow_button
