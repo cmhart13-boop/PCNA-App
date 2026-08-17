@@ -55,7 +55,7 @@ MUTED = "#66798a"
 LINE = "#d6e2eb"
 PANEL = "#f7fafc"
 NAV_BLUE = "#003b5c"
-PCNA_HERO_URL = "https://assets.pcna.com/image/upload/f_auto,q_auto/Mkt_Dept/2026%20Jobs/2026-0817_Web_Messaging/0817_Web_PCNA_Hero_m.gif?app_sync=202608161830"
+PCNA_HERO_URL = "https://assets.pcna.com/image/upload/ar_16:7,c_fill,g_north,pg_1,q_auto,f_jpg/Mkt_Dept/2026%20Jobs/2026-0817_Web_Messaging/0817_Web_PCNA_Hero_m.jpg"
 
 st.markdown(
     f"""
@@ -92,9 +92,36 @@ html,body,[data-testid="stAppViewContainer"],[data-testid="stMain"]{{background:
 [data-testid="stFileUploaderDropzone"]{{border-radius:14px!important;padding:14px 10px!important;border-color:#b8cad8!important;background:#fbfdff!important}}
 [data-testid="stExpander"]{{border:1px solid var(--line)!important;border-radius:14px!important;overflow:hidden;margin:8px 0}}
 label,[data-testid="stWidgetLabel"],[data-testid="stWidgetLabel"] p{{font-weight:800!important;color:var(--pcna)!important}}
-.bottom-nav{{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:min(var(--page-max),100%);height:var(--nav-height);background:var(--nav-blue);border-top:1px solid rgba(255,255,255,.10);display:grid;grid-template-columns:repeat(4,1fr);z-index:9999;padding:7px 7px max(7px,env(safe-area-inset-bottom));box-sizing:border-box}}
+.bottom-nav{{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:min(var(--page-max),100%);height:var(--nav-height);background:var(--nav-blue);border-top:1px solid rgba(255,255,255,.10);display:grid;grid-template-columns:repeat(5,1fr);z-index:9999;padding:7px 7px max(7px,env(safe-area-inset-bottom));box-sizing:border-box}}
 .nav-item{{display:flex;flex-direction:column;align-items:center;justify-content:center;text-decoration:none!important;color:rgba(255,255,255,.62)!important;font-size:12.5px;font-weight:800;gap:3px;border-radius:12px}}
 .nav-icon{{font-size:20px;line-height:1}} .nav-item.active{{color:rgba(255,255,255,.96)!important;background:rgba(255,255,255,.08)}}
+</style>
+""",
+    unsafe_allow_html=True,
+)
+
+
+st.markdown(
+    """
+<style>
+/* pcna-hide-streamlit-chrome */
+[data-testid="stStatusWidget"],
+[data-testid="stDecoration"],
+[data-testid="stAppDeployButton"],
+[data-testid="stDeployButton"],
+[data-testid="stViewerBadge"],
+[data-testid="stAppCreatorAvatar"],
+[class*="viewerBadge"],
+[class*="ViewerBadge"],
+[class*="stDeployButton"],
+a[href*="streamlit.io/cloud"],
+a[href*="share.streamlit.io"],
+button[title="Manage app"],
+button[aria-label="Manage app"] {
+  display:none!important;
+  visibility:hidden!important;
+  pointer-events:none!important;
+}
 </style>
 """,
     unsafe_allow_html=True,
@@ -166,14 +193,15 @@ def approved_pcna_header(width: int = 158):
 
 
 def bottom_nav(page: str):
-    group = "create" if page in {"spec", "blank", "quote"} else page
+    group = page
     st.markdown(
         f"""
 <div class="bottom-nav">
 <a class="nav-item {'active' if group=='home' else ''}" href="{nav_link('home')}"><span class="nav-icon">⌂</span><span>Home</span></a>
+<a class="nav-item {'active' if group=='spec' else ''}" href="{nav_link('spec')}"><span class="nav-icon">✓</span><span>Specs</span></a>
 <a class="nav-item {'active' if group=='search' else ''}" href="{nav_link('search')}"><span class="nav-icon">⌕</span><span>Products</span></a>
-<a class="nav-item {'active' if group=='create' else ''}" href="{nav_link('create')}"><span class="nav-icon">＋</span><span>Create</span></a>
-<a class="nav-item {'active' if group=='projects' else ''}" href="{projects_link()}"><span class="nav-icon">▣</span><span>Projects</span></a>
+<a class="nav-item {'active' if group=='virtual' else ''}" href="{nav_link('virtual')}"><span class="nav-icon">◇</span><span>Virtuals</span></a>
+<a class="nav-item {'active' if group=='quote' else ''}" href="{nav_link('quote')}"><span class="nav-icon">$</span><span>Quotes</span></a>
 </div>
 """,
         unsafe_allow_html=True,
@@ -200,8 +228,8 @@ def render_streamlit_mobile_home():
       <img src="{logo}" class="pcna-head-logo" alt="PCNA">
     </a>
   </div>
-  <a class="pcna-hero" href="https://www.pcna.com/executive-gifts?pageType=homepage_banner&location=a_spot&campaign=hero-giftsthatimpressus&type=coolers&business=pcna&country=us&segment=n/a" target="_blank" rel="noopener noreferrer" aria-label="Open PCNA.com">
-    <img src="{PCNA_HERO_URL}" class="pcna-hero-img" alt="PCNA hero banner">
+  <a class="pcna-hero" href="https://www.pcna.com/en-us" target="_blank" rel="noopener noreferrer" aria-label="Open PCNA.com">
+    <img src="{PCNA_HERO_URL}" class="pcna-hero-img" alt="PCNA lifestyle banner">
   </a>
   <div class="pcna-section-title">What do you need?<span></span></div>
   <div class="pcna-grid">
@@ -212,7 +240,7 @@ def render_streamlit_mobile_home():
   </div>
 </div>
 <nav class="pcna-mobile-nav">
-  <a class="active" href="?page=home"><b>⌂</b><span>Home</span></a><a href="?page=projects"><b>▱</b><span>Projects</span></a><a href="?page=search"><b>◇</b><span>Products</span></a><a href="?page=virtual"><b>◯</b><span>Messages</span></a><a href="?page=create"><b>♙</b><span>Account</span></a>
+  <a class="active" href="?page=home"><b>⌂</b><span>Home</span></a><a href="?page=spec"><b>✓</b><span>Specs</span></a><a href="?page=search"><b>⌕</b><span>Products</span></a><a href="?page=virtual"><b>◇</b><span>Virtuals</span></a><a href="?page=quote"><b>$</b><span>Quotes</span></a>
 </nav>
 <style>
 :root{{--pcna-navy:#063f80;--pcna-blue:#075ca8;--cyan:#27afe2}}
@@ -225,7 +253,7 @@ def render_streamlit_mobile_home():
 .pcna-head a{{display:inline-flex;align-items:center;text-decoration:none!important}}
 .pcna-head-logo{{display:block;height:60px;max-width:235px;width:auto;object-fit:contain}}
 .pcna-hero{{position:relative;display:block;width:100%;height:188px;border-radius:17px;overflow:hidden;text-decoration:none!important;background:#063f80;box-shadow:0 5px 18px rgba(8,65,120,.18)}}
-.pcna-hero-img{{position:absolute;inset:0;display:block;width:100%!important;height:100%!important;max-width:none!important;object-fit:cover!important;object-position:center center!important;margin:0!important;padding:0!important}}
+.pcna-hero-img{{position:absolute;inset:0;display:block;width:100%!important;height:100%!important;max-width:none!important;object-fit:cover!important;object-position:center top!important;margin:0!important;padding:0!important}}
 .pcna-section-title{{font-size:clamp(25px,6.4vw,35px);font-weight:900;line-height:1;color:#082f66;margin:12px 0 10px;letter-spacing:-.03em}}
 .pcna-section-title span{{display:block;width:62px;height:4px;border-radius:99px;background:var(--cyan);margin-top:7px}}
 .pcna-grid{{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(2,210px);gap:10px}}
