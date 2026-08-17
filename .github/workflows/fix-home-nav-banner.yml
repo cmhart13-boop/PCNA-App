@@ -1,0 +1,113 @@
+name: Apply home banner and nav fix
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/fix-home-nav-banner.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Patch app.py
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          p = Path('app.py')
+          s = p.read_text()
+
+          old = 'PCNA_HERO_URL = "https://assets.pcna.com/image/upload/f_auto,q_auto/Mkt_Dept/2026%20Jobs/2026-0817_Web_Messaging/0817_Web_PCNA_Hero_m.gif?app_sync=202608161830"'
+          new = 'PCNA_HERO_URL = "https://assets.pcna.com/image/upload/ar_16:7,c_fill,g_north,pg_1,q_auto,f_jpg/Mkt_Dept/2026%20Jobs/2026-0817_Web_Messaging/0817_Web_PCNA_Hero_m.jpg"'
+          assert old in s, 'Current hero URL not found'
+          s = s.replace(old, new, 1)
+
+          old = '''#MainMenu,footer,[data-testid="stToolbar"],[data-testid="stStatusWidget"],[data-testid="stAppDeployButton"],[data-testid="stDeployButton"],
+[class*="viewerBadge"],[class*="ViewerBadge"],a[href*="streamlit.io/cloud"]{display:none!important;visibility:hidden!important;height:0!important}'''
+          new = '''#MainMenu,footer,[data-testid="stToolbar"],[data-testid="stStatusWidget"],[data-testid="stDecoration"],[data-testid="stAppDeployButton"],[data-testid="stDeployButton"],[data-testid="stViewerBadge"],[data-testid="stAppCreatorAvatar"],
+[class*="viewerBadge"],[class*="ViewerBadge"],[class*="stDeployButton"],a[href*="streamlit.io"],a[href*="share.streamlit.io"],button[title="Manage app"],button[aria-label="Manage app"]{display:none!important;visibility:hidden!important;height:0!important;min-height:0!important;max-height:0!important;overflow:hidden!important}'''
+          assert old in s, 'Streamlit chrome CSS block not found'
+          s = s.replace(old, new, 1)
+
+          old = '.bottom-nav{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:min(var(--page-max),100%);height:var(--nav-height);background:var(--nav-blue);border-top:1px solid rgba(255,255,255,.10);display:grid;grid-template-columns:repeat(4,1fr);z-index:9999;padding:7px 7px max(7px,env(safe-area-inset-bottom));box-sizing:border-box}'
+          new = '.bottom-nav{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:min(var(--page-max),100%);height:var(--nav-height);background:var(--nav-blue);border-top:1px solid rgba(255,255,255,.10);display:grid;grid-template-columns:repeat(5,1fr);z-index:9999;padding:7px 7px max(7px,env(safe-area-inset-bottom));box-sizing:border-box}'
+          assert old in s, 'Bottom-nav 4-column CSS not found'
+          s = s.replace(old, new, 1)
+
+          old = '''def bottom_nav(page: str):
+    group = "create" if page in {"spec", "blank", "quote"} else page
+    st.markdown(
+        f"""
+<div class="bottom-nav">
+<a class="nav-item {'active' if group=='home' else ''}" href="{nav_link('home')}"><span class="nav-icon">⌂</span><span>Home</span></a>
+<a class="nav-item {'active' if group=='search' else ''}" href="{nav_link('search')}"><span class="nav-icon">⌕</span><span>Products</span></a>
+<a class="nav-item {'active' if group=='create' else ''}" href="{nav_link('create')}"><span class="nav-icon">＋</span><span>Create</span></a>
+<a class="nav-item {'active' if group=='projects' else ''}" href="{projects_link()}"><span class="nav-icon">▣</span><span>Projects</span></a>
+</div>
+""",
+        unsafe_allow_html=True,
+    )'''
+          new = '''def bottom_nav(page: str):
+    group = page
+    st.markdown(
+        f"""
+<div class="bottom-nav">
+<a class="nav-item {'active' if group=='home' else ''}" href="{nav_link('home')}"><span class="nav-icon">⌂</span><span>Home</span></a>
+<a class="nav-item {'active' if group=='spec' else ''}" href="{nav_link('spec')}"><span class="nav-icon">✓</span><span>Specs</span></a>
+<a class="nav-item {'active' if group=='search' else ''}" href="{nav_link('search')}"><span class="nav-icon">⌕</span><span>Products</span></a>
+<a class="nav-item {'active' if group=='virtual' else ''}" href="{nav_link('virtual')}"><span class="nav-icon">◇</span><span>Virtuals</span></a>
+<a class="nav-item {'active' if group=='quote' else ''}" href="{nav_link('quote')}"><span class="nav-icon">$</span><span>Quotes</span></a>
+</div>
+""",
+        unsafe_allow_html=True,
+    )'''
+          assert old in s, 'Shared bottom_nav function not found'
+          s = s.replace(old, new, 1)
+
+          old = '''  <a class="pcna-hero" href="https://www.pcna.com/executive-gifts?pageType=homepage_banner&location=a_spot&campaign=hero-giftsthatimpressus&type=coolers&business=pcna&country=us&segment=n/a" target="_blank" rel="noopener noreferrer" aria-label="Open PCNA.com">
+    <img src="{PCNA_HERO_URL}" class="pcna-hero-img" alt="PCNA hero banner">
+  </a>'''
+          new = '''  <a class="pcna-hero" href="https://www.pcna.com/en-us" target="_blank" rel="noopener noreferrer" aria-label="Open PCNA.com">
+    <img src="{PCNA_HERO_URL}" class="pcna-hero-img" alt="PCNA lifestyle banner">
+  </a>'''
+          assert old in s, 'Home hero link block not found'
+          s = s.replace(old, new, 1)
+
+          old = '''<nav class="pcna-mobile-nav">
+  <a class="active" href="?page=home"><b>⌂</b><span>Home</span></a><a href="?page=projects"><b>▱</b><span>Projects</span></a><a href="?page=search"><b>◇</b><span>Products</span></a><a href="?page=virtual"><b>◯</b><span>Messages</span></a><a href="?page=create"><b>♙</b><span>Account</span></a>
+</nav>'''
+          new = '''<nav class="pcna-mobile-nav">
+  <a class="active" href="?page=home"><b>⌂</b><span>Home</span></a><a href="?page=spec"><b>✓</b><span>Specs</span></a><a href="?page=search"><b>⌕</b><span>Products</span></a><a href="?page=virtual"><b>◇</b><span>Virtuals</span></a><a href="?page=quote"><b>$</b><span>Quotes</span></a>
+</nav>'''
+          assert old in s, 'Home mobile nav block not found'
+          s = s.replace(old, new, 1)
+
+          old = '.pcna-hero-img{position:absolute;inset:0;display:block;width:100%!important;height:100%!important;max-width:none!important;object-fit:cover!important;object-position:center center!important;margin:0!important;padding:0!important}'
+          new = '.pcna-hero-img{position:absolute;inset:0;display:block;width:100%!important;height:100%!important;max-width:none!important;object-fit:cover!important;object-position:center top!important;margin:0!important;padding:0!important}'
+          assert old in s, 'Hero image CSS not found'
+          s = s.replace(old, new, 1)
+
+          # Guardrail: the four home cards must stay byte-for-byte untouched by this patch.
+          for required in ['Spec Sample<br>Order', 'Virtuals /<br>Designs', 'Quote<br>Request', '<div class="pcna-card-title">Projects</div>']:
+              assert required in s, f'Home-card guardrail failed: {required}'
+
+          p.write_text(s)
+          PY
+
+      - name: Commit patch and remove one-time workflow
+        run: |
+          rm .github/workflows/fix-home-nav-banner.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add app.py .github/workflows/fix-home-nav-banner.yml
+          git commit -m "Apply static lifestyle hero and five-item nav"
+          git push origin main
