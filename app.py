@@ -101,33 +101,6 @@ label,[data-testid="stWidgetLabel"],[data-testid="stWidgetLabel"] p{{font-weight
 )
 
 
-st.markdown(
-    """
-<style>
-/* pcna-hide-streamlit-chrome */
-[data-testid="stStatusWidget"],
-[data-testid="stDecoration"],
-[data-testid="stAppDeployButton"],
-[data-testid="stDeployButton"],
-[data-testid="stViewerBadge"],
-[data-testid="stAppCreatorAvatar"],
-[class*="viewerBadge"],
-[class*="ViewerBadge"],
-[class*="stDeployButton"],
-a[href*="streamlit.io/cloud"],
-a[href*="share.streamlit.io"],
-button[title="Manage app"],
-button[aria-label="Manage app"] {
-  display:none!important;
-  visibility:hidden!important;
-  pointer-events:none!important;
-}
-</style>
-""",
-    unsafe_allow_html=True,
-)
-
-
 @st.cache_data(show_spinner=False)
 def read_csv_bytes(data: bytes, name: str) -> pd.DataFrame:
     import io
