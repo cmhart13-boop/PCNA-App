@@ -49,6 +49,62 @@ from storage import (
 
 st.set_page_config(page_title="PCNA", layout="centered", initial_sidebar_state="collapsed")
 
+st.set_option("client.toolbarMode", "minimal")
+
+# Community Cloud chrome (including the bottom-right "Manage app / Hosted by Streamlit"
+# control) is removed by serving the app in Streamlit embed mode. Preserve all
+# existing query parameters and hash state; only add embed=true when missing.
+components.html(
+    """
+    <script>
+    (() => {
+      const doc = window.parent.document;
+      const script = doc.createElement('script');
+      script.textContent = `
+        (() => {
+          try {
+            const url = new URL(window.location.href);
+            if (!url.searchParams.has('embed')) {
+              url.searchParams.set('embed', 'true');
+              window.location.replace(url.toString());
+            }
+          } catch (_) {}
+        })();
+      `;
+      doc.documentElement.appendChild(script);
+      script.remove();
+    })();
+    </script>
+    """,
+    height=0,
+    width=0,
+)
+
+# Suppress any remaining in-app Streamlit chrome in local/dev/self-hosted renders.
+st.html("""
+<style>
+#MainMenu,
+footer,
+header[data-testid="stHeader"],
+[data-testid="stStatusWidget"],
+[data-testid="stDecoration"],
+[data-testid="stToolbar"],
+[data-testid="stToolbarActions"],
+[data-testid="stDeployButton"],
+[data-testid="stAppDeployButton"],
+[data-testid="stViewerBadge"],
+[data-testid="stAppViewerBadge"],
+[data-testid*="ViewerBadge"],
+[data-testid*="viewerBadge"] {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+</style>
+""")
+
+
 PCNA_BLUE = "#084f86"
 INK = "#14273a"
 MUTED = "#66798a"
