@@ -11,7 +11,7 @@ headless = true
 maxUploadSize = 1000
 
 [client]
-toolbarMode = "viewer"
+toolbarMode = "minimal"
 
 [browser]
 gatherUsageStats = false
