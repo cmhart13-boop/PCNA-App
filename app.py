@@ -51,51 +51,100 @@ st.set_page_config(page_title="PCNA", layout="centered", initial_sidebar_state="
 
 st.set_option("client.toolbarMode", "minimal")
 
-# Streamlit Community Cloud renders its viewer badge in a separate outer React
-# shell, as a sibling of the actual app iframe. Route the top-level browser to
-# Streamlit's raw app endpoint and remove that shell from the execution path.
-# This is intentionally a one-shot canonical redirect: no observer, polling,
-# local storage, CSS selector, or widget-removal loop can recreate the shell.
-components.html(
-    """
-    <script>
-    (() => {
-      try {
-        const hostDocument = window.top.document;
-        if (hostDocument.documentElement.dataset.pcnaRawApp === 'ready') return;
-
-        const bootstrap = hostDocument.createElement('script');
-        bootstrap.textContent = `
-          (() => {
-            const current = new URL(window.location.href);
-            const appFrame = document.querySelector('iframe[title="streamlitApp"]');
-
-            if (!appFrame && current.pathname.startsWith('/~/+/') &&
-                current.searchParams.get('embed') === 'true') {
-              document.documentElement.dataset.pcnaRawApp = 'ready';
-              return;
-            }
-
-            const target = appFrame
-              ? new URL(appFrame.src, current.href)
-              : new URL(current.href);
-            current.searchParams.forEach((value, key) => {
-              if (key !== 'embed') target.searchParams.set(key, value);
-            });
-            target.searchParams.set('embed', 'true');
-            target.hash = current.hash;
-            window.location.replace(target.href);
-          })();
-        `;
-        (hostDocument.head || hostDocument.documentElement).appendChild(bootstrap);
-        bootstrap.remove();
-      } catch (_) {}
-    })();
-    </script>
-    """,
-    height=0,
-    width=0,
+# Startup is deliberately handled in two continuous stages. Community Cloud's
+# outer shell exists before the Streamlit app iframe is ready, so the first
+# executable app code paints a branded white cover over that shell and then
+# moves the browser to Streamlit's raw embedded app endpoint. The raw app draws
+# the identical splash in its own document while the home screen becomes ready.
+# The user therefore sees one continuous PCNA launch surface rather than Cloud
+# chrome, white flashes, iframe transitions, or intermediate Streamlit UI.
+_STARTUP_LOGO_PATH = Path("IMG_2337.webp")
+_STARTUP_LOGO_DATA = (
+    "data:image/webp;base64," + base64.b64encode(_STARTUP_LOGO_PATH.read_bytes()).decode("ascii")
+    if _STARTUP_LOGO_PATH.exists()
+    else ""
 )
+
+_STARTUP_BOOTSTRAP = """
+<script>
+(() => {
+  try {
+    const topWindow = window.top;
+    const topDocument = topWindow.document;
+    const current = new URL(topWindow.location.href);
+
+    if (current.pathname.startsWith('/~/+/') && current.searchParams.get('embed') === 'true') {
+      return;
+    }
+
+    let cover = topDocument.getElementById('pcna-native-startup-cover');
+    if (!cover) {
+      cover = topDocument.createElement('div');
+      cover.id = 'pcna-native-startup-cover';
+      cover.setAttribute('aria-label', 'PCNA loading');
+      cover.style.cssText = [
+        'position:fixed', 'inset:0', 'z-index:2147483647',
+        'background:#ffffff', 'display:flex', 'align-items:center',
+        'justify-content:center', 'margin:0', 'padding:0',
+        'overflow:hidden', 'opacity:1', 'transition:opacity .42s ease'
+      ].join(';');
+      const logo = topDocument.createElement('img');
+      logo.src = '__PCNA_STARTUP_LOGO__';
+      logo.alt = 'PCNA';
+      logo.style.cssText = 'display:block;width:min(68vw,310px);height:auto;max-height:34vh;object-fit:contain';
+      cover.appendChild(logo);
+      topDocument.documentElement.appendChild(cover);
+    }
+
+    const appFrame = topDocument.querySelector('iframe[title="streamlitApp"]');
+    if (!appFrame || !appFrame.src) return;
+
+    const target = new URL(appFrame.src, current.href);
+    current.searchParams.forEach((value, key) => {
+      if (!['embed', 'pcna_startup'].includes(key)) target.searchParams.set(key, value);
+    });
+    target.searchParams.set('embed', 'true');
+    target.searchParams.set('pcna_startup', '1');
+    target.hash = current.hash;
+
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      topWindow.location.replace(target.href);
+    }));
+  } catch (_) {}
+})();
+</script>
+""".replace("__PCNA_STARTUP_LOGO__", _STARTUP_LOGO_DATA)
+
+components.html(_STARTUP_BOOTSTRAP, height=0, width=0)
+
+if str(st.query_params.get("pcna_startup", "")) == "1":
+    st.markdown(
+        f"""
+        <div id="pcna-app-startup-cover" aria-label="PCNA loading">
+          <img src="{_STARTUP_LOGO_DATA}" alt="PCNA">
+        </div>
+        <style>
+        #pcna-app-startup-cover {{
+          position:fixed; inset:0; z-index:2147483646; background:#fff;
+          display:flex; align-items:center; justify-content:center;
+          margin:0; padding:0; overflow:hidden; pointer-events:none;
+          animation:pcnaStartupExit 2.75s cubic-bezier(.22,.61,.36,1) forwards;
+        }}
+        #pcna-app-startup-cover img {{
+          display:block; width:min(68vw,310px); height:auto; max-height:34vh;
+          object-fit:contain; opacity:0;
+          animation:pcnaLogoEnter .34s ease-out .08s forwards;
+        }}
+        @keyframes pcnaLogoEnter {{ from {{opacity:0;transform:scale(.985)}} to {{opacity:1;transform:scale(1)}} }}
+        @keyframes pcnaStartupExit {{
+          0%, 78% {{opacity:1;visibility:visible}}
+          100% {{opacity:0;visibility:hidden}}
+        }}
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
 
 
 PCNA_BLUE = "#084f86"
