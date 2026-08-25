@@ -1,0 +1,176 @@
+name: Implement polished PCNA startup
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  implement:
+    if: github.event.head_commit.message == 'Implement polished PCNA startup and splash'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Build startup architecture
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          p = Path('app.py')
+          s = p.read_text(encoding='utf-8')
+
+          old_start = s.index('st.set_option("client.toolbarMode", "minimal")')
+          old_end = s.index('\n\n\nPCNA_BLUE =', old_start)
+
+          replacement = r'''st.set_option("client.toolbarMode", "minimal")
+
+# Startup is deliberately handled in two continuous stages. Community Cloud's
+# outer shell exists before the Streamlit app iframe is ready, so the first
+# executable app code paints a branded white cover over that shell and then
+# moves the browser to Streamlit's raw embedded app endpoint. The raw app draws
+# the identical splash in its own document while the home screen becomes ready.
+# The user therefore sees one continuous PCNA launch surface rather than Cloud
+# chrome, white flashes, iframe transitions, or intermediate Streamlit UI.
+_STARTUP_LOGO_PATH = Path("IMG_2337.webp")
+_STARTUP_LOGO_DATA = (
+    "data:image/webp;base64," + base64.b64encode(_STARTUP_LOGO_PATH.read_bytes()).decode("ascii")
+    if _STARTUP_LOGO_PATH.exists()
+    else ""
+)
+
+components.html(
+    f"""
+    <script>
+    (() => {{
+      try {{
+        const topWindow = window.top;
+        const topDocument = topWindow.document;
+        const current = new URL(topWindow.location.href);
+
+        // Once we are already on Streamlit's raw application endpoint there is
+        // no Community Cloud shell left to remove. The in-app splash below owns
+        // the remainder of the launch transition.
+        if (current.pathname.startsWith('/~/+/') && current.searchParams.get('embed') === 'true') {{
+          return;
+        }}
+
+        let cover = topDocument.getElementById('pcna-native-startup-cover');
+        if (!cover) {{
+          cover = topDocument.createElement('div');
+          cover.id = 'pcna-native-startup-cover';
+          cover.setAttribute('aria-label', 'PCNA loading');
+          cover.style.cssText = [
+            'position:fixed', 'inset:0', 'z-index:2147483647',
+            'background:#ffffff', 'display:flex', 'align-items:center',
+            'justify-content:center', 'margin:0', 'padding:0',
+            'overflow:hidden', 'opacity:1', 'transition:opacity .42s ease'
+          ].join(';');
+          const logo = topDocument.createElement('img');
+          logo.src = '{_STARTUP_LOGO_DATA}';
+          logo.alt = 'PCNA';
+          logo.style.cssText = 'display:block;width:min(68vw,310px);height:auto;max-height:34vh;object-fit:contain';
+          cover.appendChild(logo);
+          topDocument.documentElement.appendChild(cover);
+        }}
+
+        const appFrame = topDocument.querySelector('iframe[title="streamlitApp"]');
+        if (!appFrame || !appFrame.src) return;
+
+        const target = new URL(appFrame.src, current.href);
+        current.searchParams.forEach((value, key) => {{
+          if (!['embed', 'pcna_startup'].includes(key)) target.searchParams.set(key, value);
+        }});
+        target.searchParams.set('embed', 'true');
+        target.searchParams.set('pcna_startup', '1');
+        target.hash = current.hash;
+
+        // Give the browser one committed frame with the branded cover before
+        // replacing the Cloud wrapper. That removes the visible white/widget
+        // hand-off that previously made startup look choppy.
+        requestAnimationFrame(() => requestAnimationFrame(() => {{
+          topWindow.location.replace(target.href);
+        }}));
+      }} catch (_) {{}}
+    }})();
+    </script>
+    """,
+    height=0,
+    width=0,
+)
+
+# The raw endpoint gets the same visual surface, so the wrapper-to-app handoff
+# is visually continuous. It holds for ~2.35 seconds and then fades into the
+# already-rendered PCNA home screen instead of revealing intermediate paints.
+if str(st.query_params.get("pcna_startup", "")) == "1":
+    st.markdown(
+        f"""
+        <div id="pcna-app-startup-cover" aria-label="PCNA loading">
+          <img src="{_STARTUP_LOGO_DATA}" alt="PCNA">
+        </div>
+        <style>
+        #pcna-app-startup-cover {{
+          position:fixed; inset:0; z-index:2147483646; background:#fff;
+          display:flex; align-items:center; justify-content:center;
+          margin:0; padding:0; overflow:hidden; pointer-events:none;
+          animation:pcnaStartupExit 2.75s cubic-bezier(.22,.61,.36,1) forwards;
+        }}
+        #pcna-app-startup-cover img {{
+          display:block; width:min(68vw,310px); height:auto; max-height:34vh;
+          object-fit:contain; opacity:0;
+          animation:pcnaLogoEnter .34s ease-out .08s forwards;
+        }}
+        @keyframes pcnaLogoEnter {{ from {{opacity:0;transform:scale(.985)}} to {{opacity:1;transform:scale(1)}} }}
+        @keyframes pcnaStartupExit {{
+          0%, 78% {{opacity:1;visibility:visible}}
+          100% {{opacity:0;visibility:hidden}}
+        }}
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+'''
+
+          s2 = s[:old_start] + replacement + s[old_end:]
+          p.write_text(s2, encoding='utf-8')
+          PY
+
+      - name: Engineering acceptance audit
+        run: |
+          python -m py_compile app.py
+          python - <<'PY'
+          from pathlib import Path
+          s = Path('app.py').read_text(encoding='utf-8')
+          checks = {
+              'approved bundled logo used': '_STARTUP_LOGO_PATH = Path("IMG_2337.webp")' in s,
+              'outer shell covered': 'pcna-native-startup-cover' in s,
+              'raw endpoint handoff': "current.pathname.startsWith('/~/+/')" in s,
+              'embed mode forced': "target.searchParams.set('embed', 'true')" in s,
+              'startup state carried': "target.searchParams.set('pcna_startup', '1')" in s,
+              'two-frame paint before redirect': 'requestAnimationFrame(() => requestAnimationFrame' in s,
+              'raw app splash present': 'pcna-app-startup-cover' in s,
+              '2-3 second hold': '2.75s' in s,
+              'smooth fade': '@keyframes pcnaStartupExit' in s,
+              'no old raw-app marker': 'pcnaRawApp' not in s,
+              'navigation remains embedded': '?embed=true&page=' in s,
+          }
+          failed = [name for name, ok in checks.items() if not ok]
+          for name, ok in checks.items():
+              print(f'{name}: {"PASS" if ok else "FAIL"}')
+          if failed:
+              raise SystemExit('Acceptance audit failed: ' + ', '.join(failed))
+          PY
+
+      - name: Commit implementation and remove one-time workflow
+        run: |
+          git config user.name "PCNA App Engineering"
+          git config user.email "actions@users.noreply.github.com"
+          git rm .github/workflows/implement-polished-startup.yml
+          git add app.py
+          git commit -m "Build seamless branded PCNA startup"
+          git push origin main
