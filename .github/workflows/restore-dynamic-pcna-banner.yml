@@ -1,0 +1,67 @@
+name: Restore dynamic PCNA home banner
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  restore-banner:
+    if: github.event.head_commit.message == 'Restore dynamic PCNA home banner'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+
+      - name: Restore PCNA mobile animated hero only
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('app.py')
+          s = p.read_text(encoding='utf-8')
+          old = 'PCNA_HERO_URL = "https://assets.pcna.com/image/upload/ar_16:7,c_fill,g_north,pg_1,q_auto,f_jpg/Mkt_Dept/2026%20Jobs/2026-0817_Web_Messaging/0817_Web_PCNA_Hero_m.jpg"'
+          new = '''PCNA_HERO_URL = (\n    "https://assets.pcna.com/image/upload/f_auto,q_auto/"\n    "Mkt_Dept/2026%20Jobs/2026-0817_Web_Messaging/0817_Web_PCNA_Hero_m.gif"\n    "?v=20260825"\n)'''
+          if s.count(old) != 1:
+              raise SystemExit(f'Expected exactly one current hero definition, found {s.count(old)}')
+          before_startup = s[:s.index('PCNA_BLUE =')]
+          s2 = s.replace(old, new, 1)
+          after_startup = s2[:s2.index('PCNA_BLUE =')]
+          if before_startup != after_startup:
+              raise SystemExit('Startup architecture changed unexpectedly')
+          p.write_text(s2, encoding='utf-8')
+          PY
+
+      - name: Acceptance audit
+        run: |
+          python -m py_compile app.py
+          python - <<'PY'
+          from pathlib import Path
+          s = Path('app.py').read_text(encoding='utf-8')
+          checks = {
+              'current 0817 mobile animated PCNA hero': '0817_Web_PCNA_Hero_m.gif' in s,
+              'static 0817 jpg removed': '0817_Web_PCNA_Hero_m.jpg' not in s,
+              'Cloudinary animated format preserved': 'f_auto,q_auto' in s,
+              'home still uses PCNA_HERO_URL': '<img src="{PCNA_HERO_URL}" class="pcna-hero-img"' in s,
+              'startup bootstrap preserved': '_STARTUP_BOOTSTRAP' in s,
+              'startup ready preserved': '_STARTUP_READY' in s,
+              'no raw endpoint redirect reintroduced': 'topWindow.location.replace' not in s,
+          }
+          for name, ok in checks.items():
+              print(f'{name}: {"PASS" if ok else "FAIL"}')
+          failed = [name for name, ok in checks.items() if not ok]
+          if failed:
+              raise SystemExit('FAILED: ' + ', '.join(failed))
+          PY
+
+      - name: Commit banner change and remove workflow
+        run: |
+          git config user.name "PCNA App Engineering"
+          git config user.email "actions@users.noreply.github.com"
+          git rm .github/workflows/restore-dynamic-pcna-banner.yml
+          git add app.py
+          git commit -m "Restore rotating PCNA.com mobile hero"
+          git push origin main
