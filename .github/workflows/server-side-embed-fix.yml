@@ -1,0 +1,69 @@
+name: Force PCNA top-level embed mode
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    if: github.event.head_commit.message == 'Install server-side Streamlit embed enforcement'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Replace iframe-parent hack with server-side URL enforcement
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          p = Path('app.py')
+          s = p.read_text(encoding='utf-8')
+
+          pattern = re.compile(
+              r'st\.set_option\("client\.toolbarMode", "viewer"\)\n\n'
+              r'# Community Cloud chrome.*?'
+              r'(?=# Suppress any remaining in-app Streamlit chrome)',
+              re.S,
+          )
+
+          replacement = '''st.set_option("client.toolbarMode", "viewer")\n\n# Streamlit Community Cloud renders its \"Created by / Hosted with Streamlit\"\n# bar in the top-level Cloud shell. Do not try to reach that shell through a\n# child component iframe. Force the browser's actual Streamlit query state into\n# embed mode before rendering the application, then rerun once with the canonical\n# URL. Every internal link also preserves embed=true.\nif st.query_params.get("embed") != "true":\n    st.query_params["embed"] = "true"\n    st.rerun()\n\n'''
+
+          s2, n = pattern.subn(replacement, s, count=1)
+          if n != 1:
+              raise SystemExit(f'Expected exactly one old Cloud-chrome bootstrap block, found {n}')
+
+          # components is no longer used anywhere after removing the iframe hack.
+          s2 = s2.replace('import streamlit.components.v1 as components\n', '')
+          p.write_text(s2, encoding='utf-8')
+          PY
+      - name: Acceptance audit
+        run: |
+          python -m py_compile app.py
+          python - <<'PY'
+          from pathlib import Path
+          s = Path('app.py').read_text(encoding='utf-8')
+          checks = {
+              'server-side embed guard': 'st.query_params.get("embed") != "true"' in s,
+              'top-level embed write': 'st.query_params["embed"] = "true"' in s,
+              'one rerun after canonicalization': 'st.rerun()' in s,
+              'old parent-document injection removed': 'window.parent.document' not in s,
+              'components iframe bootstrap removed': 'components.html(' not in s,
+              'home/nav preserve embed': '?embed=true&page=' in s,
+          }
+          failed = [k for k,v in checks.items() if not v]
+          for k,v in checks.items(): print(f'{k}: {"PASS" if v else "FAIL"}')
+          if failed: raise SystemExit('FAILED: ' + ', '.join(failed))
+          PY
+      - name: Commit permanent fix and remove one-time workflow
+        run: |
+          git config user.name "PCNA App Engineering"
+          git config user.email "actions@users.noreply.github.com"
+          git rm .github/workflows/server-side-embed-fix.yml
+          git add app.py
+          git commit -m "Enforce Streamlit embed mode at top-level URL"
+          git push origin main
