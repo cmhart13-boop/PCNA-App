@@ -1,0 +1,77 @@
+name: Restore spec and quote card links
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  fix-links:
+    if: github.event.head_commit.message == 'Restore spec and quote card links'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+
+      - name: Restore proven in-app card navigation
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          p = Path('app.py')
+          s = p.read_text(encoding='utf-8')
+
+          replacements = {
+              '<a class="pcna-card" href="?embed=true&page=spec" target="_self" onclick="event.preventDefault();window.location.assign(this.href);">': '<a class="pcna-card" href="?embed=true&page=spec">',
+              '<a class="pcna-card" href="?embed=true&page=quote" target="_self" onclick="event.preventDefault();window.location.assign(this.href);">': '<a class="pcna-card" href="?embed=true&page=quote">',
+              '<a class="pcna-card" href="?embed=true&page=virtual" target="_self" onclick="event.preventDefault();window.location.assign(this.href);">': '<a class="pcna-card" href="?embed=true&page=virtual">',
+              '<a class="pcna-card" href="?embed=true&page=projects" target="_self" onclick="event.preventDefault();window.location.assign(this.href);">': '<a class="pcna-card" href="?embed=true&page=projects">',
+          }
+
+          for old, new in replacements.items():
+              if old not in s:
+                  raise SystemExit(f'Expected broken card link not found: {old}')
+              s = s.replace(old, new, 1)
+
+          p.write_text(s, encoding='utf-8')
+          PY
+
+      - name: Acceptance audit
+        run: |
+          python -m py_compile app.py
+          python - <<'PY'
+          from pathlib import Path
+          s = Path('app.py').read_text(encoding='utf-8')
+          required = [
+              '<a class="pcna-card" href="?embed=true&page=spec">',
+              '<a class="pcna-card" href="?embed=true&page=quote">',
+              'elif page == "spec":',
+              'elif page == "quote":',
+              'PCNA_HERO_URL = (',
+              'pcna-native-startup-cover',
+          ]
+          for token in required:
+              if token not in s:
+                  raise SystemExit(f'Missing required token: {token}')
+          forbidden = [
+              'href="?embed=true&page=spec" target="_self" onclick=',
+              'href="?embed=true&page=quote" target="_self" onclick=',
+          ]
+          for token in forbidden:
+              if token in s:
+                  raise SystemExit(f'Broken navigation still present: {token}')
+          print('PASS: spec/quote cards route directly to in-app Streamlit pages')
+          PY
+
+      - name: Commit fix and remove workflow
+        run: |
+          git config user.name "PCNA App Engineering"
+          git config user.email "actions@users.noreply.github.com"
+          git rm .github/workflows/restore-spec-quote-card-links.yml
+          git add app.py
+          git commit -m "Restore in-app spec and quote card navigation"
+          git push origin main
