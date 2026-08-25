@@ -51,121 +51,58 @@ st.set_page_config(page_title="PCNA", layout="centered", initial_sidebar_state="
 
 st.set_option("client.toolbarMode", "minimal")
 
-# Single-document mobile startup. The existing browser document is never replaced
-# or redirected. A stable PCNA splash covers the launch surface until the home UI
-# is ready, then fades exactly once.
-_STARTUP_LOGO_PATH = Path("IMG_2337.webp")
-_STARTUP_LOGO_DATA = (
-    "data:image/webp;base64," + base64.b64encode(_STARTUP_LOGO_PATH.read_bytes()).decode("ascii")
-    if _STARTUP_LOGO_PATH.exists()
-    else ""
+# Community Cloud chrome (including the bottom-right "Manage app / Hosted by Streamlit"
+# control) is removed by serving the app in Streamlit embed mode. Preserve all
+# existing query parameters and hash state; only add embed=true when missing.
+components.html(
+    """
+    <script>
+    (() => {
+      const doc = window.parent.document;
+      const script = doc.createElement('script');
+      script.textContent = `
+        (() => {
+          try {
+            const url = new URL(window.location.href);
+            if (!url.searchParams.has('embed')) {
+              url.searchParams.set('embed', 'true');
+              window.location.replace(url.toString());
+            }
+          } catch (_) {}
+        })();
+      `;
+      doc.documentElement.appendChild(script);
+      script.remove();
+    })();
+    </script>
+    """,
+    height=0,
+    width=0,
 )
 
-_STARTUP_BOOTSTRAP = """
-<script>
-(() => {
-  try {
-    const topDocument = window.top.document;
-    const root = topDocument.documentElement;
-
-    const removeHostChrome = () => {
-      const selectors = [
-        '[data-testid="stStatusWidget"]',
-        '[data-testid="stToolbar"]',
-        '[data-testid="stAppDeployButton"]',
-        '[data-testid="stDeployButton"]',
-        '[class*="viewerBadge"]',
-        '[class*="ViewerBadge"]',
-        'a[href*="streamlit.io/cloud"]',
-        'a[href*="share.streamlit.io"]'
-      ];
-      selectors.forEach((selector) => {
-        topDocument.querySelectorAll(selector).forEach((node) => node.remove());
-      });
-
-      topDocument.querySelectorAll('button,a,div').forEach((node) => {
-        const style = window.top.getComputedStyle(node);
-        if (style.position !== 'fixed' && style.position !== 'sticky') return;
-        const rect = node.getBoundingClientRect();
-        const nearBottomRight = rect.right >= window.top.innerWidth - 140 && rect.bottom >= window.top.innerHeight - 140;
-        if (!nearBottomRight) return;
-        const label = [
-          node.getAttribute('aria-label') || '',
-          node.getAttribute('title') || '',
-          node.textContent || ''
-        ].join(' ').toLowerCase();
-        if (label.includes('manage app') || label.includes('streamlit')) node.remove();
-      });
-    };
-
-    removeHostChrome();
-    if (!root.__pcnaHostObserver) {
-      root.__pcnaHostObserver = new MutationObserver(removeHostChrome);
-      root.__pcnaHostObserver.observe(topDocument.body || root, {childList:true, subtree:true});
-    }
-
-    if (root.dataset.pcnaStartupComplete === '1') return;
-    if (topDocument.getElementById('pcna-native-startup-cover')) return;
-
-    const cover = topDocument.createElement('div');
-    cover.id = 'pcna-native-startup-cover';
-    cover.setAttribute('aria-label', 'PCNA loading');
-    cover.dataset.startedAt = String(performance.now());
-    cover.style.cssText = [
-      'position:fixed','inset:0','z-index:2147483647','background:#ffffff',
-      'display:flex','align-items:center','justify-content:center',
-      'margin:0','padding:0','overflow:hidden','opacity:1',
-      'transition:opacity .46s cubic-bezier(.22,.61,.36,1)',
-      'pointer-events:none'
-    ].join(';');
-
-    const logo = topDocument.createElement('img');
-    logo.src = '__PCNA_STARTUP_LOGO__';
-    logo.alt = 'PCNA';
-    logo.style.cssText = [
-      'display:block','width:min(68vw,310px)','height:auto','max-height:34vh',
-      'object-fit:contain','opacity:1','transform:none'
-    ].join(';');
-
-    cover.appendChild(logo);
-    root.appendChild(cover);
-  } catch (_) {}
-})();
-</script>
-""".replace("__PCNA_STARTUP_LOGO__", _STARTUP_LOGO_DATA)
-
-_STARTUP_READY = """
-<script>
-(() => {
-  try {
-    const topDocument = window.top.document;
-    const root = topDocument.documentElement;
-    const cover = topDocument.getElementById('pcna-native-startup-cover');
-    if (!cover) {
-      root.dataset.pcnaStartupComplete = '1';
-      return;
-    }
-
-    const startedAt = Number(cover.dataset.startedAt || performance.now());
-    const elapsed = performance.now() - startedAt;
-    const wait = Math.max(0, 700 - elapsed);
-
-    window.top.setTimeout(() => {
-      requestAnimationFrame(() => requestAnimationFrame(() => {
-        cover.style.opacity = '0';
-        window.top.setTimeout(() => {
-          cover.remove();
-          root.dataset.pcnaStartupComplete = '1';
-        }, 500);
-      }));
-    }, wait);
-  } catch (_) {}
-})();
-</script>
-"""
-
-components.html(_STARTUP_BOOTSTRAP, height=0, width=0)
-
+# Suppress any remaining in-app Streamlit chrome in local/dev/self-hosted renders.
+st.html("""
+<style>
+#MainMenu,
+footer,
+header[data-testid="stHeader"],
+[data-testid="stStatusWidget"],
+[data-testid="stDecoration"],
+[data-testid="stToolbar"],
+[data-testid="stToolbarActions"],
+[data-testid="stDeployButton"],
+[data-testid="stAppDeployButton"],
+[data-testid="stViewerBadge"],
+[data-testid="stAppViewerBadge"],
+[data-testid*="ViewerBadge"],
+[data-testid*="viewerBadge"] {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+</style>
+""")
 
 
 PCNA_BLUE = "#084f86"
@@ -269,11 +206,11 @@ def current_page() -> str:
 
 
 def nav_link(page: str) -> str:
-    return f"?embed=true&page={quote(page)}"
+    return f"?page={quote(page)}"
 
 
 def projects_link() -> str:
-    return "?embed=true&page=projects"
+    return "?page=projects"
 
 
 def page_header(kicker: str, title: str, copy: str):
@@ -325,14 +262,14 @@ def render_streamlit_mobile_home():
   </a>
   <div class="pcna-section-title">What do you need?<span></span></div>
   <div class="pcna-grid">
-    <a class="pcna-card" href="?embed=true&page=spec"><div class="pcna-card-icon">✓</div><div class="pcna-card-title">Spec Sample<br>Order</div><div class="pcna-card-sub">Tell Nova what you need and build the verified PCNA order.</div><div class="card-art backpack" aria-hidden="true"><div></div></div><div class="pcna-arrow">→</div></a>
-    <a class="pcna-card" href="?embed=true&page=virtual"><div class="pcna-card-icon">◇</div><div class="pcna-card-title">Virtuals /<br>Designs</div><div class="pcna-card-sub">Ask Nova for product, kit or packaging virtuals and keep them in Projects.</div><div class="card-art laptop" aria-hidden="true"><div class="screen">NORTHPOINT<br><small>SOLUTIONS</small></div></div><div class="pcna-arrow">→</div></a>
-    <a class="pcna-card" href="?embed=true&page=quote"><div class="pcna-card-icon">$</div><div class="pcna-card-title">Quote<br>Request</div><div class="pcna-card-sub">Quote a verified PCNA product at the requested quantity.</div><div class="card-art quote-sheet" aria-hidden="true"><div class="qline"></div><div class="qline short"></div><div class="qbars"></div></div><div class="pcna-arrow">→</div></a>
-    <a class="pcna-card" href="?embed=true&page=projects"><div class="pcna-card-icon">□</div><div class="pcna-card-title">Projects</div><div class="pcna-card-sub">View and manage your saved projects, orders and virtuals in one place.</div><div class="card-art notebook" aria-hidden="true"><div class="elastic"></div></div><div class="pcna-arrow">→</div></a>
+    <a class="pcna-card" href="?page=spec"><div class="pcna-card-icon">✓</div><div class="pcna-card-title">Spec Sample<br>Order</div><div class="pcna-card-sub">Tell Nova what you need and build the verified PCNA order.</div><div class="card-art backpack" aria-hidden="true"><div></div></div><div class="pcna-arrow">→</div></a>
+    <a class="pcna-card" href="?page=virtual"><div class="pcna-card-icon">◇</div><div class="pcna-card-title">Virtuals /<br>Designs</div><div class="pcna-card-sub">Ask Nova for product, kit or packaging virtuals and keep them in Projects.</div><div class="card-art laptop" aria-hidden="true"><div class="screen">NORTHPOINT<br><small>SOLUTIONS</small></div></div><div class="pcna-arrow">→</div></a>
+    <a class="pcna-card" href="?page=quote"><div class="pcna-card-icon">$</div><div class="pcna-card-title">Quote<br>Request</div><div class="pcna-card-sub">Quote a verified PCNA product at the requested quantity.</div><div class="card-art quote-sheet" aria-hidden="true"><div class="qline"></div><div class="qline short"></div><div class="qbars"></div></div><div class="pcna-arrow">→</div></a>
+    <a class="pcna-card" href="?page=projects"><div class="pcna-card-icon">□</div><div class="pcna-card-title">Projects</div><div class="pcna-card-sub">View and manage your saved projects, orders and virtuals in one place.</div><div class="card-art notebook" aria-hidden="true"><div class="elastic"></div></div><div class="pcna-arrow">→</div></a>
   </div>
 </div>
 <nav class="pcna-mobile-nav">
-  <a class="active" href="?embed=true&page=home"><b>⌂</b><span>Home</span></a><a href="?embed=true&page=spec"><b>✓</b><span>Specs</span></a><a href="?embed=true&page=search"><b>⌕</b><span>Products</span></a><a href="?embed=true&page=virtual"><b>◇</b><span>Virtuals</span></a><a href="?embed=true&page=quote"><b>$</b><span>Quotes</span></a>
+  <a class="active" href="?page=home"><b>⌂</b><span>Home</span></a><a href="?page=spec"><b>✓</b><span>Specs</span></a><a href="?page=search"><b>⌕</b><span>Products</span></a><a href="?page=virtual"><b>◇</b><span>Virtuals</span></a><a href="?page=quote"><b>$</b><span>Quotes</span></a>
 </nav>
 <style>
 :root{{--pcna-navy:#063f80;--pcna-blue:#075ca8;--cyan:#27afe2}}
@@ -574,7 +511,6 @@ if page != "home":
 
 if page == "home":
     render_streamlit_mobile_home()
-    components.html(_STARTUP_READY, height=0, width=0)
     st.stop()
 
 elif page == "create":
