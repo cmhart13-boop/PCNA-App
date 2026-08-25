@@ -174,11 +174,7 @@ MUTED = "#66798a"
 LINE = "#d6e2eb"
 PANEL = "#f7fafc"
 NAV_BLUE = "#003b5c"
-PCNA_HERO_URL = (
-    "https://assets.pcna.com/image/upload/f_auto,q_auto/"
-    "Mkt_Dept/2026%20Jobs/2026-0817_Web_Messaging/0817_Web_PCNA_Hero_m.gif"
-    "?v=20260825"
-)
+PCNA_HERO_URL = "https://assets.pcna.com/image/upload/ar_16:7,c_fill,g_north,pg_1,q_auto,f_jpg/Mkt_Dept/2026%20Jobs/2026-0817_Web_Messaging/0817_Web_PCNA_Hero_m.jpg"
 
 st.markdown(
     f"""
