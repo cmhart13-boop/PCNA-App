@@ -51,34 +51,14 @@ st.set_page_config(page_title="PCNA", layout="centered", initial_sidebar_state="
 
 st.set_option("client.toolbarMode", "viewer")
 
-# Community Cloud chrome (including the bottom-right "Manage app / Hosted by Streamlit"
-# control) is removed by serving the app in Streamlit embed mode. Preserve all
-# existing query parameters and hash state; only add embed=true when missing.
-components.html(
-    """
-    <script>
-    (() => {
-      const doc = window.parent.document;
-      const script = doc.createElement('script');
-      script.textContent = `
-        (() => {
-          try {
-            const url = new URL(window.location.href);
-            if (!url.searchParams.has('embed')) {
-              url.searchParams.set('embed', 'true');
-              window.location.replace(url.toString());
-            }
-          } catch (_) {}
-        })();
-      `;
-      doc.documentElement.appendChild(script);
-      script.remove();
-    })();
-    </script>
-    """,
-    height=0,
-    width=0,
-)
+# Streamlit Community Cloud renders its "Created by / Hosted with Streamlit"
+# bar in the top-level Cloud shell. Do not try to reach that shell through a
+# child component iframe. Force the browser's actual Streamlit query state into
+# embed mode before rendering the application, then rerun once with the canonical
+# URL. Every internal link also preserves embed=true.
+if st.query_params.get("embed") != "true":
+    st.query_params["embed"] = "true"
+    st.rerun()
 
 # Suppress any remaining in-app Streamlit chrome in local/dev/self-hosted renders.
 st.html("""
