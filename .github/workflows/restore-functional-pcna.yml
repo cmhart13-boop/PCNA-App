@@ -1,0 +1,33 @@
+name: Restore functional PCNA app
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+jobs:
+  restore:
+    if: github.event.head_commit.message == 'Restore functional PCNA app tools'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Restore exact known-good functional tree
+        run: |
+          git config user.name "PCNA App Engineering"
+          git config user.email "actions@users.noreply.github.com"
+          git checkout 1847e86d551c30cd2edce70c2133f8c05f8b868a -- .
+          rm -f .github/workflows/restore-functional-pcna.yml
+          python -m py_compile app.py
+          python - <<'PY'
+          from pathlib import Path
+          s = Path('app.py').read_text(encoding='utf-8')
+          for token in ['elif page == "search"','elif page == "spec"','elif page == "quote"','elif page == "virtual"','elif page == "projects"','st.text_input("Product name or item number"','st.button("Generate Spec Sample"','st.button("Generate Quote"']:
+              assert token in s, token
+          print('PASS: restored functional tool routes and widgets from exact known-good tree')
+          PY
+          git add -A
+          git diff --cached --check
+          git commit -m "Restore exact known-good functional PCNA app"
+          git push origin main
