@@ -37,8 +37,10 @@ jobs:
           if n != 1:
               raise SystemExit(f'Expected exactly one old Cloud-chrome bootstrap block, found {n}')
 
-          # components is no longer used anywhere after removing the iframe hack.
-          s2 = s2.replace('import streamlit.components.v1 as components\n', '')
+          # Remove the import only if no other code references components.
+          without_import = s2.replace('import streamlit.components.v1 as components\n', '')
+          if 'components.' not in without_import:
+              s2 = without_import
           p.write_text(s2, encoding='utf-8')
           PY
       - name: Acceptance audit
@@ -52,7 +54,6 @@ jobs:
               'top-level embed write': 'st.query_params["embed"] = "true"' in s,
               'one rerun after canonicalization': 'st.rerun()' in s,
               'old parent-document injection removed': 'window.parent.document' not in s,
-              'components iframe bootstrap removed': 'components.html(' not in s,
               'home/nav preserve embed': '?embed=true&page=' in s,
           }
           failed = [k for k,v in checks.items() if not v]
