@@ -206,11 +206,11 @@ def current_page() -> str:
 
 
 def nav_link(page: str) -> str:
-    return f"?page={quote(page)}"
+    return f"?embed=true&page={quote(page)}"
 
 
 def projects_link() -> str:
-    return "?page=projects"
+    return "?embed=true&page=projects"
 
 
 def page_header(kicker: str, title: str, copy: str):
@@ -262,14 +262,14 @@ def render_streamlit_mobile_home():
   </a>
   <div class="pcna-section-title">What do you need?<span></span></div>
   <div class="pcna-grid">
-    <a class="pcna-card" href="?page=spec"><div class="pcna-card-icon">✓</div><div class="pcna-card-title">Spec Sample<br>Order</div><div class="pcna-card-sub">Tell Nova what you need and build the verified PCNA order.</div><div class="card-art backpack" aria-hidden="true"><div></div></div><div class="pcna-arrow">→</div></a>
-    <a class="pcna-card" href="?page=virtual"><div class="pcna-card-icon">◇</div><div class="pcna-card-title">Virtuals /<br>Designs</div><div class="pcna-card-sub">Ask Nova for product, kit or packaging virtuals and keep them in Projects.</div><div class="card-art laptop" aria-hidden="true"><div class="screen">NORTHPOINT<br><small>SOLUTIONS</small></div></div><div class="pcna-arrow">→</div></a>
-    <a class="pcna-card" href="?page=quote"><div class="pcna-card-icon">$</div><div class="pcna-card-title">Quote<br>Request</div><div class="pcna-card-sub">Quote a verified PCNA product at the requested quantity.</div><div class="card-art quote-sheet" aria-hidden="true"><div class="qline"></div><div class="qline short"></div><div class="qbars"></div></div><div class="pcna-arrow">→</div></a>
-    <a class="pcna-card" href="?page=projects"><div class="pcna-card-icon">□</div><div class="pcna-card-title">Projects</div><div class="pcna-card-sub">View and manage your saved projects, orders and virtuals in one place.</div><div class="card-art notebook" aria-hidden="true"><div class="elastic"></div></div><div class="pcna-arrow">→</div></a>
+    <a class="pcna-card" href="?embed=true&page=spec"><div class="pcna-card-icon">✓</div><div class="pcna-card-title">Spec Sample<br>Order</div><div class="pcna-card-sub">Tell Nova what you need and build the verified PCNA order.</div><div class="card-art backpack" aria-hidden="true"><div></div></div><div class="pcna-arrow">→</div></a>
+    <a class="pcna-card" href="?embed=true&page=virtual"><div class="pcna-card-icon">◇</div><div class="pcna-card-title">Virtuals /<br>Designs</div><div class="pcna-card-sub">Ask Nova for product, kit or packaging virtuals and keep them in Projects.</div><div class="card-art laptop" aria-hidden="true"><div class="screen">NORTHPOINT<br><small>SOLUTIONS</small></div></div><div class="pcna-arrow">→</div></a>
+    <a class="pcna-card" href="?embed=true&page=quote"><div class="pcna-card-icon">$</div><div class="pcna-card-title">Quote<br>Request</div><div class="pcna-card-sub">Quote a verified PCNA product at the requested quantity.</div><div class="card-art quote-sheet" aria-hidden="true"><div class="qline"></div><div class="qline short"></div><div class="qbars"></div></div><div class="pcna-arrow">→</div></a>
+    <a class="pcna-card" href="?embed=true&page=projects"><div class="pcna-card-icon">□</div><div class="pcna-card-title">Projects</div><div class="pcna-card-sub">View and manage your saved projects, orders and virtuals in one place.</div><div class="card-art notebook" aria-hidden="true"><div class="elastic"></div></div><div class="pcna-arrow">→</div></a>
   </div>
 </div>
 <nav class="pcna-mobile-nav">
-  <a class="active" href="?page=home"><b>⌂</b><span>Home</span></a><a href="?page=spec"><b>✓</b><span>Specs</span></a><a href="?page=search"><b>⌕</b><span>Products</span></a><a href="?page=virtual"><b>◇</b><span>Virtuals</span></a><a href="?page=quote"><b>$</b><span>Quotes</span></a>
+  <a class="active" href="?embed=true&page=home"><b>⌂</b><span>Home</span></a><a href="?embed=true&page=spec"><b>✓</b><span>Specs</span></a><a href="?embed=true&page=search"><b>⌕</b><span>Products</span></a><a href="?embed=true&page=virtual"><b>◇</b><span>Virtuals</span></a><a href="?embed=true&page=quote"><b>$</b><span>Quotes</span></a>
 </nav>
 <style>
 :root{{--pcna-navy:#063f80;--pcna-blue:#075ca8;--cyan:#27afe2}}
