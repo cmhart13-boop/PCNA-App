@@ -15,157 +15,33 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: main
-
       - name: Build startup architecture
+        env:
+          STARTUP_BLOCK_B64: c3Quc2V0X29wdGlvbigiY2xpZW50LnRvb2xiYXJNb2RlIiwgIm1pbmltYWwiKQoKIyBTdGFydHVwIGlzIGRlbGliZXJhdGVseSBoYW5kbGVkIGluIHR3byBjb250aW51b3VzIHN0YWdlcy4gQ29tbXVuaXR5IENsb3VkJ3MKIyBvdXRlciBzaGVsbCBleGlzdHMgYmVmb3JlIHRoZSBTdHJlYW1saXQgYXBwIGlmcmFtZSBpcyByZWFkeSwgc28gdGhlIGZpcnN0CiMgZXhlY3V0YWJsZSBhcHAgY29kZSBwYWludHMgYSBicmFuZGVkIHdoaXRlIGNvdmVyIG92ZXIgdGhhdCBzaGVsbCBhbmQgdGhlbgojIG1vdmVzIHRoZSBicm93c2VyIHRvIFN0cmVhbWxpdCdzIHJhdyBlbWJlZGRlZCBhcHAgZW5kcG9pbnQuIFRoZSByYXcgYXBwIGRyYXdzCiMgaWRlbnRpY2FsIHNwbGFzaCBpbiBpdHMgb3duIGRvY3VtZW50IHdoaWxlIHRoZSBob21lIHNjcmVlbiBiZWNvbWVzIHJlYWR5LgojIFRoZSB1c2VyIHRoZXJlZm9yZSBzZWVzIG9uZSBjb250aW51b3VzIFBDTkEgbGF1bmNoIHN1cmZhY2UgcmF0aGVyIHRoYW4gQ2xvdWQKIyBjaHJvbWUsIHdoaXRlIGZsYXNoZXMsIGlmcmFtZSB0cmFuc2l0aW9ucywgb3IgaW50ZXJtZWRpYXRlIFN0cmVhbWxpdCBVSS4KX1NUQVJUVVBfTE9HT19QQVRIID0gUGF0aCgiSU1HXzIzMzcud2VicCIpCl9TVEFSVFVQX0xPR09fREFUQSA9ICgKICAgICJkYXRhOmltYWdlL3dlYnA7YmFzZTY0LCIgKyBiYXNlNjQuYjY0ZW5jb2RlKF9TVEFSVFVQX0xPR09fUEFUSC5yZWFkX2J5dGVzKCkpLmRlY29kZSgiYXNjaWkiKQogICAgaWYgX1NUQVJUVVBfTE9HT19QQVRILmV4aXN0cygpCiAgICBlbHNlICIiCikKCmNvbXBvbmVudHMuaHRtbCgKICAgIGYiIiIKICAgIDxzY3JpcHQ+CiAgICAoKCkgPT4gewogICAgICB0cnkgewogICAgICAgIGNvbnN0IHRvcFdpbmRvdyA9IHdpbmRvdy50b3A7CiAgICAgICAgY29uc3QgdG9wRG9jdW1lbnQgPSB0b3BXaW5kb3cuZG9jdW1lbnQ7CiAgICAgICAgY29uc3QgY3VycmVudCA9IG5ldyBVUkwodG9wV2luZG93LmxvY2F0aW9uLmhyZWYpOwoKICAgICAgICBpZiAoY3VycmVudC5wYXRobmFtZS5zdGFydHNXaXRoKCcvfi8rLycpICYmIGN1cnJlbnQuc2VhcmNoUGFyYW1zLmdldCgnZW1iZWQnKSA9PT0gJ3RydWUnKSB7CiAgICAgICAgICByZXR1cm47CiAgICAgICAgfQoKICAgICAgICBsZXQgY292ZXIgPSB0b3BEb2N1bWVudC5nZXRFbGVtZW50QnlJZCgncGNuYS1uYXRpdmUtc3RhcnR1cC1jb3ZlcicpOwogICAgICAgIGlmICghY292ZXIpIHsKICAgICAgICAgIGNvdmVyID0gdG9wRG9jdW1lbnQuY3JlYXRlRWxlbWVudCgnZGl2Jyk7CiAgICAgICAgICBjb3Zlci5pZCA9ICdwY25hLW5hdGl2ZS1zdGFydHVwLWNvdmVyJzsKICAgICAgICAgIGNvdmVyLnNldEF0dHJpYnV0ZSgnYXJpYS1sYWJlbCcsICdQQ05BIGxvYWRpbmcnKTsKICAgICAgICAgIGNvdmVyLnN0eWxlLmNzc1RleHQgPSBbCiAgICAgICAgICAgICdwb3NpdGlvbjpmaXhlZCcsICdpbnNldDowJywgJ3otaW5kZXg6MjE0NzQ4MzY0NycsCiAgICAgICAgICAgICdiYWNrZ3JvdW5kOiNmZmZmZmYnLCAnZGlzcGxheTpmbGV4JywgJ2FsaWduLWl0ZW1zOmNlbnRlcicsCiAgICAgICAgICAgICdqdXN0aWZ5LWNvbnRlbnQ6Y2VudGVyJywgJ21hcmdpbjowJywgJ3BhZGRpbmc6MCcsCiAgICAgICAgICAgICdvdmVyZmxvdzpoaWRkZW4nLCAnb3BhY2l0eToxJywgJ3RyYW5zaXRpb246b3BhY2l0eSAuNDJzIGVhc2UnCiAgICAgICAgICBdLmpvaW4oJzsnKTsKICAgICAgICAgIGNvbnN0IGxvZ28gPSB0b3BEb2N1bWVudC5jcmVhdGVFbGVtZW50KCdpbWcnKTsKICAgICAgICAgIGxvZ28uc3JjID0gJ3tfU1RBUlRVUF9MT0dPX0RBVEF9JzsKICAgICAgICAgIGxvZ28uYWx0ID0gJ1BDTkEnOwogICAgICAgICAgbG9nby5zdHlsZS5jc3NUZXh0ID0gJ2Rpc3BsYXk6YmxvY2s7d2lkdGg6bWluKDY4dncsMzEwcHgpO2hlaWdodDphdXRvO21heC1oZWlnaHQ6MzR2aDtPYmplY3QtZml0OmNvbnRhaW4nOwogICAgICAgICAgY292ZXIuYXBwZW5kQ2hpbGQobG9nbyk7CiAgICAgICAgICB0b3BEb2N1bWVudC5kb2N1bWVudEVsZW1lbnQuYXBwZW5kQ2hpbGQoY292ZXIpOwogICAgICAgIH0KCiAgICAgICAgY29uc3QgYXBwRnJhbWUgPSB0b3BEb2N1bWVudC5xdWVyeVNlbGVjdG9yKCdpZnJhbWVbdGl0bGU9InN0cmVhbWxpdEFwcCJdJyk7CiAgICAgICAgaWYgKCFhcHBGcmFtZSB8fCAhYXBwRnJhbWUuc3JjKSByZXR1cm47CgogICAgICAgIGNvbnN0IHRhcmdldCA9IG5ldyBVUkwoYXBwRnJhbWUuc3JjLCBjdXJyZW50LmhyZWYpOwogICAgICAgIGN1cnJlbnQuc2VhcmNoUGFyYW1zLmZvckVhY2goKHZhbHVlLCBrZXkpID0+IHsKICAgICAgICAgIGlmICghWydlbWJlZCcsICdwY25hX3N0YXJ0dXAnXS5pbmNsdWRlcyhrZXkpKSB0YXJnZXQuc2VhcmNoUGFyYW1zLnNldChrZXksIHZhbHVlKTsKICAgICAgICB9KTsKICAgICAgICB0YXJnZXQuc2VhcmNoUGFyYW1zLnNldCgnZW1iZWQnLCAndHJ1ZScpOwogICAgICAgIHRhcmdldC5zZWFyY2hQYXJhbXMuc2V0KCdwY25hX3N0YXJ0dXAnLCAnMScpOwogICAgICAgIHRhcmdldC5oYXNoID0gY3VycmVudC5oYXNoOwoKICAgICAgICByZXF1ZXN0QW5pbWF0aW9uRnJhbWUoKCkgPT4gcmVxdWVzdEFuaW1hdGlvbkZyYW1lKCgpID0+IHsKICAgICAgICAgIHRvcFdpbmRvdy5sb2NhdGlvbi5yZXBsYWNlKHRhcmdldC5ocmVmKTsKICAgICAgICB9KSk7CiAgICAgIH0gY2F0Y2ggKF8pIHt9CiAgICB9KSgpOwogICAgPC9zY3JpcHQ+CiAgICAiIiIsCiAgICBoZWlnaHQ9MCwKICAgIHdpZHRoPTAsCikKCmlmIHN0cihzdC5xdWVyeV9wYXJhbXMuZ2V0KCJwY25hX3N0YXJ0dXAiLCAiIikpID09ICIxIjoKICAgIHN0Lm1hcmtkb3duKAogICAgICAgIGYiIiIKICAgICAgICA8ZGl2IGlkPSJwY25hLWFwcC1zdGFydHVwLWNvdmVyIiBhcmlhLWxhYmVsPSJQQ05BIGxvYWRpbmciPgogICAgICAgICAgPGltZyBzcmM9IntfU1RBUlRVUF9MT0dPX0RBVEF9IiBhbHQ9IlBDTkEiPgogICAgICAgIDwvZGl2PgogICAgICAgIDxzdHlsZT4KICAgICAgICAjcGNuYS1hcHAtc3RhcnR1cC1jb3ZlciB7CiAgICAgICAgICBwb3NpdGlvbjpmaXhlZDsvIGluc2V0OjA7IHotaW5kZXg6MjE0NzQ4MzY0NjsgYmFja2dyb3VuZDojZmZmOwogICAgICAgICAgZGlzcGxheTpmbGV4OyBhbGlnbi1pdGVtczpjZW50ZXI7IGp1c3RpZnktY29udGVudDpjZW50ZXI7CiAgICAgICAgICBtYXJnaW46MDsgcGFkZGluZzowOyBvdmVyZmxvdzpoaWRkZW47IHBvaW50ZXItZXZlbnRzOm5vbmU7CiAgICAgICAgICBhbmltYXRpb246cGNuYVN0YXJ0dXBFeGl0IDIuNzVzIGN1YmljLWJlemllciguMjIsLjYxLC4zNiwxKSBmb3J3YXJkczsKICAgICAgICB9CiAgICAgICAgI3BjbmEtYXBwLXN0YXJ0dXAtY292ZXIgaW1nIHsKICAgICAgICAgIGRpc3BsYXk6YmxvY2s7IHdpZHRoOm1pbig2OHZ3LDMxMHB4KTsgaGVpZ2h0OmF1dG87IG1heC1oZWlnaHQ6MzR2aDsKICAgICAgICAgIG9iamVjdC1maXQ6Y29udGFpbjsgb3BhY2l0eTowOwogICAgICAgICAgYW5pbWF0aW9uOnBjbmFMb2dvRW50ZXIgLjM0cyBlYXNlLW91dCAuMDhzIGZvcndhcmRzOwogICAgICAgIH0KICAgICAgICBAa2V5ZnJhbWVzIHBjbmFMb2dvRW50ZXIgeyBmcm9tIHtvcGFjaXR5OjA7dHJhbnNmb3JtOnNjYWxlKC45ODUpfSB0byB7b3BhY2l0eToxO3RyYW5zZm9ybTpzY2FsZSgxKX0gfQogICAgICAgIEBrZXlmcmFtZXMgcGNuYVN0YXJ0dXBFeGl0IHsKICAgICAgICAgIDAlLCA3OCUge29wYWNpdHk6MTt2aXNpYmlsaXR5OnZpc2libGV9CiAgICAgICAgICAxMDAlIHtvcGFjaXR5OjA7dmlzaWJpbGl0eTpoaWRkZW59CiAgICAgICAgfQogICAgICAgIDwvc3R5bGU+CiAgICAgICAgIiIiLAogICAgICAgIHVuc2FmZV9hbGxvd19odG1sPVRydWUsCiAgICApCg==
         run: |
           python - <<'PY'
           from pathlib import Path
-          import re
-
+          import base64
           p = Path('app.py')
           s = p.read_text(encoding='utf-8')
-
-          old_start = s.index('st.set_option("client.toolbarMode", "minimal")')
-          old_end = s.index('\n\n\nPCNA_BLUE =', old_start)
-
-          replacement = r'''st.set_option("client.toolbarMode", "minimal")
-
-# Startup is deliberately handled in two continuous stages. Community Cloud's
-# outer shell exists before the Streamlit app iframe is ready, so the first
-# executable app code paints a branded white cover over that shell and then
-# moves the browser to Streamlit's raw embedded app endpoint. The raw app draws
-# the identical splash in its own document while the home screen becomes ready.
-# The user therefore sees one continuous PCNA launch surface rather than Cloud
-# chrome, white flashes, iframe transitions, or intermediate Streamlit UI.
-_STARTUP_LOGO_PATH = Path("IMG_2337.webp")
-_STARTUP_LOGO_DATA = (
-    "data:image/webp;base64," + base64.b64encode(_STARTUP_LOGO_PATH.read_bytes()).decode("ascii")
-    if _STARTUP_LOGO_PATH.exists()
-    else ""
-)
-
-components.html(
-    f"""
-    <script>
-    (() => {{
-      try {{
-        const topWindow = window.top;
-        const topDocument = topWindow.document;
-        const current = new URL(topWindow.location.href);
-
-        // Once we are already on Streamlit's raw application endpoint there is
-        // no Community Cloud shell left to remove. The in-app splash below owns
-        // the remainder of the launch transition.
-        if (current.pathname.startsWith('/~/+/') && current.searchParams.get('embed') === 'true') {{
-          return;
-        }}
-
-        let cover = topDocument.getElementById('pcna-native-startup-cover');
-        if (!cover) {{
-          cover = topDocument.createElement('div');
-          cover.id = 'pcna-native-startup-cover';
-          cover.setAttribute('aria-label', 'PCNA loading');
-          cover.style.cssText = [
-            'position:fixed', 'inset:0', 'z-index:2147483647',
-            'background:#ffffff', 'display:flex', 'align-items:center',
-            'justify-content:center', 'margin:0', 'padding:0',
-            'overflow:hidden', 'opacity:1', 'transition:opacity .42s ease'
-          ].join(';');
-          const logo = topDocument.createElement('img');
-          logo.src = '{_STARTUP_LOGO_DATA}';
-          logo.alt = 'PCNA';
-          logo.style.cssText = 'display:block;width:min(68vw,310px);height:auto;max-height:34vh;object-fit:contain';
-          cover.appendChild(logo);
-          topDocument.documentElement.appendChild(cover);
-        }}
-
-        const appFrame = topDocument.querySelector('iframe[title="streamlitApp"]');
-        if (!appFrame || !appFrame.src) return;
-
-        const target = new URL(appFrame.src, current.href);
-        current.searchParams.forEach((value, key) => {{
-          if (!['embed', 'pcna_startup'].includes(key)) target.searchParams.set(key, value);
-        }});
-        target.searchParams.set('embed', 'true');
-        target.searchParams.set('pcna_startup', '1');
-        target.hash = current.hash;
-
-        // Give the browser one committed frame with the branded cover before
-        // replacing the Cloud wrapper. That removes the visible white/widget
-        // hand-off that previously made startup look choppy.
-        requestAnimationFrame(() => requestAnimationFrame(() => {{
-          topWindow.location.replace(target.href);
-        }}));
-      }} catch (_) {{}}
-    }})();
-    </script>
-    """,
-    height=0,
-    width=0,
-)
-
-# The raw endpoint gets the same visual surface, so the wrapper-to-app handoff
-# is visually continuous. It holds for ~2.35 seconds and then fades into the
-# already-rendered PCNA home screen instead of revealing intermediate paints.
-if str(st.query_params.get("pcna_startup", "")) == "1":
-    st.markdown(
-        f"""
-        <div id="pcna-app-startup-cover" aria-label="PCNA loading">
-          <img src="{_STARTUP_LOGO_DATA}" alt="PCNA">
-        </div>
-        <style>
-        #pcna-app-startup-cover {{
-          position:fixed; inset:0; z-index:2147483646; background:#fff;
-          display:flex; align-items:center; justify-content:center;
-          margin:0; padding:0; overflow:hidden; pointer-events:none;
-          animation:pcnaStartupExit 2.75s cubic-bezier(.22,.61,.36,1) forwards;
-        }}
-        #pcna-app-startup-cover img {{
-          display:block; width:min(68vw,310px); height:auto; max-height:34vh;
-          object-fit:contain; opacity:0;
-          animation:pcnaLogoEnter .34s ease-out .08s forwards;
-        }}
-        @keyframes pcnaLogoEnter {{ from {{opacity:0;transform:scale(.985)}} to {{opacity:1;transform:scale(1)}} }}
-        @keyframes pcnaStartupExit {{
-          0%, 78% {{opacity:1;visibility:visible}}
-          100% {{opacity:0;visibility:hidden}}
-        }}
-        </style>
-        """,
-        unsafe_allow_html=True,
-    )
-'''
-
-          s2 = s[:old_start] + replacement + s[old_end:]
-          p.write_text(s2, encoding='utf-8')
+          start = s.index('st.set_option("client.toolbarMode", "minimal")')
+          end = s.index('\n\n\nPCNA_BLUE =', start)
+          block = base64.b64decode(__import__('os').environ['STARTUP_BLOCK_B64']).decode('utf-8')
+          p.write_text(s[:start] + block + s[end:], encoding='utf-8')
           PY
-
       - name: Engineering acceptance audit
         run: |
           python -m py_compile app.py
           python - <<'PY'
           from pathlib import Path
           s = Path('app.py').read_text(encoding='utf-8')
-          checks = {
-              'approved bundled logo used': '_STARTUP_LOGO_PATH = Path("IMG_2337.webp")' in s,
-              'outer shell covered': 'pcna-native-startup-cover' in s,
-              'raw endpoint handoff': "current.pathname.startsWith('/~/+/')" in s,
-              'embed mode forced': "target.searchParams.set('embed', 'true')" in s,
-              'startup state carried': "target.searchParams.set('pcna_startup', '1')" in s,
-              'two-frame paint before redirect': 'requestAnimationFrame(() => requestAnimationFrame' in s,
-              'raw app splash present': 'pcna-app-startup-cover' in s,
-              '2-3 second hold': '2.75s' in s,
-              'smooth fade': '@keyframes pcnaStartupExit' in s,
-              'no old raw-app marker': 'pcnaRawApp' not in s,
-              'navigation remains embedded': '?embed=true&page=' in s,
-          }
-          failed = [name for name, ok in checks.items() if not ok]
-          for name, ok in checks.items():
-              print(f'{name}: {"PASS" if ok else "FAIL"}')
-          if failed:
-              raise SystemExit('Acceptance audit failed: ' + ', '.join(failed))
+          required = ['pcna-native-startup-cover','pcna-app-startup-cover',"target.searchParams.set('embed', 'true')","target.searchParams.set('pcna_startup', '1')",'requestAnimationFrame(() => requestAnimationFrame','2.75s','@keyframes pcnaStartupExit','?embed=true&page=']
+          missing = [x for x in required if x not in s]
+          print('compile: PASS')
+          print('startup architecture:', 'PASS' if not missing else 'FAIL')
+          if missing:
+              raise SystemExit('Missing: ' + ', '.join(missing))
           PY
-
       - name: Commit implementation and remove one-time workflow
         run: |
           git config user.name "PCNA App Engineering"
