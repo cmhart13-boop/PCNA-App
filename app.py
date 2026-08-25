@@ -51,35 +51,6 @@ st.set_page_config(page_title="PCNA", layout="centered", initial_sidebar_state="
 
 st.set_option("client.toolbarMode", "minimal")
 
-# Community Cloud chrome (including the bottom-right "Manage app / Hosted by Streamlit"
-# control) is removed by serving the app in Streamlit embed mode. Preserve all
-# existing query parameters and hash state; only add embed=true when missing.
-components.html(
-    """
-    <script>
-    (() => {
-      const doc = window.parent.document;
-      const script = doc.createElement('script');
-      script.textContent = `
-        (() => {
-          try {
-            const url = new URL(window.location.href);
-            if (!url.searchParams.has('embed')) {
-              url.searchParams.set('embed', 'true');
-              window.location.replace(url.toString());
-            }
-          } catch (_) {}
-        })();
-      `;
-      doc.documentElement.appendChild(script);
-      script.remove();
-    })();
-    </script>
-    """,
-    height=0,
-    width=0,
-)
-
 # Suppress any remaining in-app Streamlit chrome in local/dev/self-hosted renders.
 st.html("""
 <style>
@@ -257,9 +228,9 @@ def render_streamlit_mobile_home():
       <img src="{logo}" class="pcna-head-logo" alt="PCNA">
     </a>
   </div>
-  <a class="pcna-hero" href="https://www.pcna.com/en-us" target="_blank" rel="noopener noreferrer" aria-label="Open PCNA.com">
+  <div class="pcna-hero" aria-label="PCNA lifestyle banner">
     <img src="{PCNA_HERO_URL}" class="pcna-hero-img" alt="PCNA lifestyle banner">
-  </a>
+  </div>
   <div class="pcna-section-title">What do you need?<span></span></div>
   <div class="pcna-grid">
     <a class="pcna-card" href="?page=spec"><div class="pcna-card-icon">✓</div><div class="pcna-card-title">Spec Sample<br>Order</div><div class="pcna-card-sub">Tell Nova what you need and build the verified PCNA order.</div><div class="card-art backpack" aria-hidden="true"><div></div></div><div class="pcna-arrow">→</div></a>
