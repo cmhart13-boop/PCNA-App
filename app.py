@@ -49,7 +49,7 @@ from storage import (
 
 st.set_page_config(page_title="PCNA", layout="centered", initial_sidebar_state="collapsed")
 
-st.set_option("client.toolbarMode", "minimal")
+st.set_option("client.toolbarMode", "viewer")
 
 # Community Cloud chrome (including the bottom-right "Manage app / Hosted by Streamlit"
 # control) is removed by serving the app in Streamlit embed mode. Preserve all
