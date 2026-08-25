@@ -49,40 +49,53 @@ from storage import (
 
 st.set_page_config(page_title="PCNA", layout="centered", initial_sidebar_state="collapsed")
 
-st.set_option("client.toolbarMode", "viewer")
+st.set_option("client.toolbarMode", "minimal")
 
-# Streamlit Community Cloud renders its "Created by / Hosted with Streamlit"
-# bar in the top-level Cloud shell. Do not try to reach that shell through a
-# child component iframe. Force the browser's actual Streamlit query state into
-# embed mode before rendering the application, then rerun once with the canonical
-# URL. Every internal link also preserves embed=true.
-if st.query_params.get("embed") != "true":
-    st.query_params["embed"] = "true"
-    st.rerun()
+# Streamlit Community Cloud renders its viewer badge in a separate outer React
+# shell, as a sibling of the actual app iframe. Route the top-level browser to
+# Streamlit's raw app endpoint and remove that shell from the execution path.
+# This is intentionally a one-shot canonical redirect: no observer, polling,
+# local storage, CSS selector, or widget-removal loop can recreate the shell.
+components.html(
+    """
+    <script>
+    (() => {
+      try {
+        const hostDocument = window.top.document;
+        if (hostDocument.documentElement.dataset.pcnaRawApp === 'ready') return;
 
-# Suppress any remaining in-app Streamlit chrome in local/dev/self-hosted renders.
-st.html("""
-<style>
-#MainMenu,
-footer,
-header[data-testid="stHeader"],
-[data-testid="stStatusWidget"],
-[data-testid="stDecoration"],
-[data-testid="stToolbar"],
-[data-testid="stToolbarActions"],
-[data-testid="stDeployButton"],
-[data-testid="stAppDeployButton"],
-[data-testid="stViewerBadge"],
-[data-testid="stAppViewerBadge"],
-[data-testid*="ViewerBadge"],
-[data-testid*="viewerBadge"] {
-    display: none !important;
-    visibility: hidden !important;
-    opacity: 0 !important;
-    pointer-events: none !important;
-}
-</style>
-""")
+        const bootstrap = hostDocument.createElement('script');
+        bootstrap.textContent = `
+          (() => {
+            const current = new URL(window.location.href);
+            const appFrame = document.querySelector('iframe[title="streamlitApp"]');
+
+            if (!appFrame && current.pathname.startsWith('/~/+/') &&
+                current.searchParams.get('embed') === 'true') {
+              document.documentElement.dataset.pcnaRawApp = 'ready';
+              return;
+            }
+
+            const target = appFrame
+              ? new URL(appFrame.src, current.href)
+              : new URL(current.href);
+            current.searchParams.forEach((value, key) => {
+              if (key !== 'embed') target.searchParams.set(key, value);
+            });
+            target.searchParams.set('embed', 'true');
+            target.hash = current.hash;
+            window.location.replace(target.href);
+          })();
+        `;
+        (hostDocument.head || hostDocument.documentElement).appendChild(bootstrap);
+        bootstrap.remove();
+      } catch (_) {}
+    })();
+    </script>
+    """,
+    height=0,
+    width=0,
+)
 
 
 PCNA_BLUE = "#084f86"
