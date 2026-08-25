@@ -51,13 +51,9 @@ st.set_page_config(page_title="PCNA", layout="centered", initial_sidebar_state="
 
 st.set_option("client.toolbarMode", "minimal")
 
-# Startup is deliberately handled in two continuous stages. Community Cloud's
-# outer shell exists before the Streamlit app iframe is ready, so the first
-# executable app code paints a branded white cover over that shell and then
-# moves the browser to Streamlit's raw embedded app endpoint. The raw app draws
-# the identical splash in its own document while the home screen becomes ready.
-# The user therefore sees one continuous PCNA launch surface rather than Cloud
-# chrome, white flashes, iframe transitions, or intermediate Streamlit UI.
+# Single-document mobile startup. The existing browser document is never replaced
+# or redirected. A stable PCNA splash covers the launch surface until the home UI
+# is ready, then fades exactly once.
 _STARTUP_LOGO_PATH = Path("IMG_2337.webp")
 _STARTUP_LOGO_DATA = (
     "data:image/webp;base64," + base64.b64encode(_STARTUP_LOGO_PATH.read_bytes()).decode("ascii")
@@ -69,81 +65,106 @@ _STARTUP_BOOTSTRAP = """
 <script>
 (() => {
   try {
-    const topWindow = window.top;
-    const topDocument = topWindow.document;
-    const current = new URL(topWindow.location.href);
+    const topDocument = window.top.document;
+    const root = topDocument.documentElement;
 
-    if (current.pathname.startsWith('/~/+/') && current.searchParams.get('embed') === 'true') {
-      return;
+    const removeHostChrome = () => {
+      const selectors = [
+        '[data-testid="stStatusWidget"]',
+        '[data-testid="stToolbar"]',
+        '[data-testid="stAppDeployButton"]',
+        '[data-testid="stDeployButton"]',
+        '[class*="viewerBadge"]',
+        '[class*="ViewerBadge"]',
+        'a[href*="streamlit.io/cloud"]',
+        'a[href*="share.streamlit.io"]'
+      ];
+      selectors.forEach((selector) => {
+        topDocument.querySelectorAll(selector).forEach((node) => node.remove());
+      });
+
+      topDocument.querySelectorAll('button,a,div').forEach((node) => {
+        const style = window.top.getComputedStyle(node);
+        if (style.position !== 'fixed' && style.position !== 'sticky') return;
+        const rect = node.getBoundingClientRect();
+        const nearBottomRight = rect.right >= window.top.innerWidth - 140 && rect.bottom >= window.top.innerHeight - 140;
+        if (!nearBottomRight) return;
+        const label = [
+          node.getAttribute('aria-label') || '',
+          node.getAttribute('title') || '',
+          node.textContent || ''
+        ].join(' ').toLowerCase();
+        if (label.includes('manage app') || label.includes('streamlit')) node.remove();
+      });
+    };
+
+    removeHostChrome();
+    if (!root.__pcnaHostObserver) {
+      root.__pcnaHostObserver = new MutationObserver(removeHostChrome);
+      root.__pcnaHostObserver.observe(topDocument.body || root, {childList:true, subtree:true});
     }
 
-    let cover = topDocument.getElementById('pcna-native-startup-cover');
-    if (!cover) {
-      cover = topDocument.createElement('div');
-      cover.id = 'pcna-native-startup-cover';
-      cover.setAttribute('aria-label', 'PCNA loading');
-      cover.style.cssText = [
-        'position:fixed', 'inset:0', 'z-index:2147483647',
-        'background:#ffffff', 'display:flex', 'align-items:center',
-        'justify-content:center', 'margin:0', 'padding:0',
-        'overflow:hidden', 'opacity:1', 'transition:opacity .42s ease'
-      ].join(';');
-      const logo = topDocument.createElement('img');
-      logo.src = '__PCNA_STARTUP_LOGO__';
-      logo.alt = 'PCNA';
-      logo.style.cssText = 'display:block;width:min(68vw,310px);height:auto;max-height:34vh;object-fit:contain';
-      cover.appendChild(logo);
-      topDocument.documentElement.appendChild(cover);
-    }
+    if (root.dataset.pcnaStartupComplete === '1') return;
+    if (topDocument.getElementById('pcna-native-startup-cover')) return;
 
-    const appFrame = topDocument.querySelector('iframe[title="streamlitApp"]');
-    if (!appFrame || !appFrame.src) return;
+    const cover = topDocument.createElement('div');
+    cover.id = 'pcna-native-startup-cover';
+    cover.setAttribute('aria-label', 'PCNA loading');
+    cover.dataset.startedAt = String(performance.now());
+    cover.style.cssText = [
+      'position:fixed','inset:0','z-index:2147483647','background:#ffffff',
+      'display:flex','align-items:center','justify-content:center',
+      'margin:0','padding:0','overflow:hidden','opacity:1',
+      'transition:opacity .46s cubic-bezier(.22,.61,.36,1)',
+      'pointer-events:none'
+    ].join(';');
 
-    const target = new URL(appFrame.src, current.href);
-    current.searchParams.forEach((value, key) => {
-      if (!['embed', 'pcna_startup'].includes(key)) target.searchParams.set(key, value);
-    });
-    target.searchParams.set('embed', 'true');
-    target.searchParams.set('pcna_startup', '1');
-    target.hash = current.hash;
+    const logo = topDocument.createElement('img');
+    logo.src = '__PCNA_STARTUP_LOGO__';
+    logo.alt = 'PCNA';
+    logo.style.cssText = [
+      'display:block','width:min(68vw,310px)','height:auto','max-height:34vh',
+      'object-fit:contain','opacity:1','transform:none'
+    ].join(';');
 
-    requestAnimationFrame(() => requestAnimationFrame(() => {
-      topWindow.location.replace(target.href);
-    }));
+    cover.appendChild(logo);
+    root.appendChild(cover);
   } catch (_) {}
 })();
 </script>
 """.replace("__PCNA_STARTUP_LOGO__", _STARTUP_LOGO_DATA)
 
-components.html(_STARTUP_BOOTSTRAP, height=0, width=0)
+_STARTUP_READY = """
+<script>
+(() => {
+  try {
+    const topDocument = window.top.document;
+    const root = topDocument.documentElement;
+    const cover = topDocument.getElementById('pcna-native-startup-cover');
+    if (!cover) {
+      root.dataset.pcnaStartupComplete = '1';
+      return;
+    }
 
-if str(st.query_params.get("pcna_startup", "")) == "1":
-    st.markdown(
-        f"""
-        <div id="pcna-app-startup-cover" aria-label="PCNA loading">
-          <img src="{_STARTUP_LOGO_DATA}" alt="PCNA">
-        </div>
-        <style>
-        #pcna-app-startup-cover {{
-          position:fixed; inset:0; z-index:2147483646; background:#fff;
-          display:flex; align-items:center; justify-content:center;
-          margin:0; padding:0; overflow:hidden; pointer-events:none;
-          animation:pcnaStartupExit 2.75s cubic-bezier(.22,.61,.36,1) forwards;
-        }}
-        #pcna-app-startup-cover img {{
-          display:block; width:min(68vw,310px); height:auto; max-height:34vh;
-          object-fit:contain; opacity:0;
-          animation:pcnaLogoEnter .34s ease-out .08s forwards;
-        }}
-        @keyframes pcnaLogoEnter {{ from {{opacity:0;transform:scale(.985)}} to {{opacity:1;transform:scale(1)}} }}
-        @keyframes pcnaStartupExit {{
-          0%, 78% {{opacity:1;visibility:visible}}
-          100% {{opacity:0;visibility:hidden}}
-        }}
-        </style>
-        """,
-        unsafe_allow_html=True,
-    )
+    const startedAt = Number(cover.dataset.startedAt || performance.now());
+    const elapsed = performance.now() - startedAt;
+    const wait = Math.max(0, 700 - elapsed);
+
+    window.top.setTimeout(() => {
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        cover.style.opacity = '0';
+        window.top.setTimeout(() => {
+          cover.remove();
+          root.dataset.pcnaStartupComplete = '1';
+        }, 500);
+      }));
+    }, wait);
+  } catch (_) {}
+})();
+</script>
+"""
+
+components.html(_STARTUP_BOOTSTRAP, height=0, width=0)
 
 
 
@@ -553,6 +574,7 @@ if page != "home":
 
 if page == "home":
     render_streamlit_mobile_home()
+    components.html(_STARTUP_READY, height=0, width=0)
     st.stop()
 
 elif page == "create":
