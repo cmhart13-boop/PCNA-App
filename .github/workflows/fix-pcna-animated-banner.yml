@@ -1,0 +1,65 @@
+name: Fix PCNA animated home banner
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  fix-banner:
+    if: github.event.head_commit.message == 'Fix PCNA animated banner source'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+
+      - name: Restore native animated PCNA hero asset
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('app.py')
+          s = p.read_text(encoding='utf-8')
+          old = '''PCNA_HERO_URL = (
+    "https://assets.pcna.com/image/upload/f_auto,q_auto/"
+    "Mkt_Dept/2026%20Jobs/2026-0817_Web_Messaging/0817_Web_PCNA_Hero_m.gif"
+    "?v=20260825"
+)'''
+          new = '''PCNA_HERO_URL = (
+    "https://assets.pcna.com/image/upload/"
+    "Mkt_Dept/2026%20Jobs/2026-0817_Web_Messaging/0817_Web_PCNA_Hero_m.gif"
+    "?v=20260825-animated"
+)'''
+          if old not in s:
+              raise SystemExit('Expected current hero definition not found; refusing unrelated edits')
+          s = s.replace(old, new, 1)
+          p.write_text(s, encoding='utf-8')
+          PY
+
+      - name: Acceptance audit
+        run: |
+          python -m py_compile app.py
+          python - <<'PY'
+          from pathlib import Path
+          s = Path('app.py').read_text(encoding='utf-8')
+          assert 'https://assets.pcna.com/image/upload/' in s
+          assert '0817_Web_PCNA_Hero_m.gif' in s
+          assert 'f_auto,q_auto' not in s[s.index('PCNA_HERO_URL'):s.index('st.markdown(', s.index('PCNA_HERO_URL'))]
+          assert 'pcna-native-startup-cover' in s, 'startup code unexpectedly changed/missing'
+          assert '_STARTUP_READY' in s, 'startup ready code unexpectedly changed/missing'
+          print('PASS: native animated GIF URL preserved without Cloudinary format conversion')
+          print('PASS: startup architecture retained')
+          PY
+
+      - name: Commit only banner fix and remove workflow
+        run: |
+          git config user.name "PCNA App Engineering"
+          git config user.email "actions@users.noreply.github.com"
+          git rm .github/workflows/fix-pcna-animated-banner.yml
+          git add app.py
+          git diff --cached --check
+          git commit -m "Fix PCNA animated home banner playback"
+          git push origin main
