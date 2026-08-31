@@ -42,9 +42,15 @@ function QuoteTool(){
 }
 
 function SpecTool(){
-  const [q,setQ]=useState(''); const [color,setColor]=useState('Black'); const [size,setSize]=useState(''); const [method,setMethod]=useState('Embroidery'); const [location,setLocation]=useState('Left Chest'); const [imprint,setImprint]=useState('White'); const [shipTo,setShipTo]=useState(''); const [result,setResult]=useState(''); const [error,setError]=useState('');
-  const go=async()=>{setError('');try{const d=await pcna({action:'spec',q,color,size,method,location,imprint,ship_to:shipTo});setResult(d.order)}catch(e){setError(e.message)}};
-  return <Tool title="Spec Sample Order" copy="Build the clean PCNA spec-order format from a verified product match."><label>Product or item number</label><input value={q} onChange={e=>setQ(e.target.value)} placeholder="Dade Polo or TM16398"/><label>Color</label><input value={color} onChange={e=>setColor(e.target.value)}/><label>Size (if applicable)</label><input value={size} onChange={e=>setSize(e.target.value)}/><label>Decoration method</label><input value={method} onChange={e=>setMethod(e.target.value)}/><label>Decoration location</label><input value={location} onChange={e=>setLocation(e.target.value)}/><label>Imprint color</label><input value={imprint} onChange={e=>setImprint(e.target.value)}/><label>Ship To</label><textarea value={shipTo} onChange={e=>setShipTo(e.target.value)}/><button onClick={go}>Build spec order</button>{error&&<div className="error">{error}</div>}{result&&<><div className="result">{result}</div><button className="secondary" onClick={()=>navigator.clipboard.writeText(result)}>Copy order</button></>}</Tool>;
+  const [natural,setNatural]=useState(''); const [result,setResult]=useState(''); const [error,setError]=useState(''); const [busy,setBusy]=useState(false);
+  const go=async()=>{
+    if(!natural.trim()||busy)return;
+    setBusy(true);setError('');setResult('');
+    try{const d=await pcna({action:'spec_ai',q:natural.trim()});setResult(d.order||'')}
+    catch(e){setError(e.message)}
+    finally{setBusy(false)}
+  };
+  return <Tool title="Spec Sample Order" copy="Tell Nova the request in plain English. Nova interprets it, then the app resolves the verified PCNA product and decoration data before building the order."><label>Tell Nova what you need</label><textarea value={natural} onChange={e=>setNatural(e.target.value)} placeholder="Make me a spec sample order with the Dade Polo in black, medium, embroidery left chest, white imprint."/><button onClick={go} disabled={busy||!natural.trim()}>{busy?'Nova is generating…':'Generate Spec Sample Order'}</button>{busy&&<div className="success">Nova is generating your verified spec sample order…</div>}{error&&<div className="error">{error}</div>}{result&&<><div className="result">{result}</div><button className="secondary" onClick={()=>navigator.clipboard.writeText(result)}>Copy order</button></>}</Tool>;
 }
 
 function VirtualTool(){
