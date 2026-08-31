@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import os
+
 from fastapi import FastAPI, HTTPException, Query
 
 from core import (
@@ -16,6 +18,7 @@ from core import (
     search_products,
     decorations_for_item,
 )
+from pcna_brain import resolve_spec_request
 from starter_data import verified_starter_data
 
 app = FastAPI()
@@ -84,6 +87,21 @@ def pcna(
             "schedule": tier["Schedule"],
             "price_description": tier["Price Description"],
             "below_moq": tier["Below MOQ"],
+        }
+
+    if action == "spec_ai":
+        if not q.strip():
+            raise HTTPException(status_code=400, detail="Tell Nova what spec sample order you need.")
+        key = os.getenv("OPENAI_API_KEY", "").strip()
+        if not key:
+            raise HTTPException(status_code=503, detail="OPENAI_API_KEY is not configured for this deployment.")
+        try:
+            result = resolve_spec_request(key, q, PRODUCTS, DECORATIONS)
+        except Exception as exc:
+            raise HTTPException(status_code=502, detail=f"Nova could not complete the spec request: {exc}") from exc
+        return {
+            "order": result.get("order", ""),
+            "unresolved": result.get("unresolved", []),
         }
 
     if action == "spec":
