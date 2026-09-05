@@ -18,7 +18,7 @@ function Home(){
     ['quote','$','Quote Request','Quote a verified PCNA product at the requested quantity.'],
     ['projects','□','Projects','Keep saved customer project notes and requests in one place.']
   ];
-  return <><div className="head"><a href="https://www.pcna.com/en-us"><img className="logo" src={logo} alt="PCNA"/></a></div><div className="hero"><img src={hero} alt="PCNA lifestyle"/></div><div className="sectionTitle">What do you need?</div><div className="grid">{cards.map(([id,icon,title,copy])=><a className="card" href={`/?page=${id}`} key={id}><div className="icon">{icon}</div><h3>{title}</h3><p>{copy}</p><div className="arrow">→</div></a>)}</div></>;
+  return <div className="home"><div className="head"><a href="https://www.pcna.com/en-us"><img className="logo" src={logo} alt="PCNA"/></a></div><div className="hero"><img src={hero} alt="PCNA lifestyle"/></div><div className="sectionTitle">What do you need?</div><div className="grid">{cards.map(([id,icon,title,copy])=><a className="card" href={`/?page=${id}`} key={id}><div className="icon">{icon}</div><h3>{title}</h3><p>{copy}</p><div className="arrow">→</div></a>)}</div></div>;
 }
 
 async function pcna(params){
